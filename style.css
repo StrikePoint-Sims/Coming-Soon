@@ -159,7 +159,7 @@ body {
   .nav { padding: 20px 20px; }
   .nav-logo { height: 44px; }
   .hero-content { padding: 0 20px; margin-top: -20px; }
-  .hero-heading { font-size: 2.6rem; margin-bottom: 22px; }
+  .hero-heading { font-size: clamp(2.4rem, 10vw, 3.2rem); margin-bottom: 22px; }
   .mobile-break { display: block; }
   .hero-sub { font-size: 1.05rem; line-height: 1.9; margin-bottom: 32px; }
   .cta { padding: 16px 48px; font-size: 1rem; }
@@ -170,7 +170,7 @@ body {
 
 /* ── Small Phone ── */
 @media (max-width: 360px) {
-  .hero-heading { font-size: 2.2rem; }
+  .hero-heading { font-size: clamp(2rem, 9vw, 2.6rem); }
   .hero-sub { font-size: 0.95rem; }
   .cta { padding: 15px 40px; font-size: 0.95rem; }
 }
