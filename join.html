@@ -246,7 +246,8 @@
         <img src="logo.png" alt="" class="welcome-logo" aria-hidden="true">
         <h1 class="welcome-heading">Where the Season Never Ends</h1>
         <p class="welcome-body">
-          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern CT <br> Three premium bays | 300+ courses | Open 24/7/365
+          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern CT<br>
+          Three premium bays | 300+ courses | Open 24/7/365
         </p>
         <p class="welcome-body">
           We're building our early access list now.
@@ -280,8 +281,6 @@
         </div>
       </div>
     </div>
-
-
 
     <!-- ═════════ 2: GOLF PROFILE ═════════ -->
     <div class="slide" data-slide="2">
@@ -351,7 +350,7 @@
             <span class="q-option-key">F</span>
             <div class="q-option-content"><div class="q-option-title">Lebanon</div></div>
           </div>
-          <div class="q-option q-option--other" data-value="other" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+          <div class="q-option" data-value="other" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
             <span class="q-option-key">G</span>
             <div class="q-option-content">
               <div class="q-option-title">Somewhere else</div>
@@ -365,7 +364,7 @@
       </div>
     </div>
 
-    <!-- ═════════ 4: PRIORITY ═════════ -->
+    <!-- ═════════ 4: PRIORITY (multi-select) ═════════ -->
     <div class="slide" data-slide="4">
       <div class="slide-inner">
         <div class="q-number">4 of 5</div>
@@ -384,15 +383,16 @@
             <span class="q-option-key">C</span>
             <div class="q-option-content"><div class="q-option-title">Having somewhere to play year-round</div></div>
           </div>
-          <div class="q-option" data-value="A golf-focused atmostphere" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
-            <span class="q-option-key">D</span>
-            <div class="q-option-content"><div class="q-option-title">A golf-focused atmostphere</div></div>
-          <div class="q-option" data-value="Access to a wide variety of courses" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
-            <span class="q-option-key">D</span>
-            <div class="q-option-content"><div class="q-option-title">Access to a wide variety of courses</div></div>
-          </div>
           <div class="q-option" data-value="A golf-focused atmosphere" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
             <span class="q-option-key">D</span>
+            <div class="q-option-content"><div class="q-option-title">A golf-focused atmosphere</div></div>
+          </div>
+          <div class="q-option" data-value="Access to a wide variety of courses" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
+            <span class="q-option-key">E</span>
+            <div class="q-option-content"><div class="q-option-title">Access to a wide variety of courses</div></div>
+          </div>
+          <div class="q-option" data-value="Leagues and competitive events" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
+            <span class="q-option-key">F</span>
             <div class="q-option-content"><div class="q-option-title">Leagues and competitive events</div></div>
           </div>
         </div>
@@ -400,7 +400,7 @@
           <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
         </div>
       </div>
-
+    </div>
 
     <!-- ═════════ 5: FOUNDING 20 ═════════ -->
     <div class="slide" data-slide="5">
@@ -449,8 +449,8 @@
         <div class="ty-check ty-check--gold">
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
-        <h2 class="ty-heading" id="ty-heading-f">You're in the running.</h2>
-        <p class="ty-body">We'll reach out with Founding 20 details as things come together. Thanks for the early interest.</p>
+        <h2 class="ty-heading" id="ty-heading-f">You're on the list.</h2>
+        <p class="ty-body">We'll reach out with Founding 20 details as things come together.<br>Thank you.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -464,7 +464,7 @@
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
         <h2 class="ty-heading" id="ty-heading-s">You're on the list.</h2>
-        <p class="ty-body">We'll be in touch. Thanks for the interest.</p>
+        <p class="ty-body">Thank you. We'll be in touch.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -484,19 +484,13 @@
 </div>
 
 <script>
-  /* ═══════════════════════════════════════════════════════
-     GOOGLE SHEETS ENDPOINT
-     ─────────────────────────────────────────────────────
-     Replace with your Google Apps Script Web App URL.
-     See README for setup instructions.
-  ═══════════════════════════════════════════════════════ */
   var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEbYdo1E3B2oKPfaSvQ4J24kfxNdQI1ViSZknVxtnP59rx36GpORaLp09T_8YFAilUyg/exec';
 
   var current = 0;
   var data = {
     full_name: '', first_name: '', email: '',
     community: '', community_other: '',
-    golf_level: '', priority: '',
+    golf_level: '', priority: [],
     founding_20: false, updates: ''
   };
 
@@ -570,14 +564,15 @@
     });
   }
 
+  /* Single-select with auto-advance (screens 2) */
   function selectAuto(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     var val = el.getAttribute('data-value');
-    if (current === 3) data.golf_level = val;
-    if (current === 4) data.priority = val;
+    if (current === 2) data.golf_level = val;
     setTimeout(function() { goTo(current + 1); }, 320);
   }
 
+  /* Town select — auto-advance unless "other" */
   function selectTown(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     var val = el.getAttribute('data-value');
@@ -592,6 +587,17 @@
     }
   }
 
+  /* Multi-select toggle (screen 4) */
+  function toggleMulti(el) {
+    var on = el.classList.toggle('is-selected');
+    el.setAttribute('aria-checked', on ? 'true' : 'false');
+  }
+
+  function multiKey(e, el) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMulti(el); }
+  }
+
+  /* Updates — auto-advance and submit */
   function selectUpdates(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     data.updates = el.getAttribute('data-value');
@@ -607,22 +613,33 @@
     }
   }
 
+  /* Keyboard shortcuts */
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
       if (current === 0 || current === 1) { e.preventDefault(); goNext(); return; }
-      if (current === 2 && data.community === 'other') { e.preventDefault(); goNext(); return; }
+      if (current === 3 && data.community === 'other') { e.preventDefault(); goNext(); return; }
+      if (current === 4) { e.preventDefault(); goNext(); return; }
     }
-    if ([2,3,4,6].indexOf(current) !== -1) {
+    if ([2,3,6].indexOf(current) !== -1) {
       var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
       var idx = map[e.key.toLowerCase()];
       if (idx !== undefined) {
         if (document.activeElement.id === 'other-town') return;
         var opts = slides[current].querySelectorAll('.q-option');
         if (opts[idx]) {
-          if (current === 2) selectTown(opts[idx]);
+          if (current === 3) selectTown(opts[idx]);
           else if (current === 6) selectUpdates(opts[idx]);
           else selectAuto(opts[idx]);
         }
+      }
+    }
+    /* Letter toggles for multi-select screen 4 */
+    if (current === 4) {
+      var mmap = { a:0, b:1, c:2, d:3, e:4, f:5 };
+      var midx = mmap[e.key.toLowerCase()];
+      if (midx !== undefined) {
+        var mopts = slides[current].querySelectorAll('.q-option');
+        if (mopts[midx]) toggleMulti(mopts[midx]);
       }
     }
   });
@@ -635,8 +652,12 @@
       data.community_other = document.getElementById('other-town').value.trim();
     }
 
+    /* Collect multi-select priorities */
+    var selected = document.querySelectorAll('[data-slide="4"] .q-option.is-selected');
+    data.priority = Array.from(selected).map(function(el) { return el.getAttribute('data-value'); });
+
     if (data.founding_20) {
-      document.getElementById('ty-heading-f').textContent = "You're in the running, " + data.first_name + ".";
+      document.getElementById('ty-heading-f').textContent = "We'll let you know when we open up membership, " + data.first_name + ".";
       goTo(7);
     } else {
       document.getElementById('ty-heading-s').textContent = "You're on the list, " + data.first_name + ".";
@@ -648,7 +669,7 @@
       email: data.email,
       community: data.community === 'other' ? data.community_other : data.community,
       golf_level: data.golf_level,
-      priority: data.priority,
+      priority: data.priority.join(', '),
       founding_20: data.founding_20 ? 'Yes' : 'No',
       updates: data.updates,
       submitted: new Date().toISOString()
