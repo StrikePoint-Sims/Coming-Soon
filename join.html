@@ -246,7 +246,7 @@
         <img src="logo.png" alt="" class="welcome-logo" aria-hidden="true">
         <h1 class="welcome-heading">Where the Season Never Ends</h1>
         <p class="welcome-body">
-          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern Connecticut three premium bays | 300+ courses | open 24/7/365
+          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern CT <br> Three premium bays | 300+ courses | Open 24/7/365
         </p>
         <p class="welcome-body">
           We're building our early access list now.
@@ -284,9 +284,9 @@
 
 
     <!-- ═════════ 2: GOLF PROFILE ═════════ -->
-    <div class="slide" data-slide="3">
+    <div class="slide" data-slide="2">
       <div class="slide-inner">
-        <div class="q-number">3 of 5</div>
+        <div class="q-number">2 of 5</div>
         <div class="q-label" id="level-label">How does golf fit into your life?</div>
         <div class="q-options" role="radiogroup" aria-labelledby="level-label">
           <div class="q-option" data-value="The Competitor" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
@@ -321,10 +321,10 @@
       </div>
     </div>
 
-    <!-- ═════════ 2: LOCATION ═════════ -->
-    <div class="slide" data-slide="2">
+    <!-- ═════════ 3: LOCATION ═════════ -->
+    <div class="slide" data-slide="3">
       <div class="slide-inner">
-        <div class="q-number">2 of 5</div>
+        <div class="q-number">3 of 5</div>
         <div class="q-label" id="town-label">Where are you coming from?</div>
         <div class="q-options" role="radiogroup" aria-labelledby="town-label">
           <div class="q-option" data-value="Colchester" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
@@ -370,26 +370,37 @@
       <div class="slide-inner">
         <div class="q-number">4 of 5</div>
         <div class="q-label" id="priority-label">What matters most to you in a simulator facility?</div>
-        <div class="q-options" role="radiogroup" aria-labelledby="priority-label">
-          <div class="q-option" data-value="Accuracy of the shot data" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+        <p class="q-fine" style="margin-bottom:16px;margin-top:-20px">Choose as many as you like</p>
+        <div class="q-options" role="group" aria-labelledby="priority-label">
+          <div class="q-option" data-value="Accuracy of the shot data" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
             <span class="q-option-key">A</span>
             <div class="q-option-content"><div class="q-option-title">Accuracy of the shot data</div></div>
           </div>
-          <div class="q-option" data-value="Being able to play on my own schedule" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+          <div class="q-option" data-value="24/7 Access" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
             <span class="q-option-key">B</span>
             <div class="q-option-content"><div class="q-option-title">Being able to play on my own schedule</div></div>
           </div>
-          <div class="q-option" data-value="Having somewhere to play year-round" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+          <div class="q-option" data-value="Having somewhere to play year-round" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
             <span class="q-option-key">C</span>
             <div class="q-option-content"><div class="q-option-title">Having somewhere to play year-round</div></div>
           </div>
-          <div class="q-option" data-value="Access to a wide variety of courses" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+          <div class="q-option" data-value="A golf-focused atmostphere" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content"><div class="q-option-title">A golf-focused atmostphere</div></div>
+          <div class="q-option" data-value="Access to a wide variety of courses" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
             <span class="q-option-key">D</span>
             <div class="q-option-content"><div class="q-option-title">Access to a wide variety of courses</div></div>
           </div>
+          <div class="q-option" data-value="A golf-focused atmosphere" tabindex="0" role="checkbox" aria-checked="false" onclick="toggleMulti(this)" onkeydown="multiKey(event,this)">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content"><div class="q-option-title">Leagues and competitive events</div></div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
         </div>
       </div>
-    </div>
+
 
     <!-- ═════════ 5: FOUNDING 20 ═════════ -->
     <div class="slide" data-slide="5">
