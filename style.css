@@ -72,9 +72,10 @@ body {
 }
 
 .hero-sub {
-  font-family: 'Lato', sans-serif; font-size: 0.925rem;
-  font-weight: 300; font-style: italic; line-height: 1.9;
-  letter-spacing: 0.025em; color: rgba(255,255,255,0.88);
+  font-family: 'Lato', sans-serif; font-size: 1rem;
+  font-weight: 400; font-style: normal; line-height: 2;
+  letter-spacing: 0.06em; color: rgba(255,255,255,0.92);
+  text-transform: uppercase;
   margin-bottom: 40px; opacity: 0; transform: translateY(16px);
   animation: fadeSlideUp 0.9s ease-out 0.9s forwards;
 }
@@ -85,28 +86,27 @@ body {
   font-family: 'Lato', sans-serif; font-size: 0.95rem;
   font-weight: 400; letter-spacing: 0.04em; color: #fff;
   text-decoration: none; padding: 17px 60px;
-  border: 1px solid rgba(255,255,255,0.3); border-radius: 40px;
-  background: rgba(70,90,46,0.5);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border: none; border-radius: 40px;
+  background: #3a5a28;
   overflow: hidden; opacity: 0; transform: translateY(14px);
   animation: fadeSlideUp 0.9s ease-out 1.2s forwards;
-  transition: border-color 0.35s, transform 0.3s, background 0.35s;
+  transition: background 0.3s, transform 0.3s;
   cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
 .cta::before {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: rgba(255,255,255,0.06); opacity: 0; transition: opacity 0.35s;
 }
-.cta:hover { border-color: rgba(255,255,255,0.5); background: rgba(70,90,46,0.7); transform: translateY(-1px); }
+.cta:hover { background: #4a6e34; transform: translateY(-1px); }
 .cta:hover::before { opacity: 1; }
 .cta:active { transform: scale(0.97); }
 
 @media (hover: hover) {
   .cta::after {
     content: ''; position: absolute; inset: -3px; border-radius: inherit;
-    border: 1px solid rgba(140,170,90,0); transition: border-color 0.4s; pointer-events: none;
+    border: 1px solid rgba(58,90,40,0); transition: border-color 0.4s; pointer-events: none;
   }
-  .cta:hover::after { border-color: rgba(140,170,90,0.25); }
+  .cta:hover::after { border-color: rgba(74,110,52,0.4); }
 }
 
 /* ── Footer ── */
@@ -171,6 +171,26 @@ body {
   .hero-heading { font-size: 1.85rem; }
   .hero-sub { font-size: 0.8rem; }
   .cta { padding: 14px 36px; font-size: 0.85rem; }
+}
+
+/* ── Large Screens (1200px+) ── */
+@media (min-width: 1200px) {
+  .nav { padding: 36px 56px; }
+  .nav-brand { font-size: 1.3rem; }
+  .hero-heading { font-size: 4.2rem; margin-bottom: 34px; }
+  .hero-sub { font-size: 1.05rem; line-height: 2.1; margin-bottom: 48px; letter-spacing: 0.08em; }
+  .cta { padding: 20px 72px; font-size: 1.05rem; letter-spacing: 0.05em; }
+  .footer { padding: 22px 56px 16px; }
+  .footer-serving { font-size: 0.75rem; }
+}
+
+/* ── Ultrawide (1800px+) ── */
+@media (min-width: 1800px) {
+  .nav { padding: 44px 72px; }
+  .nav-brand { font-size: 1.45rem; }
+  .hero-heading { font-size: 5rem; margin-bottom: 40px; }
+  .hero-sub { font-size: 1.15rem; line-height: 2.2; margin-bottom: 56px; letter-spacing: 0.09em; }
+  .cta { padding: 22px 84px; font-size: 1.1rem; }
 }
 
 /* ── Landscape ── */
