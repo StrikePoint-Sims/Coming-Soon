@@ -451,7 +451,7 @@
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
         <h2 class="ty-heading" id="ty-heading-f">You're on the list.</h2>
-        <p class="ty-body">We'll reach out with Founding 20 details as we approach launch. Thank you.</p>
+        <p class="ty-body">We'll reach out with Founding 20 details as we approach launch.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -465,7 +465,7 @@
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
         <h2 class="ty-heading" id="ty-heading-s">You're on the list.</h2>
-        <p class="ty-body">We'll be in touch. Thank you.</p>
+        <p class="ty-body">We'll be in touch. Thank you for your time.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -751,10 +751,10 @@
 
     // Show appropriate thank-you
     if (data.founding_20) {
-      document.getElementById('ty-heading-f').textContent = "You're on the list, " + data.first_name + ".";
+      document.getElementById('ty-heading-f').textContent = "Thank you for your interest, " + data.first_name + ".";
       goTo(7);
     } else {
-      document.getElementById('ty-heading-s').textContent = "You're on the list, " + data.first_name + ".";
+      document.getElementById('ty-heading-s').textContent = "We'll let you know when are close to opening, " + data.first_name + ".";
       goTo(8);
     }
   }
