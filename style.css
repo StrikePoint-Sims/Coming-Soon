@@ -7,7 +7,7 @@
 
 body, html {
     height: 100%;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Marcellus', sans-serif;
     background-color: #000;
     color: #fff;
     overflow-x: hidden;
@@ -60,7 +60,7 @@ header {
 }
 
 .hero-content h1 {
-    font-family: 'Cinzel', serif;
+    font-family: 'Lato', serif;
     font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 400;
     margin-bottom: 20px;
