@@ -78,7 +78,6 @@
     .slide-inner--center .founding-detail { text-align: center; }
     .slide-inner--center .btn { margin-left: auto; margin-right: auto; }
     .slide-inner--center .btn-secondary-link { text-align: center; width: 100%; }
-    .slide-inner--center .btn-secondary-link { width: 100%; }
 
     .welcome-logo { width: 260px; max-width: 60%; height: auto; margin-bottom: 32px; opacity: 0; transform: scale(0.9); animation: logoIn 0.6s ease-out 0.2s forwards; }
     @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
@@ -494,7 +493,7 @@
      STATE
   ═══════════════════════════════════════════ */
   var current = 0;
-  var rowId = null; // assigned by server on first save
+  var rowId = null;
   var data = {
     full_name: '', first_name: '', email: '',
     community: '', community_other: '',
@@ -509,20 +508,16 @@
 
   /* ═══════════════════════════════════════════
      SERVER COMMUNICATION
-     - First call creates a row, returns row_id
-     - Subsequent calls send row_id to update
+     Uses text/plain to avoid CORS preflight.
+     Apps Script parses JSON from e.postData.contents.
   ═══════════════════════════════════════════ */
   function saveToServer(payload) {
     if (rowId) payload.row_id = rowId;
     fetch(FORM_ENDPOINT, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     }).catch(function(err) { console.error('Save error:', err); });
-
-    // no-cors means we can't read the response to get row_id back
-    // so we generate the ID client-side and send it with the first request
   }
 
   function generateId() {
@@ -535,7 +530,6 @@
   ═══════════════════════════════════════════ */
   function saveScreen(screenNum) {
     if (screenNum === 1 && data.email) {
-      // First save — create the row
       if (!rowId) rowId = generateId();
       saveToServer({
         row_id: rowId,
@@ -587,7 +581,6 @@
     slides[current].classList.add('is-exiting');
     setTimeout(function() { slides[prev].classList.remove('is-exiting'); }, 460);
 
-    // Save data from the screen we're leaving
     if (i > prev) saveScreen(prev);
 
     current = i;
@@ -731,7 +724,6 @@
 
   /* ═══════════════════════════════════════════
      FINAL SUBMIT
-     Writes the last fields and marks complete
   ═══════════════════════════════════════════ */
   function finalSubmit() {
     if (data.community === 'other') {
@@ -741,7 +733,6 @@
     var selected = document.querySelectorAll('[data-slide="4"] .q-option.is-selected');
     data.priority = Array.from(selected).map(function(el) { return el.getAttribute('data-value'); });
 
-    // Final save with all remaining data and completed status
     saveToServer({
       row_id: rowId,
       updates: data.updates,
@@ -749,12 +740,11 @@
       status: 'completed'
     });
 
-    // Show appropriate thank-you
     if (data.founding_20) {
       document.getElementById('ty-heading-f').textContent = "Thank you for your interest, " + data.first_name + ".";
       goTo(7);
     } else {
-      document.getElementById('ty-heading-s').textContent = "We'll let you know when are close to opening, " + data.first_name + ".";
+      document.getElementById('ty-heading-s').textContent = "We'll let you know when we're close to opening, " + data.first_name + ".";
       goTo(8);
     }
   }
