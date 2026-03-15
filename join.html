@@ -79,7 +79,7 @@
     .slide-inner--center .btn { margin-left: auto; margin-right: auto; }
     .slide-inner--center .btn-secondary-link { text-align: center; }
 
-    .welcome-logo { width: 180px; height: auto; margin-bottom: 32px; opacity: 0; transform: scale(0.9); animation: logoIn 0.6s ease-out 0.2s forwards; }
+    .welcome-logo { width: 420px; max-width: 70%; height: auto; margin-bottom: 36px; opacity: 0; transform: scale(0.9); animation: logoIn 0.6s ease-out 0.2s forwards; }
     @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
 
     .welcome-heading { font-family: 'Marcellus', serif; font-size: clamp(1.55rem, 4vw, 2.15rem); font-weight: 400; line-height: 1.25; margin-bottom: 18px; letter-spacing: 0.01em; }
@@ -205,7 +205,7 @@
       .slide { padding: 72px 24px 72px; }
       .bottom-nav { padding: 12px 20px; }
       .keyboard-hint { display: none; }
-      .welcome-logo { width: 140px; margin-bottom: 24px; }
+      .welcome-logo { width: 180px; margin-bottom: 28px; }
       .btn-row { flex-wrap: wrap; }
       .q-option { padding: 12px 14px; }
       .founding-detail { padding: 14px 16px; }
@@ -246,13 +246,15 @@
         <img src="logo.jpg" alt="" class="welcome-logo" aria-hidden="true">
         <h1 class="welcome-heading">Where the Season Never Ends</h1>
         <p class="welcome-body">
-          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern Connecticut — three premium bays, 300+ courses, and open around the clock.<br><br>
+          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern Connecticut — three premium bays, 300+ courses, and open around the clock.
+        </p>
+        <p class="welcome-body">
           We're building our early list now. <strong>The first 20 members get a perk no one else will.</strong>
         </p>
         <div class="btn-row">
           <button class="btn" onclick="goNext()" type="button">Get started <span class="btn-arrow">→</span></button>
-          <span class="btn-hint">Takes about 30 seconds</span>
         </div>
+        <span class="btn-hint" style="margin-top:12px">Takes about 30 seconds</span>
       </div>
     </div>
 
