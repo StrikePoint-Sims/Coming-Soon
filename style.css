@@ -33,7 +33,9 @@ body {
 
 .hero-bg::after {
   content: ''; position: absolute; inset: 0; z-index: 1;
-  background: linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.05) 35%, rgba(0,0,0,0.08) 55%, rgba(0,0,0,0.55) 100%);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.25) 55%, rgba(0,0,0,0.6) 100%),
+    rgba(0,0,0,0.25);
 }
 
 .hero-bg::before {
