@@ -54,7 +54,8 @@ body {
   text-decoration: none; transition: opacity 0.3s; display: inline-block;
 }
 .nav-brand:hover { opacity: 0.75; }
-.nav-logo { height: 40px; width: auto; display: block; }
+.nav-logo { height: 52px; width: auto; display: block; }
+.mobile-break { display: none; }
 
 /* ── Hero Content ── */
 .hero-content {
@@ -156,11 +157,12 @@ body {
 @media (max-width: 480px) {
   .hero { min-height: 100svh; }
   .nav { padding: 20px 20px; }
-  .nav-logo { height: 32px; }
+  .nav-logo { height: 44px; }
   .hero-content { padding: 0 20px; margin-top: -20px; }
-  .hero-heading { font-size: 2.1rem; margin-bottom: 20px; }
-  .hero-sub { font-size: 0.85rem; line-height: 1.85; margin-bottom: 30px; }
-  .cta { padding: 15px 44px; font-size: 0.9rem; }
+  .hero-heading { font-size: 2.6rem; margin-bottom: 22px; }
+  .mobile-break { display: block; }
+  .hero-sub { font-size: 1.05rem; line-height: 1.9; margin-bottom: 32px; }
+  .cta { padding: 16px 48px; font-size: 1rem; }
   .footer { padding: 14px 20px 10px; }
   .footer a { font-size: 0.8rem; }
   .footer-serving { font-size: 0.65rem; }
@@ -168,15 +170,15 @@ body {
 
 /* ── Small Phone ── */
 @media (max-width: 360px) {
-  .hero-heading { font-size: 1.85rem; }
-  .hero-sub { font-size: 0.8rem; }
-  .cta { padding: 14px 36px; font-size: 0.85rem; }
+  .hero-heading { font-size: 2.2rem; }
+  .hero-sub { font-size: 0.95rem; }
+  .cta { padding: 15px 40px; font-size: 0.95rem; }
 }
 
 /* ── Large Screens (1200px+) ── */
 @media (min-width: 1200px) {
   .nav { padding: 36px 56px; }
-  .nav-logo { height: 50px; }
+  .nav-logo { height: 60px; }
   .hero-heading { font-size: 4.2rem; margin-bottom: 34px; }
   .hero-sub { font-size: 1.05rem; line-height: 2.1; margin-bottom: 48px; letter-spacing: 0.03em; }
   .cta { padding: 20px 72px; font-size: 1.05rem; letter-spacing: 0.05em; }
@@ -187,7 +189,7 @@ body {
 /* ── Ultrawide (1800px+) ── */
 @media (min-width: 1800px) {
   .nav { padding: 44px 72px; }
-  .nav-logo { height: 58px; }
+  .nav-logo { height: 68px; }
   .hero-heading { font-size: 5rem; margin-bottom: 40px; }
   .hero-sub { font-size: 1.15rem; line-height: 2.2; margin-bottom: 56px; letter-spacing: 0.03em; }
   .cta { padding: 22px 84px; font-size: 1.1rem; }
