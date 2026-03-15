@@ -49,11 +49,10 @@ body {
 }
 
 .nav-brand {
-  font-family: 'Marcellus', serif; font-size: 1.125rem;
-  color: #fff; letter-spacing: 0.03em; text-decoration: none;
-  transition: opacity 0.3s;
+  text-decoration: none; transition: opacity 0.3s; display: inline-block;
 }
 .nav-brand:hover { opacity: 0.75; }
+.nav-logo { height: 40px; width: auto; display: block; }
 
 /* ── Hero Content ── */
 .hero-content {
@@ -156,7 +155,7 @@ body {
 @media (max-width: 480px) {
   .hero { min-height: 100svh; }
   .nav { padding: 20px 20px; }
-  .nav-brand { font-size: 1rem; }
+  .nav-logo { height: 32px; }
   .hero-content { padding: 0 20px; margin-top: -20px; }
   .hero-heading { font-size: 2.1rem; margin-bottom: 20px; }
   .hero-sub { font-size: 0.85rem; line-height: 1.85; margin-bottom: 30px; }
@@ -178,7 +177,7 @@ body {
 /* ── Large Screens (1200px+) ── */
 @media (min-width: 1200px) {
   .nav { padding: 36px 56px; }
-  .nav-brand { font-size: 1.3rem; }
+  .nav-logo { height: 50px; }
   .hero-heading { font-size: 4.2rem; margin-bottom: 34px; }
   .hero-sub { font-size: 1.05rem; line-height: 2.1; margin-bottom: 48px; letter-spacing: 0.08em; }
   .cta { padding: 20px 72px; font-size: 1.05rem; letter-spacing: 0.05em; }
@@ -189,7 +188,7 @@ body {
 /* ── Ultrawide (1800px+) ── */
 @media (min-width: 1800px) {
   .nav { padding: 44px 72px; }
-  .nav-brand { font-size: 1.45rem; }
+  .nav-logo { height: 58px; }
   .hero-heading { font-size: 5rem; margin-bottom: 40px; }
   .hero-sub { font-size: 1.15rem; line-height: 2.2; margin-bottom: 56px; letter-spacing: 0.09em; }
   .cta { padding: 22px 84px; font-size: 1.1rem; }
