@@ -77,7 +77,7 @@
     .slide-inner--center .founding-badge { justify-content: center; }
     .slide-inner--center .founding-detail { text-align: center; }
     .slide-inner--center .btn { margin-left: auto; margin-right: auto; }
-    .slide-inner--center .btn-secondary-link { text-align: center; }
+    .slide-inner--center .btn-secondary-link { text-align: center; width: 100%; }
     .slide-inner--center .btn-secondary-link { width: 100%; }
 
     .welcome-logo { width: 260px; max-width: 60%; height: auto; margin-bottom: 32px; opacity: 0; transform: scale(0.9); animation: logoIn 0.6s ease-out 0.2s forwards; }
@@ -248,7 +248,7 @@
         <h1 class="welcome-heading">Where the Season Never Ends</h1>
         <p class="welcome-body">
           StrikePoint Sims is bringing Trackman-powered indoor golf to eastern CT<br>
-          Three premium bays | 300+ courses | Open 24/7/365
+          Premium equipment | 300+ courses | Open 24/7/365
         </p>
         <p class="welcome-body">
           We're building our early access list now.
@@ -266,7 +266,7 @@
         <div class="q-number">1 of 5</div>
         <label class="q-label">First, where should we send updates?</label>
         <div class="q-input-group">
-          <span class="q-input-label">Full Name</span>
+          <span class="q-input-label">Name</span>
           <input class="q-input" type="text" id="fullname" name="full_name" placeholder="Your name" autocomplete="name" required>
           <div class="q-error" id="name-error"></div>
         </div>
@@ -300,7 +300,7 @@
             <span class="q-option-key">B</span>
             <div class="q-option-content">
               <div class="q-option-title">The Regular</div>
-              <div class="q-option-desc">At least once a week in season.</div>
+              <div class="q-option-desc">About once a week in season.</div>
             </div>
           </div>
           <div class="q-option" data-value="The Social Player" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
@@ -411,13 +411,13 @@
           The Founding 20
           <span class="founding-badge-line"></span>
         </div>
-        <h2 class="founding-heading">A Special Group of Members</h2>
+        <h2 class="founding-heading">An Exclusive Club</h2>
         <p class="founding-body">
           We're reserving twenty spots for golfers who want to be here from the start.
         </p>
         <div class="founding-detail">
           <p class="founding-detail-text">
-            Founding Members get an <strong>automatic tier upgrade</strong>.
+            Founding Members get <strong>automatic tier upgrades</strong> on their membership.
           </p>
         </div>
         <button class="btn btn--gold" onclick="applyFounding()" type="button">Apply for a Founding Spot <span class="btn-arrow">→</span></button>
@@ -451,7 +451,7 @@
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
         <h2 class="ty-heading" id="ty-heading-f">You're on the list.</h2>
-        <p class="ty-body">We'll reach out with Founding 20 details as things come together.<br>Thank you.</p>
+        <p class="ty-body">We'll reach out with Founding 20 details as we approach launch. Thank you.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -465,7 +465,7 @@
           <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
         </div>
         <h2 class="ty-heading" id="ty-heading-s">You're on the list.</h2>
-        <p class="ty-body">Thank you. We'll be in touch.</p>
+        <p class="ty-body">We'll be in touch. Thank you.</p>
         <div class="btn-row">
           <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
         </div>
@@ -485,9 +485,16 @@
 </div>
 
 <script>
+  /* ═══════════════════════════════════════════
+     ENDPOINT — your Google Apps Script Web App
+  ═══════════════════════════════════════════ */
   var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEbYdo1E3B2oKPfaSvQ4J24kfxNdQI1ViSZknVxtnP59rx36GpORaLp09T_8YFAilUyg/exec';
 
+  /* ═══════════════════════════════════════════
+     STATE
+  ═══════════════════════════════════════════ */
   var current = 0;
+  var rowId = null; // assigned by server on first save
   var data = {
     full_name: '', first_name: '', email: '',
     community: '', community_other: '',
@@ -500,6 +507,69 @@
   var backBtn = document.getElementById('backBtn');
   var kbHint = document.getElementById('kbHint');
 
+  /* ═══════════════════════════════════════════
+     SERVER COMMUNICATION
+     - First call creates a row, returns row_id
+     - Subsequent calls send row_id to update
+  ═══════════════════════════════════════════ */
+  function saveToServer(payload) {
+    if (rowId) payload.row_id = rowId;
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(function(err) { console.error('Save error:', err); });
+
+    // no-cors means we can't read the response to get row_id back
+    // so we generate the ID client-side and send it with the first request
+  }
+
+  function generateId() {
+    return 'sp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /* ═══════════════════════════════════════════
+     PROGRESSIVE SAVES
+     Called when leaving each screen
+  ═══════════════════════════════════════════ */
+  function saveScreen(screenNum) {
+    if (screenNum === 1 && data.email) {
+      // First save — create the row
+      if (!rowId) rowId = generateId();
+      saveToServer({
+        row_id: rowId,
+        full_name: data.full_name,
+        email: data.email,
+        status: 'started'
+      });
+    }
+
+    if (screenNum === 2 && data.golf_level) {
+      saveToServer({ row_id: rowId, golf_level: data.golf_level });
+    }
+
+    if (screenNum === 3 && data.community) {
+      var town = data.community === 'other' ? data.community_other : data.community;
+      saveToServer({ row_id: rowId, community: town });
+    }
+
+    if (screenNum === 4) {
+      var selected = document.querySelectorAll('[data-slide="4"] .q-option.is-selected');
+      var priorities = Array.from(selected).map(function(el) { return el.getAttribute('data-value'); });
+      if (priorities.length) {
+        saveToServer({ row_id: rowId, priority: priorities.join(', ') });
+      }
+    }
+
+    if (screenNum === 5) {
+      saveToServer({ row_id: rowId, founding_20: data.founding_20 ? 'Yes' : 'No' });
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     UI
+  ═══════════════════════════════════════════ */
   function updateUI() {
     var pct = { 0:0, 1:15, 2:35, 3:55, 4:75, 5:85, 6:95, 7:100, 8:100 };
     progress.style.width = (pct[current] || 0) + '%';
@@ -507,12 +577,19 @@
     kbHint.style.opacity = (current === 1) ? '0.6' : '0';
   }
 
+  /* ═══════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════ */
   function goTo(i) {
     if (i < 0 || i > 8) return;
+    var prev = current;
     slides[current].classList.remove('is-active');
     slides[current].classList.add('is-exiting');
-    var prev = current;
     setTimeout(function() { slides[prev].classList.remove('is-exiting'); }, 460);
+
+    // Save data from the screen we're leaving
+    if (i > prev) saveScreen(prev);
+
     current = i;
     slides[i].classList.add('is-active');
     updateUI();
@@ -530,6 +607,9 @@
     if (current >= 1 && current <= 4) goTo(current - 1);
   }
 
+  /* ═══════════════════════════════════════════
+     VALIDATION
+  ═══════════════════════════════════════════ */
   function validate() {
     if (current !== 1) return true;
     var nm = document.getElementById('fullname').value.trim();
@@ -559,13 +639,15 @@
     return ok;
   }
 
+  /* ═══════════════════════════════════════════
+     OPTION HANDLERS
+  ═══════════════════════════════════════════ */
   function clearOpts(el) {
     el.parentNode.querySelectorAll('.q-option').forEach(function(s) {
       s.classList.remove('is-selected'); s.setAttribute('aria-checked', 'false');
     });
   }
 
-  /* Single-select with auto-advance (screens 2) */
   function selectAuto(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     var val = el.getAttribute('data-value');
@@ -573,7 +655,6 @@
     setTimeout(function() { goTo(current + 1); }, 320);
   }
 
-  /* Town select — auto-advance unless "other" */
   function selectTown(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     var val = el.getAttribute('data-value');
@@ -588,7 +669,6 @@
     }
   }
 
-  /* Multi-select toggle (screen 4) */
   function toggleMulti(el) {
     var on = el.classList.toggle('is-selected');
     el.setAttribute('aria-checked', on ? 'true' : 'false');
@@ -598,11 +678,10 @@
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMulti(el); }
   }
 
-  /* Updates — auto-advance and submit */
   function selectUpdates(el) {
     clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
     data.updates = el.getAttribute('data-value');
-    setTimeout(function() { submitForm(); }, 320);
+    setTimeout(function() { finalSubmit(); }, 320);
   }
 
   function optKey(e, el, mode) {
@@ -634,7 +713,6 @@
         }
       }
     }
-    /* Letter toggles for multi-select screen 4 */
     if (current === 4) {
       var mmap = { a:0, b:1, c:2, d:3, e:4, f:5 };
       var midx = mmap[e.key.toLowerCase()];
@@ -645,43 +723,40 @@
     }
   });
 
+  /* ═══════════════════════════════════════════
+     FOUNDING 20
+  ═══════════════════════════════════════════ */
   function applyFounding() { data.founding_20 = true; goTo(6); }
   function declineFounding() { data.founding_20 = false; goTo(6); }
 
-  function submitForm() {
+  /* ═══════════════════════════════════════════
+     FINAL SUBMIT
+     Writes the last fields and marks complete
+  ═══════════════════════════════════════════ */
+  function finalSubmit() {
     if (data.community === 'other') {
       data.community_other = document.getElementById('other-town').value.trim();
     }
 
-    /* Collect multi-select priorities */
     var selected = document.querySelectorAll('[data-slide="4"] .q-option.is-selected');
     data.priority = Array.from(selected).map(function(el) { return el.getAttribute('data-value'); });
 
+    // Final save with all remaining data and completed status
+    saveToServer({
+      row_id: rowId,
+      updates: data.updates,
+      founding_20: data.founding_20 ? 'Yes' : 'No',
+      status: 'completed'
+    });
+
+    // Show appropriate thank-you
     if (data.founding_20) {
-      document.getElementById('ty-heading-f').textContent = "We'll let you know when we open up membership, " + data.first_name + ".";
+      document.getElementById('ty-heading-f').textContent = "You're in the running, " + data.first_name + ".";
       goTo(7);
     } else {
       document.getElementById('ty-heading-s').textContent = "You're on the list, " + data.first_name + ".";
       goTo(8);
     }
-
-    var payload = {
-      full_name: data.full_name,
-      email: data.email,
-      community: data.community === 'other' ? data.community_other : data.community,
-      golf_level: data.golf_level,
-      priority: data.priority.join(', '),
-      founding_20: data.founding_20 ? 'Yes' : 'No',
-      updates: data.updates,
-      submitted: new Date().toISOString()
-    };
-
-    fetch(FORM_ENDPOINT, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    }).catch(function(err) { console.error('Submit error:', err); });
   }
 
   updateUI();
