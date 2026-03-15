@@ -249,7 +249,7 @@
           StrikePoint Sims is bringing Trackman-powered indoor golf to eastern Connecticut three premium bays | 300+ courses | open 24/7/365
         </p>
         <p class="welcome-body">
-          We're building our early access list now. <strong>The first 20 members get a perk no one else will.</strong>
+          We're building our early access list now.
         </p>
         <div class="btn-row">
           <button class="btn" onclick="goNext()" type="button">Get started <span class="btn-arrow">→</span></button>
@@ -277,6 +277,46 @@
         <div class="btn-row">
           <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
           <span class="btn-hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- ═════════ 2: GOLF PROFILE ═════════ -->
+    <div class="slide" data-slide="3">
+      <div class="slide-inner">
+        <div class="q-number">3 of 5</div>
+        <div class="q-label" id="level-label">How does golf fit into your life?</div>
+        <div class="q-options" role="radiogroup" aria-labelledby="level-label">
+          <div class="q-option" data-value="The Competitor" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">A</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Competitor</div>
+              <div class="q-option-desc">50+ rounds a year. Always looking to sharpen my game.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Regular" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">B</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Regular</div>
+              <div class="q-option-desc">At least once a week in season.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Social Player" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">C</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Social Player</div>
+              <div class="q-option-desc">A handful of rounds a year, mostly with friends.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Newcomer" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Newcomer</div>
+              <div class="q-option-desc">Curious about golf or just getting started.</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -321,44 +361,6 @@
         </div>
         <div class="btn-row" id="town-btn" style="display:none">
           <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ═════════ 3: GOLF PROFILE ═════════ -->
-    <div class="slide" data-slide="3">
-      <div class="slide-inner">
-        <div class="q-number">3 of 5</div>
-        <div class="q-label" id="level-label">How does golf fit into your life?</div>
-        <div class="q-options" role="radiogroup" aria-labelledby="level-label">
-          <div class="q-option" data-value="The Competitor" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
-            <span class="q-option-key">A</span>
-            <div class="q-option-content">
-              <div class="q-option-title">The Competitor</div>
-              <div class="q-option-desc">50+ rounds a year. Always looking to sharpen my game.</div>
-            </div>
-          </div>
-          <div class="q-option" data-value="The Regular" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
-            <span class="q-option-key">B</span>
-            <div class="q-option-content">
-              <div class="q-option-title">The Regular</div>
-              <div class="q-option-desc">At least once a week in season.</div>
-            </div>
-          </div>
-          <div class="q-option" data-value="The Social Player" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
-            <span class="q-option-key">C</span>
-            <div class="q-option-content">
-              <div class="q-option-title">The Social Player</div>
-              <div class="q-option-desc">A handful of rounds a year, mostly with friends.</div>
-            </div>
-          </div>
-          <div class="q-option" data-value="The Newcomer" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
-            <span class="q-option-key">D</span>
-            <div class="q-option-content">
-              <div class="q-option-title">The Newcomer</div>
-              <div class="q-option-desc">Curious about golf or just getting started.</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -477,7 +479,7 @@
      Replace with your Google Apps Script Web App URL.
      See README for setup instructions.
   ═══════════════════════════════════════════════════════ */
-  var FORM_ENDPOINT = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+  var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEbYdo1E3B2oKPfaSvQ4J24kfxNdQI1ViSZknVxtnP59rx36GpORaLp09T_8YFAilUyg/exec';
 
   var current = 0;
   var data = {
