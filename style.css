@@ -85,7 +85,7 @@ body {
 /* ── CTA ── */
 .cta {
   display: inline-block; position: relative;
-  font-family: 'Lato', sans-serif; font-size: 0.95rem;
+  font-family: 'Marcellus', serif; font-size: 0.95rem;
   font-weight: 400; letter-spacing: 0.04em; color: #fff;
   text-decoration: none; padding: 17px 60px;
   border: none; border-radius: 40px;
