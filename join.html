@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Join the Waitlist — StrikePoint Sims | Indoor Golf Simulator Eastern CT</title>
+  <meta name="description" content="Join the StrikePoint Sims waitlist. Be one of the Founding 20 and lock in an upgraded Trackman-powered indoor golf membership in eastern Connecticut.">
+  <link rel="canonical" href="https://www.strikepointsims.com/join">
+  <meta property="og:title" content="Join the Waitlist — StrikePoint Sims">
+  <meta property="og:description" content="Be one of the Founding 20. Trackman-powered indoor golf opening in eastern Connecticut.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.strikepointsims.com/join">
+  <meta property="og:image" content="https://www.strikepointsims.com/og-image.jpg">
+  <meta name="theme-color" content="#2c3618">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Marcellus&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #2c3618;
+      --text: #ffffff;
+      --text-muted: rgba(255,255,255,0.50);
+      --text-soft: rgba(255,255,255,0.75);
+      --accent: #8fa65e;
+      --accent-hover: #a3bb72;
+      --accent-dim: rgba(143,166,94,0.12);
+      --input-border: rgba(255,255,255,0.18);
+      --input-focus: rgba(255,255,255,0.45);
+      --error: #e8735a;
+      --gold: #c9a84c;
+      --gold-dim: rgba(201,168,76,0.12);
+      --gold-border: rgba(201,168,76,0.35);
+    }
+
+    html { height: 100%; -webkit-text-size-adjust: 100%; }
+
+    body {
+      min-height: 100%; font-family: 'Lato', sans-serif;
+      background: var(--bg); color: var(--text); overflow: hidden;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+    }
+
+    .form-shell { position: relative; width: 100%; height: 100svh; min-height: 520px; overflow: hidden; }
+
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; padding: 20px 32px;
+    }
+    .topbar-logo { height: 36px; width: auto; opacity: 0.9; transition: opacity 0.3s; }
+    .topbar-logo:hover { opacity: 1; }
+    .topbar-home { font-size: 0.8rem; font-weight: 400; color: var(--text-muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.25s; }
+    .topbar-home:hover { color: var(--text); }
+
+    .progress-track { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 200; background: rgba(255,255,255,0.06); }
+    .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+    .slides { position: relative; width: 100%; height: 100%; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 80px 32px 72px; opacity: 0; transform: translateY(40px);
+      pointer-events: none; transition: opacity 0.45s ease, transform 0.45s ease;
+      overflow-y: auto;
+    }
+    .slide.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .slide.is-exiting { opacity: 0; transform: translateY(-40px); pointer-events: none; }
+
+    .slide-inner { width: 100%; max-width: 540px; }
+
+    .welcome-logo { width: 68px; height: auto; margin-bottom: 28px; opacity: 0; transform: scale(0.9); animation: logoIn 0.6s ease-out 0.2s forwards; }
+    @keyframes logoIn { to { opacity: 1; transform: scale(1); } }
+
+    .welcome-heading { font-family: 'Marcellus', serif; font-size: clamp(1.55rem, 4vw, 2.15rem); font-weight: 400; line-height: 1.25; margin-bottom: 18px; letter-spacing: 0.01em; }
+    .welcome-body { font-size: 0.95rem; font-weight: 300; line-height: 1.8; color: var(--text-soft); margin-bottom: 36px; }
+    .welcome-body strong { font-weight: 400; color: var(--text); }
+
+    .q-number { font-size: 0.72rem; font-weight: 400; color: var(--accent); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 12px; }
+    .q-label { font-family: 'Marcellus', serif; font-size: clamp(1.25rem, 3.5vw, 1.7rem); font-weight: 400; line-height: 1.35; margin-bottom: 28px; }
+
+    .q-input-group { margin-bottom: 18px; }
+    .q-input-label { display: block; font-size: 0.78rem; font-weight: 400; color: var(--text-muted); letter-spacing: 0.03em; margin-bottom: 6px; text-transform: uppercase; }
+
+    .q-input {
+      width: 100%; font-family: 'Lato', sans-serif; font-size: 1.1rem; font-weight: 300;
+      color: var(--text); background: transparent; border: none;
+      border-bottom: 2px solid var(--input-border); padding: 10px 0; outline: none;
+      transition: border-color 0.3s; caret-color: var(--accent);
+    }
+    .q-input::placeholder { color: var(--text-muted); font-weight: 300; }
+    .q-input:focus { border-color: var(--input-focus); }
+    .q-input.has-error { border-color: var(--error); }
+
+    .q-error { font-size: 0.78rem; color: var(--error); margin-top: 6px; min-height: 1.1em; }
+    .q-fine { font-size: 0.78rem; color: var(--text-muted); margin-top: 10px; font-style: italic; }
+
+    .q-options { display: flex; flex-direction: column; gap: 10px; }
+
+    .q-option {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 18px; border: 1px solid var(--input-border); border-radius: 8px;
+      cursor: pointer; transition: border-color 0.25s, background 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .q-option:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .q-option.is-selected { border-color: var(--accent); background: var(--accent-dim); }
+
+    .q-option-key {
+      display: flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; min-width: 26px;
+      border: 1px solid var(--input-border); border-radius: 5px;
+      font-size: 0.72rem; font-weight: 700; color: var(--text-muted);
+      transition: border-color 0.25s, color 0.25s, background 0.25s; margin-top: 1px;
+    }
+    .q-option.is-selected .q-option-key { border-color: var(--accent); background: var(--accent); color: var(--bg); }
+
+    .q-option-content { flex: 1; }
+    .q-option-title { font-size: 0.95rem; font-weight: 400; color: var(--text-soft); line-height: 1.35; }
+    .q-option.is-selected .q-option-title { color: var(--text); }
+    .q-option-desc { font-size: 0.82rem; font-weight: 300; color: var(--text-muted); line-height: 1.5; margin-top: 3px; }
+
+    .q-option-other-input {
+      width: 100%; font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 300;
+      color: var(--text); background: transparent; border: none;
+      border-bottom: 1px solid var(--input-border); padding: 6px 0; margin-top: 6px;
+      outline: none; caret-color: var(--accent);
+    }
+    .q-option-other-input::placeholder { color: var(--text-muted); }
+    .q-option-other-input:focus { border-color: var(--input-focus); }
+
+    .founding-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .founding-badge-line { width: 28px; height: 1px; background: var(--gold-border); }
+    .founding-heading { font-family: 'Marcellus', serif; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 400; line-height: 1.25; margin-bottom: 18px; }
+    .founding-body { font-size: 0.95rem; font-weight: 300; line-height: 1.8; color: var(--text-soft); margin-bottom: 28px; }
+    .founding-body strong { font-weight: 400; color: var(--text); }
+
+    .founding-detail { padding: 18px 20px; margin-bottom: 28px; border: 1px solid var(--gold-border); border-radius: 8px; background: var(--gold-dim); }
+    .founding-detail-text { font-size: 0.9rem; font-weight: 300; line-height: 1.7; color: var(--text-soft); }
+    .founding-detail-text strong { font-weight: 400; color: var(--gold); }
+
+    .btn-secondary-link {
+      display: block; margin-top: 14px; font-size: 0.82rem; font-weight: 400;
+      color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px;
+      cursor: pointer; background: none; border: none; font-family: 'Lato', sans-serif;
+      transition: color 0.25s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-secondary-link:hover { color: var(--text-soft); }
+
+    .ty-check { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+    .ty-check--accent { background: var(--accent); }
+    .ty-check--gold { background: var(--gold); }
+    .ty-check svg { width: 26px; height: 26px; stroke: var(--bg); stroke-width: 2.5; fill: none; }
+    .ty-heading { font-family: 'Marcellus', serif; font-size: clamp(1.4rem, 4vw, 1.85rem); font-weight: 400; margin-bottom: 14px; }
+    .ty-body { font-size: 0.95rem; font-weight: 300; line-height: 1.75; color: var(--text-soft); margin-bottom: 36px; }
+
+    .btn-row { display: flex; align-items: center; gap: 16px; margin-top: 28px; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 400;
+      letter-spacing: 0.03em; color: var(--bg); background: var(--accent);
+      border: none; border-radius: 6px; padding: 13px 28px; cursor: pointer;
+      transition: background 0.25s, transform 0.2s; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:active { transform: scale(0.97); }
+    .btn--gold { background: var(--gold); }
+    .btn--gold:hover { background: #d4b45a; }
+    .btn-arrow { font-size: 1.1em; line-height: 1; }
+    .btn-hint { font-size: 0.75rem; color: var(--text-muted); font-weight: 300; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--input-border); }
+    .btn-ghost:hover { background: rgba(255,255,255,0.05); color: var(--text-soft); }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px; pointer-events: none;
+    }
+    .nav-back {
+      pointer-events: auto; display: flex; align-items: center; gap: 6px;
+      font-family: 'Lato', sans-serif; font-size: 0.8rem; font-weight: 400;
+      color: var(--text-muted); background: none; border: none; cursor: pointer;
+      padding: 6px 10px; border-radius: 4px; transition: color 0.25s, background 0.25s, opacity 0.3s;
+      opacity: 0; -webkit-tap-highlight-color: transparent;
+    }
+    .nav-back.is-visible { opacity: 1; }
+    .nav-back:hover { color: var(--text-soft); background: rgba(255,255,255,0.06); }
+    .nav-back svg { width: 14px; height: 14px; }
+    .keyboard-hint { font-size: 0.72rem; color: var(--text-muted); opacity: 0.6; }
+
+    @media (max-width: 600px) {
+      .topbar { padding: 16px 20px; }
+      .topbar-logo { height: 30px; }
+      .slide { padding: 72px 24px 72px; }
+      .bottom-nav { padding: 12px 20px; }
+      .keyboard-hint { display: none; }
+      .welcome-logo { width: 56px; margin-bottom: 22px; }
+      .btn-row { flex-wrap: wrap; }
+      .q-option { padding: 12px 14px; }
+      .founding-detail { padding: 14px 16px; }
+    }
+
+    @media (max-width: 360px) {
+      .q-label { font-size: 1.15rem; }
+      .welcome-heading { font-size: 1.35rem; }
+      .founding-heading { font-size: 1.3rem; }
+    }
+
+    @supports (padding: env(safe-area-inset-bottom)) {
+      .bottom-nav { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+      .topbar { padding-top: calc(16px + env(safe-area-inset-top)); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.05ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="form-shell">
+
+  <div class="progress-track"><div class="progress-fill" id="progress"></div></div>
+
+  <div class="topbar">
+    <a href="/"><img src="logo.png" alt="StrikePoint Sims" class="topbar-logo"></a>
+    <a href="/" class="topbar-home">strikepointsims.com</a>
+  </div>
+
+  <div class="slides" id="slides">
+
+    <!-- ═════════ 0: WELCOME ═════════ -->
+    <div class="slide is-active" data-slide="0">
+      <div class="slide-inner">
+        <img src="logo.png" alt="" class="welcome-logo" aria-hidden="true">
+        <h1 class="welcome-heading">Where the Season Never Ends</h1>
+        <p class="welcome-body">
+          StrikePoint Sims is bringing Trackman-powered indoor golf to eastern Connecticut — three premium bays, 300+ courses, and open around the clock.<br><br>
+          We're building our early list now. <strong>The first 20 members get a perk no one else will.</strong>
+        </p>
+        <div class="btn-row">
+          <button class="btn" onclick="goNext()" type="button">Get started <span class="btn-arrow">→</span></button>
+          <span class="btn-hint">Takes about 30 seconds</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 1: NAME + EMAIL ═════════ -->
+    <div class="slide" data-slide="1">
+      <div class="slide-inner">
+        <div class="q-number">1 of 5</div>
+        <label class="q-label">First, where should we send updates?</label>
+        <div class="q-input-group">
+          <span class="q-input-label">Full Name</span>
+          <input class="q-input" type="text" id="fullname" name="full_name" placeholder="Your name" autocomplete="name" required>
+          <div class="q-error" id="name-error"></div>
+        </div>
+        <div class="q-input-group">
+          <span class="q-input-label">Email</span>
+          <input class="q-input" type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email" required>
+          <div class="q-error" id="email-error"></div>
+        </div>
+        <p class="q-fine">No spam, we promise — just StrikePoint Sims news.</p>
+        <div class="btn-row">
+          <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
+          <span class="btn-hint">press <strong>Enter ↵</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 2: LOCATION ═════════ -->
+    <div class="slide" data-slide="2">
+      <div class="slide-inner">
+        <div class="q-number">2 of 5</div>
+        <div class="q-label" id="town-label">Where are you coming from?</div>
+        <div class="q-options" role="radiogroup" aria-labelledby="town-label">
+          <div class="q-option" data-value="Colchester" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">A</span>
+            <div class="q-option-content"><div class="q-option-title">Colchester</div></div>
+          </div>
+          <div class="q-option" data-value="Hebron" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">B</span>
+            <div class="q-option-content"><div class="q-option-title">Hebron</div></div>
+          </div>
+          <div class="q-option" data-value="Marlborough" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">C</span>
+            <div class="q-option-content"><div class="q-option-title">Marlborough</div></div>
+          </div>
+          <div class="q-option" data-value="Glastonbury" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content"><div class="q-option-title">Glastonbury</div></div>
+          </div>
+          <div class="q-option" data-value="East Hampton" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">E</span>
+            <div class="q-option-content"><div class="q-option-title">East Hampton</div></div>
+          </div>
+          <div class="q-option" data-value="Lebanon" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">F</span>
+            <div class="q-option-content"><div class="q-option-title">Lebanon</div></div>
+          </div>
+          <div class="q-option q-option--other" data-value="other" tabindex="0" role="radio" aria-checked="false" onclick="selectTown(this)" onkeydown="optKey(event,this,'town')">
+            <span class="q-option-key">G</span>
+            <div class="q-option-content">
+              <div class="q-option-title">Somewhere else</div>
+              <input class="q-option-other-input" type="text" id="other-town" placeholder="Your town" style="display:none" onclick="event.stopPropagation()">
+            </div>
+          </div>
+        </div>
+        <div class="btn-row" id="town-btn" style="display:none">
+          <button class="btn" onclick="goNext()" type="button">OK <span class="btn-arrow">→</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 3: GOLF PROFILE ═════════ -->
+    <div class="slide" data-slide="3">
+      <div class="slide-inner">
+        <div class="q-number">3 of 5</div>
+        <div class="q-label" id="level-label">How does golf fit into your life?</div>
+        <div class="q-options" role="radiogroup" aria-labelledby="level-label">
+          <div class="q-option" data-value="The Competitor" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">A</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Competitor</div>
+              <div class="q-option-desc">50+ rounds a year. Always looking to sharpen my game.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Regular" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">B</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Regular</div>
+              <div class="q-option-desc">At least once a week in season.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Social Player" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">C</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Social Player</div>
+              <div class="q-option-desc">A handful of rounds a year, mostly with friends.</div>
+            </div>
+          </div>
+          <div class="q-option" data-value="The Newcomer" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content">
+              <div class="q-option-title">The Newcomer</div>
+              <div class="q-option-desc">Curious about golf or just getting started.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 4: PRIORITY ═════════ -->
+    <div class="slide" data-slide="4">
+      <div class="slide-inner">
+        <div class="q-number">4 of 5</div>
+        <div class="q-label" id="priority-label">What matters most to you in a simulator facility?</div>
+        <div class="q-options" role="radiogroup" aria-labelledby="priority-label">
+          <div class="q-option" data-value="Accuracy of the shot data" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">A</span>
+            <div class="q-option-content"><div class="q-option-title">Accuracy of the shot data</div></div>
+          </div>
+          <div class="q-option" data-value="Being able to play on my own schedule" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">B</span>
+            <div class="q-option-content"><div class="q-option-title">Being able to play on my own schedule</div></div>
+          </div>
+          <div class="q-option" data-value="Having somewhere to play year-round" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">C</span>
+            <div class="q-option-content"><div class="q-option-title">Having somewhere to play year-round</div></div>
+          </div>
+          <div class="q-option" data-value="Access to a wide variety of courses" tabindex="0" role="radio" aria-checked="false" onclick="selectAuto(this)" onkeydown="optKey(event,this,'auto')">
+            <span class="q-option-key">D</span>
+            <div class="q-option-content"><div class="q-option-title">Access to a wide variety of courses</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 5: FOUNDING 20 ═════════ -->
+    <div class="slide" data-slide="5">
+      <div class="slide-inner">
+        <div class="founding-badge">
+          <span class="founding-badge-line"></span>
+          The Founding 20
+          <span class="founding-badge-line"></span>
+        </div>
+        <h2 class="founding-heading">An Early Spot for Those Who Want One</h2>
+        <p class="founding-body">
+          We're reserving twenty spots for golfers who want to be here from the start.
+        </p>
+        <div class="founding-detail">
+          <p class="founding-detail-text">
+            Founding Members get an <strong>automatic tier upgrade for the first 90 days</strong> — Gold-level access and perks at the Silver membership rate.
+          </p>
+        </div>
+        <button class="btn btn--gold" onclick="applyFounding()" type="button">Apply for a Founding Spot <span class="btn-arrow">→</span></button>
+        <button class="btn-secondary-link" onclick="declineFounding()" type="button">No thanks, just keep me posted</button>
+      </div>
+    </div>
+
+    <!-- ═════════ 6: UPDATES ═════════ -->
+    <div class="slide" data-slide="6">
+      <div class="slide-inner">
+        <div class="q-number">5 of 5</div>
+        <div class="q-label" id="updates-label">Want to follow along as we build this thing out?</div>
+        <div class="q-options" role="radiogroup" aria-labelledby="updates-label">
+          <div class="q-option" data-value="Yes, keep me in the loop" tabindex="0" role="radio" aria-checked="false" onclick="selectUpdates(this)" onkeydown="optKey(event,this,'submit')">
+            <span class="q-option-key">A</span>
+            <div class="q-option-content"><div class="q-option-title">Yes, keep me in the loop</div></div>
+          </div>
+          <div class="q-option" data-value="Just let me know when you're open" tabindex="0" role="radio" aria-checked="false" onclick="selectUpdates(this)" onkeydown="optKey(event,this,'submit')">
+            <span class="q-option-key">B</span>
+            <div class="q-option-content"><div class="q-option-title">Just let me know when you're open</div></div>
+          </div>
+        </div>
+        <p class="q-fine">Either way — no spam, we promise.</p>
+      </div>
+    </div>
+
+    <!-- ═════════ 7: THANK YOU — FOUNDING ═════════ -->
+    <div class="slide" data-slide="7">
+      <div class="slide-inner">
+        <div class="ty-check ty-check--gold">
+          <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
+        </div>
+        <h2 class="ty-heading" id="ty-heading-f">You're in the running.</h2>
+        <p class="ty-body">We'll reach out with Founding 20 details as things come together. Thanks for the early interest.</p>
+        <div class="btn-row">
+          <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═════════ 8: THANK YOU — STANDARD ═════════ -->
+    <div class="slide" data-slide="8">
+      <div class="slide-inner">
+        <div class="ty-check ty-check--accent">
+          <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
+        </div>
+        <h2 class="ty-heading" id="ty-heading-s">You're on the list.</h2>
+        <p class="ty-body">We'll be in touch. Thanks for the interest.</p>
+        <div class="btn-row">
+          <a href="/" class="btn btn-ghost">← Back to StrikePoint Sims</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-back" id="backBtn" onclick="goPrev()" type="button" aria-label="Previous question">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 2 4 7 9 12"/></svg>
+      Back
+    </button>
+    <span class="keyboard-hint" id="kbHint">Press <strong>Enter ↵</strong> to continue</span>
+  </div>
+
+</div>
+
+<script>
+  /* ═══════════════════════════════════════════════════════
+     GOOGLE SHEETS ENDPOINT
+     ─────────────────────────────────────────────────────
+     Replace with your Google Apps Script Web App URL.
+     See README for setup instructions.
+  ═══════════════════════════════════════════════════════ */
+  var FORM_ENDPOINT = 'YOUR_GOOGLE_APPS_SCRIPT_URL';
+
+  var current = 0;
+  var data = {
+    full_name: '', first_name: '', email: '',
+    community: '', community_other: '',
+    golf_level: '', priority: '',
+    founding_20: false, updates: ''
+  };
+
+  var slides = document.querySelectorAll('.slide');
+  var progress = document.getElementById('progress');
+  var backBtn = document.getElementById('backBtn');
+  var kbHint = document.getElementById('kbHint');
+
+  function updateUI() {
+    var pct = { 0:0, 1:15, 2:35, 3:55, 4:75, 5:85, 6:95, 7:100, 8:100 };
+    progress.style.width = (pct[current] || 0) + '%';
+    backBtn.classList.toggle('is-visible', current >= 1 && current <= 6);
+    kbHint.style.opacity = (current === 1) ? '0.6' : '0';
+  }
+
+  function goTo(i) {
+    if (i < 0 || i > 8) return;
+    slides[current].classList.remove('is-active');
+    slides[current].classList.add('is-exiting');
+    var prev = current;
+    setTimeout(function() { slides[prev].classList.remove('is-exiting'); }, 460);
+    current = i;
+    slides[i].classList.add('is-active');
+    updateUI();
+    setTimeout(function() {
+      var inp = slides[i].querySelector('.q-input:not([style*="display:none"])');
+      if (inp) inp.focus();
+    }, 120);
+  }
+
+  function goNext() { if (!validate()) return; if (current <= 6) goTo(current + 1); }
+
+  function goPrev() {
+    if (current === 6) { goTo(5); return; }
+    if (current === 5) { goTo(4); return; }
+    if (current >= 1 && current <= 4) goTo(current - 1);
+  }
+
+  function validate() {
+    if (current !== 1) return true;
+    var nm = document.getElementById('fullname').value.trim();
+    var em = document.getElementById('email').value.trim();
+    var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    var ok = true;
+
+    if (!nm) {
+      document.getElementById('fullname').classList.add('has-error');
+      document.getElementById('name-error').textContent = 'Please enter your name';
+      ok = false;
+    } else {
+      document.getElementById('fullname').classList.remove('has-error');
+      document.getElementById('name-error').textContent = '';
+    }
+
+    if (!em || !re.test(em)) {
+      document.getElementById('email').classList.add('has-error');
+      document.getElementById('email-error').textContent = em ? "That doesn't look right" : 'Please enter your email';
+      ok = false;
+    } else {
+      document.getElementById('email').classList.remove('has-error');
+      document.getElementById('email-error').textContent = '';
+    }
+
+    if (ok) { data.full_name = nm; data.first_name = nm.split(' ')[0]; data.email = em; }
+    return ok;
+  }
+
+  function clearOpts(el) {
+    el.parentNode.querySelectorAll('.q-option').forEach(function(s) {
+      s.classList.remove('is-selected'); s.setAttribute('aria-checked', 'false');
+    });
+  }
+
+  function selectAuto(el) {
+    clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
+    var val = el.getAttribute('data-value');
+    if (current === 3) data.golf_level = val;
+    if (current === 4) data.priority = val;
+    setTimeout(function() { goTo(current + 1); }, 320);
+  }
+
+  function selectTown(el) {
+    clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
+    var val = el.getAttribute('data-value');
+    data.community = val;
+    var otherInp = document.getElementById('other-town');
+    var townBtn = document.getElementById('town-btn');
+    otherInp.style.display = 'none'; townBtn.style.display = 'none';
+    if (val === 'other') {
+      otherInp.style.display = 'block'; otherInp.focus(); townBtn.style.display = 'flex';
+    } else {
+      setTimeout(function() { goTo(current + 1); }, 320);
+    }
+  }
+
+  function selectUpdates(el) {
+    clearOpts(el); el.classList.add('is-selected'); el.setAttribute('aria-checked', 'true');
+    data.updates = el.getAttribute('data-value');
+    setTimeout(function() { submitForm(); }, 320);
+  }
+
+  function optKey(e, el, mode) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (mode === 'town') selectTown(el);
+      else if (mode === 'submit') selectUpdates(el);
+      else selectAuto(el);
+    }
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      if (current === 0 || current === 1) { e.preventDefault(); goNext(); return; }
+      if (current === 2 && data.community === 'other') { e.preventDefault(); goNext(); return; }
+    }
+    if ([2,3,4,6].indexOf(current) !== -1) {
+      var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
+      var idx = map[e.key.toLowerCase()];
+      if (idx !== undefined) {
+        if (document.activeElement.id === 'other-town') return;
+        var opts = slides[current].querySelectorAll('.q-option');
+        if (opts[idx]) {
+          if (current === 2) selectTown(opts[idx]);
+          else if (current === 6) selectUpdates(opts[idx]);
+          else selectAuto(opts[idx]);
+        }
+      }
+    }
+  });
+
+  function applyFounding() { data.founding_20 = true; goTo(6); }
+  function declineFounding() { data.founding_20 = false; goTo(6); }
+
+  function submitForm() {
+    if (data.community === 'other') {
+      data.community_other = document.getElementById('other-town').value.trim();
+    }
+
+    if (data.founding_20) {
+      document.getElementById('ty-heading-f').textContent = "You're in the running, " + data.first_name + ".";
+      goTo(7);
+    } else {
+      document.getElementById('ty-heading-s').textContent = "You're on the list, " + data.first_name + ".";
+      goTo(8);
+    }
+
+    var payload = {
+      full_name: data.full_name,
+      email: data.email,
+      community: data.community === 'other' ? data.community_other : data.community,
+      golf_level: data.golf_level,
+      priority: data.priority,
+      founding_20: data.founding_20 ? 'Yes' : 'No',
+      updates: data.updates,
+      submitted: new Date().toISOString()
+    };
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(function(err) { console.error('Submit error:', err); });
+  }
+
+  updateUI();
+</script>
+</body>
+</html>
