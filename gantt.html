@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StrikePoint Sims — Development + Operations Timeline</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--accent-gold:#C5A55A;--accent-gold-dim:rgba(197,165,90,0.15);--bg:#111210;--bg-surface:#1a1b18;--bg-elevated:#222320;--border:#2a2b28;--border-light:#353630;--text-primary:#e8e6df;--text-secondary:#9a9890;--text-muted:#6a6960;--critical-red:#c44;--critical-red-dim:rgba(204,68,68,0.12);--parallel-blue:#4a8ab5;--milestone-purple:#8a6ab5;--green:#5a8a4a;--green-dim:rgba(90,138,74,0.12);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text-primary);font-family:'DM Sans',sans-serif;}
+.container{max-width:1600px;margin:0 auto;padding:32px 24px;}
+header{margin-bottom:32px;border-bottom:1px solid var(--border);padding-bottom:24px;}
+header h1{font-size:22px;font-weight:700;letter-spacing:-0.3px;margin-bottom:4px;}
+header .sub{font-size:13px;color:var(--text-secondary);}
+header .sub span{color:var(--accent-gold);font-weight:600;}
+.legend{display:flex;gap:20px;margin-bottom:24px;flex-wrap:wrap;}
+.li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;font-weight:500;}
+.ls{width:12px;height:12px;border-radius:2px;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:28px;}
+.card{background:var(--bg-surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;}
+.card .l{font-size:9px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);margin-bottom:3px;font-weight:600;}
+.card .v{font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:500;}
+.card .v.g{color:var(--accent-gold);}.card .v.r{color:var(--critical-red);}.card .v.gr{color:var(--green);}
+.card .d{font-size:10px;color:var(--text-secondary);margin-top:2px;}
+
+.gw{overflow-x:auto;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface);}
+.gt{width:100%;min-width:1400px;border-collapse:collapse;}
+.gt thead th{position:sticky;top:0;z-index:10;background:var(--bg-elevated);border-bottom:2px solid var(--border-light);padding:0;font-weight:600;}
+.mh th{text-align:center;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--text-secondary);padding:10px 0 2px;border-right:1px solid var(--border);}
+.mh th:first-child{text-align:left;padding-left:16px;min-width:300px;color:var(--text-muted);font-size:10px;}
+.wh th{text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);padding:2px 0 8px;border-right:1px solid rgba(42,43,40,0.5);font-weight:400;}
+.wh th:first-child{border-right:1px solid var(--border);}
+.wh th.tc{color:var(--accent-gold);font-weight:600;}
+.gt tbody tr{border-bottom:1px solid rgba(42,43,40,0.4);}
+.gt tbody tr:hover{background:rgba(197,165,90,0.03);}
+.gt tbody tr.sr{background:var(--bg-elevated);border-bottom:1px solid var(--border-light);}
+.gt tbody tr.sr td{padding:10px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent-gold);}
+.gt tbody td{padding:0;vertical-align:middle;border-right:1px solid rgba(42,43,40,0.3);}
+.gt tbody td:first-child{padding:8px 12px 8px 16px;border-right:1px solid var(--border);min-width:300px;max-width:340px;}
+.tl{display:flex;flex-direction:column;gap:1px;}
+.tn{font-size:12px;font-weight:500;line-height:1.3;}
+.td{font-size:10px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
+.tc2{font-size:10px;color:var(--accent-gold);font-family:'JetBrains Mono',monospace;font-weight:500;}
+.bc{position:relative;height:32px;}
+.b{position:absolute;top:6px;height:20px;border-radius:3px;opacity:0.9;}
+.b:hover{opacity:1;}
+.b.cr{background:var(--critical-red);}.b.pa{background:var(--parallel-blue);}.b.go{background:var(--accent-gold);}.b.gn{background:var(--green);}
+.mm{position:absolute;top:8px;width:14px;height:14px;transform:rotate(45deg);border-radius:2px;}
+.mm.cr{background:var(--critical-red);}.mm.go{background:var(--accent-gold);}.mm.mi{background:var(--milestone-purple);}
+
+.es{margin-top:32px;}.es h2{font-size:16px;font-weight:700;margin-bottom:4px;}.es .esub{font-size:12px;color:var(--text-secondary);margin-bottom:16px;}
+.ew{overflow-x:auto;border:1px solid var(--border);border-radius:8px;}
+.et{width:100%;min-width:1100px;border-collapse:collapse;background:var(--bg-surface);}
+.et thead th{background:var(--bg-elevated);padding:10px 12px;font-size:10px;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);font-weight:600;text-align:left;border-bottom:2px solid var(--border-light);white-space:nowrap;}
+.et thead th:nth-child(n+2){text-align:right;}
+.et thead th.phase{font-size:8px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;}
+.et tbody td{padding:6px 12px;font-size:12px;border-bottom:1px solid rgba(42,43,40,0.4);white-space:nowrap;}
+.et tbody td:nth-child(n+2){text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.et tbody tr.sl td{font-weight:700;color:var(--text-secondary);background:var(--bg-elevated);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;}
+.et tbody tr.tr{background:var(--bg-elevated);}
+.et tbody tr.tr td{border-top:2px solid var(--border-light);color:var(--accent-gold);font-weight:700;}
+.et tbody tr.or td{color:var(--parallel-blue);}
+.et tbody tr.cu td{color:var(--critical-red);font-weight:700;background:var(--critical-red-dim);}
+.et tbody tr.gn td{color:var(--green);font-weight:600;background:var(--green-dim);}
+.et tbody td.e{color:var(--text-muted);}
+.et tbody td.neg{color:var(--critical-red);}
+.et tbody td.pos{color:var(--green);}
+
+.ns{margin-top:24px;background:var(--critical-red-dim);border:1px solid rgba(204,68,68,0.25);border-radius:8px;padding:16px 20px;}
+.ns h3{font-size:12px;font-weight:700;color:var(--critical-red);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;}
+.ns p{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-bottom:6px;}
+.as{margin-top:32px;background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:20px 24px;}
+.as h2{font-size:14px;font-weight:700;margin-bottom:12px;}
+.as ul{list-style:none;padding:0;}
+.as li{font-size:12px;color:var(--text-secondary);padding:4px 0 4px 16px;position:relative;line-height:1.5;}
+.as li::before{content:"—";position:absolute;left:0;color:var(--text-muted);}
+.as li strong{color:var(--text-primary);}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <h1>StrikePoint Sims — Development + Operations Timeline</h1>
+  <div class="sub">April 2026 through December 2026 &nbsp;|&nbsp; <span>Opening: October 1</span> &nbsp;|&nbsp; Today: April 11, 2026</div>
+</header>
+<div class="legend">
+  <div class="li"><div class="ls" style="background:var(--critical-red)"></div>Critical Path</div>
+  <div class="li"><div class="ls" style="background:var(--parallel-blue)"></div>Parallel</div>
+  <div class="li"><div class="ls" style="background:var(--accent-gold)"></div>Financial</div>
+  <div class="li"><div class="ls" style="background:var(--green)"></div>Operations</div>
+  <div class="li"><div class="ls" style="background:var(--milestone-purple)"></div>Milestone</div>
+</div>
+<div class="cards">
+  <div class="card"><div class="l">Opening</div><div class="v">Oct 1</div><div class="d">25 weeks out</div></div>
+  <div class="card"><div class="l">Gross Startup</div><div class="v g">$241K</div><div class="d">Incl $4K arch adj</div></div>
+  <div class="card"><div class="l">Peak Bridge</div><div class="v r">~$27K</div><div class="d">Jun, pre-SBA</div></div>
+  <div class="card"><div class="l">Oct Revenue</div><div class="v g">$10,428</div><div class="d">29 members + walk-ins</div></div>
+  <div class="card"><div class="l">Dec Revenue</div><div class="v g">$17,490</div><div class="d">39 members + walk-ins</div></div>
+  <div class="card"><div class="l">CY2026 NOI</div><div class="v r">($18,519)</div><div class="d">Incl buildout opex</div></div>
+  <div class="card"><div class="l">Dec Cash Position</div><div class="v gr">~$7K</div><div class="d">Before Trackman repay</div></div>
+  <div class="card"><div class="l">Trackman Due</div><div class="v r">$70,485</div><div class="d">~Feb 2027</div></div>
+</div>
+
+<div class="gw">
+<table class="gt" id="ganttTable">
+<thead><tr class="mh" id="monthRow"></tr><tr class="wh" id="weekRow"></tr></thead>
+<tbody id="ganttBody"></tbody>
+</table>
+</div>
+
+<div class="es">
+  <h2>Unified Cash Flow — Startup + Operations (Apr–Dec 2026)</h2>
+  <div class="esub">All figures from financial model. Debt service uses current model structure ($2,673/mo) — needs update for new 0% Trackman + $150K SBA.</div>
+  <div class="ew">
+  <table class="et">
+    <thead><tr>
+      <th style="min-width:300px">Category</th>
+      <th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug<br><span class="phase">buildout</span></th><th>Sep<br><span class="phase">buildout</span></th><th>Oct<br><span class="phase">operating</span></th><th>Nov<br><span class="phase">operating</span></th><th>Dec<br><span class="phase">operating</span></th><th>Total</th>
+    </tr></thead>
+    <tbody>
+
+      <tr class="sl"><td colspan="11">Startup Capital Expenditures</td></tr>
+      <tr><td>Professional (architect, attorney, permits)</td><td>$2,800</td><td>$3,200</td><td>$7,800</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$13,800</td></tr>
+      <tr><td>Rent deposit (first + last)</td><td class="e">—</td><td class="e">—</td><td>$12,474</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$12,474</td></tr>
+      <tr><td>Insurance + accounting</td><td class="e">—</td><td class="e">—</td><td>$500</td><td>$900</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,400</td></tr>
+      <tr><td>Contracted buildout (40/30/30)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$13,314</td><td>$12,266</td><td>$13,406</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$38,986</td></tr>
+      <tr><td>DIY buildout (materials)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$18,520</td><td>$24,495</td><td>$15,345</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$58,360</td></tr>
+      <tr><td>Sim equipment — non-Trackman (cash)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$29,678</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$29,678</td></tr>
+      <tr><td>Technology infrastructure</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$13,267</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$13,267</td></tr>
+      <tr><td>Marketing (pre-launch + opening)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,400</td><td>$1,400</td><td>$1,900</td><td class="e">—</td><td class="e">—</td><td>$4,700</td></tr>
+      <tr><td>Pre-opening contingency + misc</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,750</td><td>$1,750</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$3,500</td></tr>
+      <tr class="tr"><td>Total Startup CapEx</td><td>$2,800</td><td>$3,200</td><td>$20,774</td><td>$32,734</td><td>$69,589</td><td>$45,168</td><td>$1,900</td><td class="e">—</td><td class="e">—</td><td>$176,165</td></tr>
+
+      <tr class="sl"><td colspan="11">Operating Expenses (begins Aug buildout)</td></tr>
+      <tr><td>Rent (3mo abated Jul-Sep)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$6,237</td><td>$6,237</td><td>$6,237</td><td>$18,711</td></tr>
+      <tr><td>Electricity</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,600</td><td>$1,600</td><td>$2,000</td><td>$2,000</td><td>$2,000</td><td>$9,200</td></tr>
+      <tr><td>Internet + water/sewer</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$50</td><td>$200</td><td>$200</td><td>$200</td><td>$200</td><td>$850</td></tr>
+      <tr><td>Insurance</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$300</td><td>$300</td><td>$300</td><td>$300</td><td>$300</td><td>$1,500</td></tr>
+      <tr><td>Trackman licensing (3 bays)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$275</td><td>$275</td><td>$275</td><td>$275</td><td>$1,100</td></tr>
+      <tr><td>Other tech subscriptions</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$303</td><td>$303</td><td>$303</td><td>$303</td><td>$1,212</td></tr>
+      <tr><td>Marketing (ongoing)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,200</td><td>$3,000</td><td>$870</td><td>$870</td><td>$570</td><td>$6,510</td></tr>
+      <tr><td>Administrative (bookkeeping, maint, misc)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$700</td><td>$700</td><td>$700</td><td>$700</td><td>$700</td><td>$3,500</td></tr>
+      <tr><td>Debt service (SBA only @ $150K/9.5%/120mo)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$1,941</td><td>$1,941</td><td>$1,941</td><td>$1,941</td><td>$1,941</td><td>$9,705</td></tr>
+      <tr><td>CC processing (2.9% of revenue)</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$302</td><td>$436</td><td>$507</td><td>$1,245</td></tr>
+      <tr class="tr"><td>Total Operating Expenses</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$5,791</td><td>$8,319</td><td>$13,128</td><td>$13,262</td><td>$13,033</td><td>$53,533</td></tr>
+
+      <tr class="sl"><td colspan="11">Revenue (begins Oct)</td></tr>
+      <tr><td>Membership revenue</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$3,828</td><td>$7,920</td><td>$9,240</td><td>$20,988</td></tr>
+      <tr><td>Walk-in revenue</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$6,600</td><td>$7,100</td><td>$8,250</td><td>$21,950</td></tr>
+      <tr class="tr"><td>Total Revenue</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$10,428</td><td>$15,020</td><td>$17,490</td><td>$42,938</td></tr>
+
+      <tr class="sl"><td colspan="11">Net Cash Flow</td></tr>
+      <tr><td>Revenue less OpEx</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="neg">($5,791)</td><td class="neg">($8,319)</td><td class="neg">($2,700)</td><td class="pos">$1,758</td><td class="pos">$4,457</td><td class="neg">($10,595)</td></tr>
+
+      <tr class="tr">
+        <td>Total Cash Out (CapEx + OpEx)</td>
+        <td>$2,800</td><td>$3,200</td><td>$20,774</td><td>$32,734</td><td>$75,380</td><td>$53,487</td><td>$15,028</td><td>$13,262</td><td>$13,033</td><td>$229,698</td>
+      </tr>
+      <tr class="tr">
+        <td>Total Cash In (Revenue + SBA + TI)</td>
+        <td class="e">—</td><td class="e">—</td><td class="e">—</td><td>$160,000</td><td>$14,000</td><td>$13,000</td><td>$10,428</td><td>$15,020</td><td>$17,490</td><td>$229,938</td>
+      </tr>
+
+      <tr class="tr">
+        <td>Net Cash Flow (Monthly)</td>
+        <td class="neg">($2,800)</td><td class="neg">($3,200)</td><td class="neg">($20,774)</td><td class="pos">$127,266</td><td class="neg">($61,380)</td><td class="neg">($40,487)</td><td class="neg">($4,600)</td><td class="pos">$1,758</td><td class="pos">$4,457</td><td>$240</td>
+      </tr>
+
+      <tr class="cu">
+        <td><strong>Cumulative Owner Cash Position</strong></td>
+        <td><strong>($2,800)</strong></td><td><strong>($6,000)</strong></td><td><strong>($26,774)</strong></td><td><strong>$100,492</strong></td><td><strong>$39,112</strong></td><td><strong>($1,375)</strong></td><td><strong>($5,975)</strong></td><td><strong>($4,217)</strong></td><td><strong>$240</strong></td><td></td>
+      </tr>
+
+      <tr class="sl"><td colspan="11">Operating Metrics (Oct–Dec)</td></tr>
+      <tr><td>Ending members</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>29</td><td>31</td><td>39</td><td></td></tr>
+      <tr><td>Walk-in patrons</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>110</td><td>119</td><td>137</td><td></td></tr>
+      <tr><td>Utilization rate</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td>17%</td><td>27%</td><td>32%</td><td></td></tr>
+      <tr><td>Operating margin</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="neg">(26%)</td><td class="pos">12%</td><td class="pos">25%</td><td></td></tr>
+
+      <tr class="sl"><td colspan="11">Memo: Off-Balance Sheet & Reserves</td></tr>
+      <tr class="or"><td><em>Trackman 0% balance</em></td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td><em>$70,485</em></td><td><em>$70,485</em></td><td><em>$70,485</em></td><td><em>$70,485</em></td><td><em>$70,485</em></td><td><em>Due ~Feb '27</em></td></tr>
+      <tr class="or"><td><em>SBA unspent reserve (for Trackman repay)</em></td><td class="e">—</td><td class="e">—</td><td class="e">—</td><td><em>$147K</em></td><td><em>$86K</em></td><td><em>$45K</em></td><td><em>$41K</em></td><td><em>$42K</em></td><td><em>$47K</em></td><td></td></tr>
+
+      <tr class="sl"><td colspan="11">Debt Service Detail (needs model update)</td></tr>
+      <tr><td><em>Current model: Trackman $1,379 + SBA $1,294 = $2,673/mo</em></td><td class="e" colspan="9"></td><td><em>OLD</em></td></tr>
+      <tr><td><em>New structure: SBA only $1,941/mo ($150K @ 9.5% / 120mo)</em></td><td class="e" colspan="9"></td><td><em>NEW</em></td></tr>
+      <tr><td><em>Trackman: $0/mo for 3 months, then $70,485 lump from SBA reserve</em></td><td class="e" colspan="9"></td><td><em>NEW</em></td></tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="ns">
+  <h3>Key Observations — Through Year End</h3>
+  <p><strong>Cash-flow positive by November.</strong> October is the only operating month with negative cash flow ($2,700 deficit). By November, revenue ($15K) exceeds operating expenses ($13.3K) and the business is self-sustaining from an operating standpoint.</p>
+  <p><strong>Cumulative position reaches ~$0 by December.</strong> The owner invests ~$27K peak in June, gets made whole when SBA funds in July, then the operating losses in Oct eat into reserves slightly before Nov-Dec surplus brings cumulative back to roughly break-even.</p>
+  <p><strong>Trackman repayment is the elephant.</strong> The $70,485 due ~Feb 2027 is covered if SBA proceeds are reserved. The "SBA unspent reserve" memo line tracks this — by Dec there's ~$47K earmarked, meaning you need another ~$23K from Jan-Feb operating cash flow or personal funds to fully repay. Jan-Feb are peak season months, so this should be achievable if member growth stays on track.</p>
+  <p><strong>Debt service is lower under new structure.</strong> Old model: $2,673/mo. New: $1,941/mo (SBA only). That's $732/mo savings = $8,784/yr, which flows straight to the bottom line. But the Trackman lump sum repayment replaces the steady monthly payments — it's a different cash flow shape, not necessarily better total cost.</p>
+  <p><strong>Model updates still needed:</strong> (1) Architect $6K→$10K, (2) Rent abatement 2→3 months, (3) TI $61K→$40K, (4) SBA $100K→$150K, (5) Trackman 0% structure, (6) Debt service recalc, (7) Monthly projection buildout month opex.</p>
+</div>
+
+<div class="as">
+  <h2>Working Assumptions</h2>
+  <ul>
+    <li><strong>Architect ($10,000):</strong> $1,800 retainer → $2,200 rough schematics ($4,000 total) → $6,000 stamped permit set.</li>
+    <li><strong>RE attorney ($2,500):</strong> Engaged mid-April. Retainer + lease review + negotiation.</li>
+    <li><strong>Lease:</strong> ~June 5. Deposit $12,474.</li>
+    <li><strong>Rent abatement:</strong> 3 months (Jul-Sep). First rent October.</li>
+    <li><strong>SBA 7(a):</strong> $150K gross / $147K net. Submitted ~mid-May, funded ~early July (45 days).</li>
+    <li><strong>SBA debt service:</strong> $1,941/mo ($150K @ 9.5% APR, 120 months). Replaces old $2,673/mo combined.</li>
+    <li><strong>Trackman:</strong> $70,485 at 0% APR, 3mo deferred, lump repayment ~Feb 2027 from SBA reserve + operating cash.</li>
+    <li><strong>TI allowance:</strong> $40K on draw schedule during construction.</li>
+    <li><strong>Construction:</strong> 10 weeks (Jul 14 – Sep 19). Father-in-law as licensed GC.</li>
+    <li><strong>Revenue assumptions (from model):</strong> 20 founding members at open, 12% walk-in conversion, 7%/3% churn.</li>
+    <li><strong>Operating expenses:</strong> $10,265/mo fixed (excl. debt service) + $1,941 debt service + 2.9% CC processing on revenue.</li>
+    <li><strong>Soft open:</strong> Sep 26-28. Grand opening: Oct 1.</li>
+  </ul>
+</div>
+</div>
+
+<script>
+const SD=new Date(2026,3,6),ED=new Date(2026,11,28),TD=new Date(2026,3,11),W=7*864e5;
+const tw=Math.ceil((ED-SD)/W);const ms=[];let d=new Date(SD);
+while(d<ED){const s=new Date(d),e=new Date(d.getFullYear(),d.getMonth()+1,0),ee=e>ED?ED:e;
+ms.push({n:s.toLocaleDateString('en-US',{month:'short',year:'2-digit'}),s:Math.floor((ee-SD)/W)-Math.floor((s-SD)/W)+1});
+d=new Date(d.getFullYear(),d.getMonth()+1,1);}
+const mR=document.getElementById('monthRow'),wR=document.getElementById('weekRow');
+mR.innerHTML='<th>Workstream / Task</th>'+ms.map(m=>`<th colspan="${m.s}">${m.n}</th>`).join('');
+const tW=Math.floor((TD-SD)/W);let wh='<th></th>';
+for(let w=0;w<tw;w++){const d=new Date(SD.getTime()+w*W);wh+=`<th${w===tW?' class="tc"':''}>${d.getMonth()+1}/${d.getDate()}</th>`;}
+wR.innerHTML=wh;
+
+const T=[
+{s:'PRE-LEASE (Weeks 1–8)'},
+{n:'Engage architect ($1,800 retainer)',d:'Send CAD + Trackman schematics',c:'$1,800',a:'2026-04-14',b:'2026-04-18',t:'c'},
+{n:'Rough schematics (~2 wks)',d:'$4,000 total for quoting',c:'$2,200 on delivery',a:'2026-04-14',b:'2026-04-28',t:'c'},
+{n:'Engage RE attorney',d:'Retained mid-April',c:'$1,000 retainer',a:'2026-04-14',b:'2026-04-28',t:'p'},
+{n:'Contractor quotes (HVAC, plumber)',d:'2-3 bids; electrician + GC confirmed',a:'2026-04-28',b:'2026-05-12',t:'c'},
+{n:'Finalize buildout budget',d:'Quotes → real numbers',a:'2026-05-12',b:'2026-05-19',t:'c'},
+{n:'Lease negotiation',d:'TI $40K, 3mo abatement, exit, 24/7',a:'2026-05-19',b:'2026-06-02',t:'c'},
+{n:'Attorney lease review',a:'2026-05-19',b:'2026-06-02',t:'c'},
+{n:'★ LEASE EXECUTION',d:'Deposit $12,474',a:'2026-06-05',b:'2026-06-05',t:'mc'},
+
+{s:'PERMITS (Weeks 5–14)'},
+{n:'Stamped permit drawings',c:'$6,000 on delivery',a:'2026-04-28',b:'2026-05-26',t:'c'},
+{n:'Permit application + fire marshal',c:'$1,300',a:'2026-06-06',b:'2026-06-13',t:'c'},
+{n:'Permit review (~5 wks)',a:'2026-06-09',b:'2026-07-11',t:'c'},
+{n:'★ PERMITS APPROVED',a:'2026-07-13',b:'2026-07-13',t:'mc'},
+
+{s:'FINANCING'},
+{n:'Update business plan + engage bank',a:'2026-05-12',b:'2026-05-26',t:'g'},
+{n:'SBA application submitted',a:'2026-05-19',b:'2026-05-26',t:'g'},
+{n:'SBA underwriting (~45 days)',a:'2026-05-26',b:'2026-07-07',t:'g'},
+{n:'★ SBA FUNDING ($147K)',a:'2026-07-07',b:'2026-07-07',t:'mg'},
+
+{s:'CONSTRUCTION (Weeks 15–24)'},
+{n:'Landlord HVAC rooftop install',a:'2026-06-08',b:'2026-06-29',t:'p'},
+{n:'Mobilization + insulation',d:'Weeks 1-2',a:'2026-07-14',b:'2026-07-28',t:'c'},
+{n:'Framing + electrical rough-in',d:'Weeks 2-4',a:'2026-07-21',b:'2026-08-11',t:'c'},
+{n:'Plumbing + HVAC ductwork',d:'Weeks 3-5',a:'2026-07-28',b:'2026-08-18',t:'c'},
+{n:'Drywall + bathroom finishing',d:'Weeks 5-7',a:'2026-08-11',b:'2026-09-01',t:'c'},
+{n:'Paint + flooring + signage',d:'Weeks 7-9 (DIY)',a:'2026-08-25',b:'2026-09-15',t:'c'},
+{n:'Simulator install + tech',d:'Weeks 8-10',a:'2026-09-01',b:'2026-09-19',t:'c'},
+{n:'Furniture + final inspections',d:'Weeks 10-11',a:'2026-09-15',b:'2026-09-26',t:'c'},
+{n:'★ CO ISSUED',a:'2026-09-26',b:'2026-09-26',t:'mc'},
+
+{s:'EQUIPMENT'},
+{n:'Order Trackman iO (×3)',d:'0% financed',a:'2026-08-04',b:'2026-08-22',t:'p'},
+{n:'Order PCs + projectors + screens',d:'Cash purchase $29,678',a:'2026-08-04',b:'2026-08-15',t:'p'},
+
+{s:'MARKETING & LAUNCH'},
+{n:'Google Business Profile',a:'2026-06-08',b:'2026-06-15',t:'p'},
+{n:'Meta Pixel + audience build',a:'2026-08-11',b:'2026-08-25',t:'p'},
+{n:'Pre-launch campaign (6 wks)',d:'Meta ads, founding members',a:'2026-08-18',b:'2026-09-28',t:'p'},
+{n:'★ SOFT OPEN (Sep 26-28)',a:'2026-09-26',b:'2026-09-28',t:'m'},
+{n:'★ GRAND OPENING Oct 1',a:'2026-10-01',b:'2026-10-01',t:'mg'},
+
+{s:'OPERATIONS (Oct–Dec)'},
+{n:'Month 1 — 29 members, 17% util',d:'NOI: ($2,700)',c:'Rev: $10,428',a:'2026-10-01',b:'2026-10-31',t:'o'},
+{n:'Month 2 — 31 members, 27% util',d:'NOI: $1,758',c:'Rev: $15,020',a:'2026-11-01',b:'2026-11-30',t:'o'},
+{n:'Month 3 — 39 members, 32% util',d:'NOI: $4,457',c:'Rev: $17,490',a:'2026-12-01',b:'2026-12-31',t:'o'},
+{n:'League play launch consideration',d:'Nov or Jan — depends on member base',a:'2026-11-01',b:'2026-12-31',t:'p'},
+{n:'Google Ads activation',d:'Once GBP has reviews + traction',a:'2026-11-15',b:'2026-12-31',t:'p'},
+{n:'DMARC policy tightening',d:'p=quarantine or p=reject',a:'2026-11-15',b:'2026-11-30',t:'p'},
+{n:'CT DRS sales tax filing (monthly)',d:'First filing due ~Nov 30',a:'2026-11-15',b:'2026-11-30',t:'p'},
+];
+
+const bo=document.getElementById('ganttBody');
+function dw(s){return(new Date(s+'T00:00:00')-SD)/W;}
+T.forEach(t=>{
+const tr=document.createElement('tr');
+if(t.s){tr.classList.add('sr');const td=document.createElement('td');td.colSpan=tw+1;td.textContent=t.s;tr.appendChild(td);bo.appendChild(tr);return;}
+const tl=document.createElement('td'),ld=document.createElement('div');ld.classList.add('tl');
+const ns=document.createElement('div');ns.classList.add('tn');ns.textContent=t.n;ld.appendChild(ns);
+if(t.d){const ds=document.createElement('div');ds.classList.add('td');ds.textContent=t.d;ld.appendChild(ds);}
+if(t.c){const cs=document.createElement('div');cs.classList.add('tc2');cs.textContent=t.c;ld.appendChild(cs);}
+tl.appendChild(ld);tr.appendChild(tl);
+const sw=dw(t.a),ew=dw(t.b),isM=t.t[0]==='m';
+for(let w=0;w<tw;w++){const td=document.createElement('td');td.classList.add('bc');
+if(isM&&w===Math.floor(sw)){const m=document.createElement('div');m.classList.add('mm');
+m.classList.add(t.t==='mc'?'cr':t.t==='mg'?'go':'mi');
+m.style.left='calc(50% - 7px)';td.appendChild(m);}
+else if(!isM){const bs=Math.max(0,sw-w),be=Math.min(1,ew-w);
+if(be>0&&bs<1){const b=document.createElement('div');b.classList.add('b');
+b.classList.add(t.t==='c'?'cr':t.t==='g'?'go':t.t==='o'?'gn':'pa');
+b.style.left=(Math.max(0,bs)*100)+'%';b.style.right=((1-Math.min(1,be))*100)+'%';td.appendChild(b);}}
+tr.appendChild(td);}bo.appendChild(tr);});
+</script>
+</body>
+</html>
