@@ -982,29 +982,8 @@ body {
     .fp-tagline--elite { color: rgba(201,168,76,0.6); }
   </style>
 
-  <!-- GA4 — TODO: Replace PLACEHOLDER_GA4_MEASUREMENT_ID with real ID from Mike, then uncomment
-  <script async src="https://www.googletagmanager.com/gtag/js?id=PLACEHOLDER_GA4_MEASUREMENT_ID"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'PLACEHOLDER_GA4_MEASUREMENT_ID');
-  </script>
-  -->
-
-  <!-- Meta Pixel — TODO: Replace PLACEHOLDER_META_PIXEL_ID with real ID from Mike, then uncomment
-  <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','PLACEHOLDER_META_PIXEL_ID');
-    fbq('track','PageView');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=PLACEHOLDER_META_PIXEL_ID&ev=PageView&noscript=1"/></noscript>
-  -->
+  <!-- GA4 + Meta Pixel are loaded by privacy-consent.js after user consent.
+       Set SP_GA_ID and SP_META_ID in privacy-consent.js before going live. -->
 
   <script type="application/ld+json">
   {
@@ -1078,6 +1057,7 @@ body {
   <script type="application/ld+json">
   { "@context": "https://schema.org", "@type": "WebSite", "name": "StrikePoint Sims", "url": "https://www.strikepointsims.com" }
   </script>
+  <link rel="stylesheet" href="privacy-consent.css">
 </head>
 
 <body>
@@ -1316,10 +1296,13 @@ body {
       <a href="join.html">Reserve a Spot</a>
       <a href="locations.html">Locations We Serve</a>
       <a href="trackman-io.html">About Trackman iO</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Use</a>
+      <a href="waiver.html">Liability Waiver</a>
       <a id="footer-email" href="#"><span class="__cf_email__" data-cfemail="70191e161f30030402191b15001f191e0403191d035e131f1d">[email&#160;protected]</span></a>
     </nav>
     <p class="footer-serving">Serving Colchester, Hebron, Marlborough, East Hampton, Lebanon, Glastonbury &amp; eastern Connecticut</p>
-    <p class="footer-legal">Opening Fall 2026 &middot; Colchester, Connecticut &middot; Last updated: <span id="last-updated">April 2026</span></p>
+    <p class="footer-legal">Opening Fall 2026 &middot; Colchester, Connecticut &middot; Last updated: <span id="last-updated">April 2026</span> &middot; <button class="sp-privacy-btn" onclick="updatePrivacyPreferences()">Privacy Settings</button></p>
   </footer>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -1359,5 +1342,6 @@ body {
     });
   })();
   </script>
+  <script src="privacy-consent.js"></script>
 </body>
 </html>

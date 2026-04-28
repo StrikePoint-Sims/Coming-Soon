@@ -16,10 +16,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Marcellus&display=swap" rel="stylesheet">
 
-  <!-- GA4 — TODO: Replace PLACEHOLDER_GA4_MEASUREMENT_ID with real ID from Mike, then uncomment
-  <script async src="https://www.googletagmanager.com/gtag/js?id=PLACEHOLDER_GA4_MEASUREMENT_ID"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','PLACEHOLDER_GA4_MEASUREMENT_ID');</script>
-  -->
+  <!-- GA4 + Meta Pixel loaded by privacy-consent.js after user consent. -->
+  <link rel="stylesheet" href="privacy-consent.css">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -164,9 +162,13 @@
     <a href="/">Home</a>
     <a href="join.html">Reserve a Spot</a>
     <a href="trackman-io.html">About Trackman iO</a>
+    <a href="privacy-policy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Use</a>
+    <a href="waiver.html">Liability Waiver</a>
     <br style="margin-top:10px">
-    <span style="display:block;margin-top:10px;opacity:0.5">&copy; 2026 StrikePoint Sims &middot; Colchester, Connecticut</span>
+    <span style="display:block;margin-top:10px;opacity:0.5">&copy; 2026 StrikePoint Sims &middot; Colchester, Connecticut &middot; <button class="sp-privacy-btn" onclick="updatePrivacyPreferences()" style="font-size:inherit;color:#1a1a1a">Privacy Settings</button></span>
   </footer>
 
+  <script src="privacy-consent.js"></script>
 </body>
 </html>

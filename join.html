@@ -17,10 +17,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Marcellus&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://js.stripe.com/v3/"></script>
 
-  <!-- GA4 — TODO: Replace PLACEHOLDER_GA4_MEASUREMENT_ID with real ID from Mike, then uncomment
-  <script async src="https://www.googletagmanager.com/gtag/js?id=PLACEHOLDER_GA4_MEASUREMENT_ID"></script>
-  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','PLACEHOLDER_GA4_MEASUREMENT_ID');</script>
-  -->
+  <!-- GA4 + Meta Pixel loaded by privacy-consent.js after user consent. -->
+  <link rel="stylesheet" href="privacy-consent.css">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -523,6 +521,20 @@
 
     #payment-element { margin-top: 8px; }
 
+    .terms-agree {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-top: 20px; cursor: pointer;
+    }
+    .terms-agree input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px;
+      margin-top: 3px; accent-color: #8fa65e; cursor: pointer;
+    }
+    .terms-agree-text {
+      font-size: 0.83rem; color: rgba(255,255,255,0.6); line-height: 1.55;
+    }
+    .terms-agree-text a { color: #8fa65e; text-decoration: underline; text-underline-offset: 2px; }
+    .terms-agree-text a:hover { color: #fff; }
+
     .stripe-loading {
       display: none; text-align: center;
       padding: 24px 0;
@@ -755,6 +767,9 @@
         </div>
         <button class="offer-btn" id="start-form-btn" onclick="d3Continue()">Continue &#8594;</button>
       </div>
+      <p style="margin-top:20px;font-size:0.78rem;color:rgba(255,255,255,0.3);text-align:left">
+        <button class="sp-privacy-btn" onclick="updatePrivacyPreferences()">Privacy Settings</button>
+      </p>
 
     </div>
   </div>
@@ -924,6 +939,11 @@
             <div id="payment-element"></div>
             <p class="input-error" id="card-error"></p>
             <p class="input-fine" id="card-charge-note"></p>
+            <label class="terms-agree">
+              <input type="checkbox" id="terms-check">
+              <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a> and <a href="waiver.html" target="_blank">Liability Waiver</a></span>
+            </label>
+            <p class="input-error" id="terms-error"></p>
           </div>
 
           <div class="stripe-loading" id="stripe-loading">Securing your spot&hellip;</div>
@@ -1343,6 +1363,13 @@
         document.getElementById('card-error').textContent = 'Please select a membership tier above.';
         return;
       }
+      var termsCheck = document.getElementById('terms-check');
+      if (termsCheck && !termsCheck.checked) {
+        document.getElementById('terms-error').textContent = 'Please agree to the Terms of Use to continue.';
+        termsCheck.focus();
+        return;
+      }
+      if (document.getElementById('terms-error')) document.getElementById('terms-error').textContent = '';
       if (!paymentElement) {
         document.getElementById('card-error').textContent = 'Payment form not ready. Please wait a moment.';
         return;
@@ -1509,5 +1536,6 @@
   })();
   </script>
 
+  <script src="privacy-consent.js"></script>
 </body>
 </html>
