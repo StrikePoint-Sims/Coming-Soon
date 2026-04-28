@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Reserve a Founding Spot | StrikePoint Sims | Opening Fall 2026</title>
-  <meta name="description" content="Reserve one of 20 Founding spots at StrikePoint Sims. Lock in below-launch rates for 24 months. No card required. Opening Fall 2026 in Colchester, CT.">
+  <meta name="description" content="Reserve one of 20 Founding spots at StrikePoint Sims. Lock in monthly savings for life. Card saved at signup, charged when we open. Opening Fall 2026 in Colchester, CT.">
   <link rel="canonical" href="https://www.strikepointsims.com/join">
   <meta property="og:title" content="Reserve a Founding Spot | StrikePoint Sims">
-  <meta property="og:description" content="20 spots. No card required. Founding pricing locked 24 months. Opening Fall 2026.">
+  <meta property="og:description" content="20 spots. Founding savings locked for life. Card saved, charged when we open.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.strikepointsims.com/join">
   <meta property="og:image" content="https://www.strikepointsims.com/og-image.jpg">
@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Marcellus&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -169,7 +170,42 @@
 
     /* ── Start button ── */
     .offer-start-wrap {
-      display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+    }
+
+    .d3-choice {
+      width: 100%; max-width: 400px;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px; border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .d3-choice:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.025); }
+    .d3-choice[data-selected="true"] {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.08);
+    }
+    .d3-check {
+      width: 22px; height: 22px; min-width: 22px; border-radius: 5px;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--bg);
+      transition: background 0.2s, border-color 0.2s;
+      margin-top: 2px;
+    }
+    .d3-choice[data-selected="true"] .d3-check {
+      background: var(--accent-light); border-color: var(--accent-light);
+    }
+    .d3-choice-label {
+      font-family: 'Marcellus', serif; font-size: 1rem; color: var(--text); margin-bottom: 3px;
+    }
+    .d3-choice-sub {
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .d3-prompt {
+      font-family: 'Marcellus', serif; font-size: 1.05rem;
+      color: var(--text-soft); margin-bottom: 6px; line-height: 1.5;
     }
 
     .offer-btn {
@@ -180,7 +216,7 @@
       text-decoration: none;
       background: var(--accent); border: none;
       border-radius: 40px; padding: 20px 72px;
-      cursor: pointer;
+      cursor: pointer; text-align: center;
       transition: background 0.3s, transform 0.3s;
       -webkit-tap-highlight-color: transparent;
     }
@@ -201,6 +237,24 @@
     .offer-fine {
       font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.78);
       letter-spacing: 0.04em;
+    }
+
+    /* ── Founding notice banner in slide 1 ── */
+    .founding-notice {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 24px;
+    }
+    .founding-notice-icon {
+      font-size: 0.9rem; line-height: 1.6; flex-shrink: 0;
+    }
+    .founding-notice-text {
+      font-size: 0.85rem; font-weight: 400;
+      color: rgba(201,168,76,0.9);
+      line-height: 1.55;
     }
 
     .hourly-note {
@@ -249,7 +303,6 @@
       width: 0%;
     }
 
-    /* Slide stack — each slide is absolutely positioned, fade between them */
     .slides-stage {
       flex: 1;
       position: relative;
@@ -377,6 +430,75 @@
     .choice-other-input::placeholder { color: var(--text-muted); }
     .choice-other-input:focus { border-color: var(--accent-light); }
 
+    /* ── Stripe payment slide ── */
+    .stripe-tiers { display: flex; flex-direction: column; gap: 8px; }
+
+    .stripe-tier {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stripe-tier:hover { border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.03); }
+    .stripe-tier.is-selected {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.12);
+    }
+    .stripe-tier--elite.is-selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+    }
+
+    .stripe-tier-key {
+      font-family: 'Oswald', sans-serif;
+      width: 28px; height: 28px; min-width: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--text-muted);
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .stripe-tier.is-selected .stripe-tier-key {
+      border-color: var(--accent-light);
+      background: var(--accent-light);
+      color: var(--bg);
+    }
+    .stripe-tier--elite.is-selected .stripe-tier-key {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .stripe-tier-info { flex: 1; }
+    .stripe-tier-name { font-size: 0.98rem; font-weight: 400; color: var(--text-soft); display: block; line-height: 1.4; }
+    .stripe-tier.is-selected .stripe-tier-name { color: var(--text); }
+    .stripe-tier-meta { font-size: 0.82rem; font-weight: 400; color: var(--text-muted); }
+    .stripe-tier--elite .stripe-tier-meta { color: rgba(201,168,76,0.8); }
+
+    .stripe-card-section { margin-top: 28px; display: none; }
+
+    #card-element {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      transition: border-color 0.3s;
+      margin-top: 8px;
+    }
+    #card-element.StripeElement--focus { border-color: var(--accent-light); }
+    #card-element.StripeElement--invalid { border-color: var(--error); }
+
+    .stripe-loading {
+      display: none; text-align: center;
+      padding: 24px 0;
+      color: var(--text-muted); font-size: 0.92rem;
+    }
+
     /* ── Slide nav ── */
     .slide-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
@@ -415,6 +537,7 @@
     }
     .nav-next-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
     .nav-next-btn:active { transform: scale(0.97); }
+    .nav-next-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
     .slide-hint-key {
       font-size: 0.74rem; font-weight: 400;
@@ -468,12 +591,12 @@
       .slide { padding: 24px 24px 110px; }
       .slide-nav { padding: 14px 24px; }
       .nav-next-btn { padding: 13px 36px; }
-      .offer-btn { padding: 18px 56px; width: 100%; text-align: center; }
+      .offer-btn { padding: 18px 56px; }      .d3-choice { max-width: 100%; }
     }
 
     @media (max-width: 480px) {
       .topbar-logo { height: 30px; }
-      .offer-btn { width: 100%; text-align: center; padding: 17px 40px; }
+      .offer-btn { padding: 17px 40px; }
       .slide-q { font-size: 1.35rem; }
       .choices { gap: 8px; }
       .choice { padding: 14px 16px; }
@@ -497,23 +620,23 @@
     <div class="offer-wrap">
 
       <span class="offer-eyebrow">Only 20 spots</span>
-      <h1 class="offer-heading">The StrikePoint OGs</h1>
-      <p class="offer-lead">Original Golfers. We’re opening StrikePoint Sims with twenty OGs. Lock in below-launch pricing for 24 months. No card required. Billing starts when we open. If you aren't satisfied, we'll refund you.</p>
+      <h1 class="offer-heading">The Founding 20</h1>
+      <p class="offer-lead">We're opening StrikePoint Sims with twenty Founding Members. Lock in your monthly savings &mdash; $30 off Range and Standard, $70 off Elite &mdash; for the life of your membership, as long as it stays active. Your card is saved at signup but you're not charged until the doors open. If it's not what we promised, you get your money back within 14 days.</p>
 
       <!-- Founding member perks -->
       <div class="offer-perks">
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">Founding pricing, locked for 24 months</div>
-            <div class="perk-desc">The lowest rates we’ll offer, guaranteed for your first two years.</div>
+            <div class="perk-name">Founding savings, locked for life</div>
+            <div class="perk-desc">$30/mo off Range and Standard, $70/mo off Elite &mdash; off our standard rates, forever, as long as your membership stays active. Cancel and the rate is gone.</div>
           </div>
         </div>
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
             <div class="perk-name">14-day money-back guarantee</div>
-            <div class="perk-desc">If it’s not what we promised, cancel within 14 days for a full refund.</div>
+            <div class="perk-desc">If it's not what we promised, cancel within 14 days for a full refund.</div>
           </div>
         </div>
         <div class="perk">
@@ -540,23 +663,23 @@
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">No charge until we open</div>
-            <div class="perk-desc">You don’t pay anything until the doors are open.</div>
+            <div class="perk-name">Charged when we open, not today</div>
+            <div class="perk-desc">Your card is saved now. Billing starts when the doors open.</div>
           </div>
         </div>
       </div>
 
       <!-- Pricing tiers -->
-      <span class="pricing-label">StrikePoint OG pricing, locked for 24 months</span>
+      <span class="pricing-label">Founding 20 pricing, locked for the life of your membership</span>
       <div class="tier-grid">
         <div class="tier">
-          <div class="tier-name">Practice</div>
+          <div class="tier-name">Range</div>
           <div class="tier-price">
             <span class="tier-price-num">$119</span>
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $149/mo</div>
-          <div class="tier-desc">Off-peak access. Weekdays before 5pm & nights.</div>
+          <div class="tier-desc">Off-peak access only (weekdays before 5pm, nights 10pm&ndash;6am). 7-day advance booking.</div>
         </div>
         <div class="tier">
           <div class="tier-name">Standard</div>
@@ -565,7 +688,7 @@
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $249/mo</div>
-          <div class="tier-desc">8 hours peak + unlimited off-peak with earlier booking and guest privileges.</div>
+          <div class="tier-desc">8 peak hours/month + unlimited off-peak. 10-day advance booking. 1 guest pass/month.</div>
         </div>
         <div class="tier tier--elite">
           <div class="tier-flag">5 spots only</div>
@@ -575,16 +698,29 @@
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $399/mo</div>
-          <div class="tier-desc">Unlimited access, priority booking, guest privileges, and longer booking windows.</div>
+          <div class="tier-desc">Unlimited access any time. 14-day advance booking. 4 guest passes/month. First pick on opening week and league nights.</div>
         </div>
       </div>
 
       <p class="hourly-note">Prefer to drop in? Hourly bays will be available at opening. No membership required.</p>
 
       <div class="offer-start-wrap">
-        <button class="offer-btn" id="start-form-btn" onclick="startForm(true)">Reserve your spot &#8594;</button>
-        <button class="offer-secondary" onclick="startForm(false)">Just keep me posted</button>
-        <p class="offer-fine">Takes ~30 seconds</p>
+        <p class="d3-prompt">How would you like to proceed?</p>
+        <div class="d3-choice" id="d3-reserve" onclick="d3Select('reserve')" data-selected="true">
+          <div class="d3-check" id="d3-check-reserve">&#10003;</div>
+          <div>
+            <div class="d3-choice-label">Reserve a founding spot</div>
+            <div class="d3-choice-sub">Card saved now &middot; charged at opening &middot; 14-day guarantee</div>
+          </div>
+        </div>
+        <div class="d3-choice" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
+          <div class="d3-check" id="d3-check-posted"></div>
+          <div>
+            <div class="d3-choice-label">Just keep me posted</div>
+            <div class="d3-choice-sub">No card needed</div>
+          </div>
+        </div>
+        <button class="offer-btn" id="start-form-btn" onclick="d3Continue()">Continue &#8594;</button>
       </div>
 
     </div>
@@ -607,7 +743,11 @@
       <!-- Slide 1: Name + Email -->
       <div class="slide is-active" data-slide="1">
         <div class="slide-inner">
-          <p class="slide-step">1 of 5</p>
+          <p class="slide-step" id="step-1">1 of 4</p>
+          <div class="founding-notice" id="founding-notice" style="display:none">
+            <span class="founding-notice-icon">&#128274;</span>
+            <span class="founding-notice-text">You&rsquo;ll save a card at the end &mdash; your first charge is your first month when we open. 14-day money-back guarantee.</span>
+          </div>
           <h2 class="slide-q">First, where should we send updates?</h2>
           <p class="slide-hint">No spam. Build progress and opening news only.</p>
           <div class="input-group">
@@ -626,7 +766,7 @@
       <!-- Slide 2: Golf level -->
       <div class="slide" data-slide="2">
         <div class="slide-inner">
-          <p class="slide-step">2 of 5</p>
+          <p class="slide-step" id="step-2">2 of 4</p>
           <h2 class="slide-q">How does golf fit into your life?</h2>
           <p class="slide-hint">There are membership options for all.</p>
           <div class="choices" id="level-choices">
@@ -665,7 +805,7 @@
       <!-- Slide 3: Town -->
       <div class="slide" data-slide="3">
         <div class="slide-inner">
-          <p class="slide-step">3 of 5</p>
+          <p class="slide-step" id="step-3">3 of 4</p>
           <h2 class="slide-q">Where are you coming from?</h2>
           <p class="slide-hint">Helps us understand a bit about you.</p>
           <div class="choices" id="town-choices">
@@ -689,7 +829,7 @@
       <!-- Slide 4: Priority (multi-select) -->
       <div class="slide" data-slide="4">
         <div class="slide-inner">
-          <p class="slide-step">4 of 5</p>
+          <p class="slide-step" id="step-4">4 of 4</p>
           <h2 class="slide-q">What matters most to you in a sim facility?</h2>
           <p class="slide-hint">Choose as many as you like.</p>
           <div class="choices" id="priority-choices">
@@ -716,13 +856,55 @@
         </div>
       </div>
 
-      <!-- Slide 6: Founder thank-you -->
+      <!-- Slide 6: Payment (founding members only) -->
       <div class="slide" data-slide="6">
+        <div class="slide-inner">
+          <p class="slide-step">Final step</p>
+          <h2 class="slide-q">Choose your tier and lock it in.</h2>
+          <p class="slide-hint">Card saved today. First charge is your first month when we open. Your Founding savings stay locked for the life of your membership. 14-day money-back guarantee.</p>
+
+          <div class="stripe-tiers" id="stripe-tiers">
+            <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
+              <span class="stripe-tier-key">A</span>
+              <div class="stripe-tier-info">
+                <span class="stripe-tier-name">Range</span>
+                <span class="stripe-tier-meta">$119/mo &middot; regular $149 &middot; off-peak only (before 5pm + nights)</span>
+              </div>
+            </div>
+            <div class="stripe-tier" data-tier="Standard" data-price="219" onclick="selectStripeTier(this)">
+              <span class="stripe-tier-key">B</span>
+              <div class="stripe-tier-info">
+                <span class="stripe-tier-name">Standard</span>
+                <span class="stripe-tier-meta">$219/mo &middot; regular $249 &middot; 8 peak hrs + unlimited off-peak</span>
+              </div>
+            </div>
+            <div class="stripe-tier stripe-tier--elite" data-tier="Elite" data-price="329" onclick="selectStripeTier(this)">
+              <span class="stripe-tier-key">C</span>
+              <div class="stripe-tier-info">
+                <span class="stripe-tier-name">Elite</span>
+                <span class="stripe-tier-meta">$329/mo &middot; regular $399 &middot; unlimited + priority &middot; 5 spots only</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stripe-card-section" id="stripe-card-section">
+            <span class="input-label">Card details</span>
+            <div id="card-element"></div>
+            <p class="input-error" id="card-error"></p>
+            <p class="input-fine" id="card-charge-note"></p>
+          </div>
+
+          <div class="stripe-loading" id="stripe-loading">Securing your spot&hellip;</div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Confirm -->
+      <div class="slide" data-slide="7">
         <div class="slide-inner slide-inner--center">
           <div class="confirm-icon">
             <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
           </div>
-          <h2 class="confirm-heading" id="confirm-heading">You're on the StrikePoint OG list.</h2>
+          <h2 class="confirm-heading" id="confirm-heading">You're on the Founding 20 list.</h2>
           <p class="confirm-body" id="confirm-body">We'll reach out with more details as we approach opening.</p>
           <a href="/" class="confirm-home-link">&#8592; Back to home</a>
         </div>
@@ -741,17 +923,23 @@
   (function(){
     var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEbYdo1E3B2oKPfaSvQ4J24kfxNdQI1ViSZknVxtnP59rx36GpORaLp09T_8YFAilUyg/exec';
 
+    // ── Replace with your Stripe publishable key (pk_live_... or pk_test_...) ──
+    var STRIPE_PUBLISHABLE_KEY = 'pk_test_REPLACE_WITH_YOUR_KEY';
+
     var current = 1;
-    var TOTAL = 5; // working slides (excluding confirm)
+    var TOTAL = 5; // working slides before payment/confirm
     var rowId = null;
+    var stripe = null, stripeCard = null, selectedTier = null;
+
     var data = {
       full_name: '', first_name: '', email: '',
       community: '', community_other: '',
       golf_level: '', priority: [],
-      founding_20: false, updates: ''
+      founding_20: false, updates: '',
+      stripe_tier: '', stripe_price: ''
     };
 
-    // ── Server save (text/plain to avoid CORS preflight) ──
+    // ── Server save ──
     function saveToServer(payload) {
       if (rowId) payload.row_id = rowId;
       try {
@@ -770,8 +958,23 @@
     // ── Start form ──
     window.startForm = function(asFounder) {
       data.founding_20 = !!asFounder;
+      data.updates = 'Yes, keep me in the loop'; // default for both paths
+      current = 1;
+
+      // Show/hide founding notice + update step label on slide 1
+      var notice = document.getElementById('founding-notice');
+      var step1  = document.getElementById('step-1');
+      if (asFounder) {
+        if (notice) notice.style.display = 'flex';
+        if (step1)  step1.textContent = '1 of 4';
+      } else {
+        if (notice) notice.style.display = 'none';
+        if (step1)  step1.textContent = '1 of 3';
+      }
+      showSlide(1);
+
       var offer = document.getElementById('offer-screen');
-      var form = document.getElementById('form-screen');
+      var form  = document.getElementById('form-screen');
       offer.classList.add('hiding');
       form.classList.add('visible');
       document.body.style.overflow = 'hidden';
@@ -803,32 +1006,56 @@
       var target = document.querySelector('.slide[data-slide="'+n+'"]');
       if (target) target.classList.add('is-active');
 
+      // Path-aware progress
       var fill = document.getElementById('progress-fill');
-      var pct = { 1:10, 2:32, 3:54, 4:76, 5:92, 6:100 };
+      var pct;
+      if (data.founding_20) {
+        pct = { 1:12, 2:32, 3:52, 4:72, 6:93, 7:100 };
+      } else {
+        pct = { 1:18, 2:52, 3:86, 7:100 };
+      }
       fill.style.width = (pct[n] || 0) + '%';
 
-      document.getElementById('back-btn').disabled = n <= 1 || n > TOTAL;
+      // Path-aware step labels
+      var stepLabels;
+      if (data.founding_20) {
+        stepLabels = { 1:'1 of 4', 2:'2 of 4', 3:'3 of 4', 4:'4 of 4', 6:'Final step' };
+      } else {
+        stepLabels = { 1:'1 of 3', 2:'2 of 3', 3:'3 of 3' };
+      }
+      var stepEl = document.getElementById('step-' + n);
+      if (stepEl && stepLabels[n]) stepEl.textContent = stepLabels[n];
 
-      var nav = document.getElementById('slide-nav');
+      var nav     = document.getElementById('slide-nav');
+      var backBtn = document.getElementById('back-btn');
       var nextBtn = document.getElementById('next-btn');
       var keyHint = document.getElementById('key-hint');
 
-      if (n > TOTAL) {
+      if (n === 7) {
         nav.style.display = 'none';
+      } else if (n === 6) {
+        nav.style.display = 'flex';
+        backBtn.disabled = false;
+        nextBtn.style.display = 'inline-block';
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Secure my spot \u2192';
+        keyHint.textContent = '';
       } else {
         nav.style.display = 'flex';
-        // Hide Next on auto-advance slides (single-select choices)
+        backBtn.disabled = n <= 1;
         if (n === 2 || n === 3 || n === 5) {
           nextBtn.style.display = 'none';
-          keyHint.textContent = 'press A–G to choose';
+          keyHint.textContent = 'press A\u2013G to choose';
         } else if (n === 4) {
           nextBtn.style.display = 'inline-block';
-          nextBtn.textContent = 'OK →';
-          keyHint.textContent = 'choose any · then Enter';
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'OK \u2192';
+          keyHint.textContent = 'choose any \u00b7 then Enter';
         } else {
           nextBtn.style.display = 'inline-block';
-          nextBtn.textContent = 'OK →';
-          keyHint.textContent = 'press Enter ↵';
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'OK \u2192';
+          keyHint.textContent = 'press Enter \u21b5';
         }
       }
 
@@ -901,17 +1128,40 @@
 
     // ── Nav ──
     window.nextSlide = function() {
+      if (current === 6) { handleStripeSubmit(); return; }
       if (current === 1 && !validateSlide1()) return;
       saveOnLeave(current);
+
+      // Slide 3 → route by path
+      if (current === 3) {
+        if (data.community === 'other') {
+          var otherVal = document.getElementById('other-town').value.trim();
+          if (!otherVal) return;
+          data.community_other = otherVal;
+        }
+        if (data.founding_20) {
+          current = 4; showSlide(4);
+        } else {
+          submitForm();
+        }
+        return;
+      }
+
+      // Slide 4 → founding goes straight to payment (skip slide 5)
+      if (current === 4) {
+        current = 6; showSlide(6);
+        return;
+      }
+
       if (current < TOTAL) {
         current++;
         showSlide(current);
-      } else if (current === TOTAL) {
-        // Already on last slide — selectUpdates handles submit
       }
     };
 
     window.prevSlide = function() {
+      // From payment, back to slide 4 (slide 5 is not in either path)
+      if (current === 6) { current = 4; showSlide(4); return; }
       if (current > 1 && current <= TOTAL) {
         current--;
         showSlide(current);
@@ -944,12 +1194,18 @@
       if (val === 'other') {
         otherInp.style.display = 'block';
         setTimeout(function(){ otherInp.focus(); }, 50);
-        // Show Next button
         document.getElementById('next-btn').style.display = 'inline-block';
-        document.getElementById('next-btn').textContent = 'OK →';
-        document.getElementById('key-hint').textContent = 'type your town · then Enter';
+        document.getElementById('next-btn').textContent = 'OK \u2192';
+        document.getElementById('key-hint').textContent = 'type your town \u00b7 then Enter';
       } else {
-        setTimeout(function(){ saveOnLeave(3); current = 4; showSlide(4); }, 280);
+        setTimeout(function(){
+          saveOnLeave(3);
+          if (data.founding_20) {
+            current = 4; showSlide(4);
+          } else {
+            submitForm();
+          }
+        }, 280);
       }
     };
 
@@ -962,7 +1218,135 @@
       clearChoices(group);
       el.classList.add('is-selected');
       data.updates = el.getAttribute('data-value');
-      setTimeout(submitForm, 280);
+      if (data.founding_20) {
+        // Founding member: go to payment slide
+        setTimeout(function(){ current = 6; showSlide(6); }, 280);
+      } else {
+        setTimeout(submitForm, 280);
+      }
+    };
+
+    // ── Stripe tier selection ──
+    window.selectStripeTier = function(el) {
+      document.querySelectorAll('.stripe-tier').forEach(function(t){ t.classList.remove('is-selected'); });
+      el.classList.add('is-selected');
+      selectedTier = {
+        name: el.getAttribute('data-tier'),
+        price: el.getAttribute('data-price')
+      };
+
+      var section = document.getElementById('stripe-card-section');
+      section.style.display = 'block';
+
+      document.getElementById('card-charge-note').textContent =
+        'Card saved now. First charge of $' + selectedTier.price + '/mo when we open.';
+
+      // Mount Stripe card element if not already mounted
+      initAndMountCard();
+
+      document.getElementById('card-error').textContent = '';
+    };
+
+    function initAndMountCard() {
+      if (stripe) return; // already initialized
+      try {
+        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+        var elements = stripe.elements({
+          fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap' }]
+        });
+        stripeCard = elements.create('card', {
+          style: {
+            base: {
+              color: '#ffffff',
+              fontFamily: '"Lato", sans-serif',
+              fontSmoothing: 'antialiased',
+              fontSize: '16px',
+              fontWeight: '300',
+              '::placeholder': { color: 'rgba(255,255,255,0.28)' }
+            },
+            invalid: { color: '#e8735a', iconColor: '#e8735a' }
+          }
+        });
+        stripeCard.mount('#card-element');
+        stripeCard.on('change', function(e) {
+          document.getElementById('card-error').textContent = e.error ? e.error.message : '';
+        });
+      } catch(err) {
+        console.error('Stripe init error:', err);
+        document.getElementById('card-error').textContent = 'Payment system unavailable. Please contact us directly.';
+      }
+    }
+
+    // ── Stripe submit ──
+    window.handleStripeSubmit = function() {
+      if (!selectedTier) {
+        document.getElementById('card-error').textContent = 'Please select a membership tier above.';
+        return;
+      }
+      if (!stripeCard) {
+        document.getElementById('card-error').textContent = 'Card entry not ready. Please wait a moment.';
+        return;
+      }
+
+      var nextBtn = document.getElementById('next-btn');
+      var loading = document.getElementById('stripe-loading');
+      nextBtn.disabled = true;
+      nextBtn.textContent = 'Processing…';
+      loading.style.display = 'block';
+      document.getElementById('card-error').textContent = '';
+
+      // Request SetupIntent client_secret from Google Apps Script
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'create_setup_intent',
+          email: data.email,
+          name: data.full_name,
+          tier: selectedTier.name,
+          row_id: rowId || ''
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(resp) {
+        if (!resp.client_secret) {
+          throw new Error(resp.error || 'Setup failed. Please try again.');
+        }
+        return stripe.confirmCardSetup(resp.client_secret, {
+          payment_method: {
+            card: stripeCard,
+            billing_details: {
+              name: data.full_name,
+              email: data.email
+            }
+          }
+        });
+      })
+      .then(function(result) {
+        if (result.error) throw new Error(result.error.message);
+
+        data.stripe_tier = selectedTier.name;
+        data.stripe_price = selectedTier.price;
+
+        // Save payment method alongside the existing row
+        if (!rowId) rowId = generateId();
+        saveToServer({
+          row_id: rowId,
+          stripe_setup_intent: result.setupIntent.id,
+          stripe_payment_method: result.setupIntent.payment_method,
+          membership_tier: selectedTier.name,
+          membership_price: selectedTier.price,
+          status: 'payment_authorized'
+        });
+
+        submitForm();
+      })
+      .catch(function(err) {
+        document.getElementById('card-error').textContent = err.message || 'Something went wrong. Please try again.';
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Secure my spot →';
+        loading.style.display = 'none';
+      });
     };
 
     // ── Final submit ──
@@ -973,21 +1357,30 @@
       var sel = document.querySelectorAll('#priority-choices .choice.is-selected');
       data.priority = Array.from(sel).map(function(el){ return el.getAttribute('data-value'); });
 
-      saveToServer({
+      var payload = {
         row_id: rowId,
         updates: data.updates,
         founding_20: data.founding_20 ? 'Yes' : 'No',
         priority: data.priority.join(', '),
         status: 'completed'
-      });
+      };
+      if (data.stripe_tier) {
+        payload.membership_tier = data.stripe_tier;
+        payload.membership_price = data.stripe_price;
+      }
+      saveToServer(payload);
 
       // Update confirm copy
       var heading = document.getElementById('confirm-heading');
       var body = document.getElementById('confirm-body');
       var icon = document.querySelector('.confirm-icon');
-      if (data.founding_20) {
-        heading.textContent = "You're on the Founding list, " + data.first_name + ".";
-        body.textContent = "We'll reach out with Founding 20 details and tier selection as we approach opening. No card required until we open.";
+      if (data.founding_20 && data.stripe_tier) {
+        heading.textContent = data.first_name + ", you're in.";
+        body.textContent = 'Your ' + data.stripe_tier + ' spot is reserved. Your card won\'t be charged until we open. You\'ll hear from us first about preview night and opening day.';
+        icon.classList.remove('confirm-icon--accent');
+      } else if (data.founding_20) {
+        heading.textContent = "You're on the Founding 20 list, " + data.first_name + ".";
+        body.textContent = "We'll reach out with details as we approach opening.";
         icon.classList.remove('confirm-icon--accent');
       } else {
         heading.textContent = "We'll be in touch, " + data.first_name + ".";
@@ -995,53 +1388,78 @@
         icon.classList.add('confirm-icon--accent');
       }
 
-      current = 6;
-      showSlide(6);
+      current = 7;
+      showSlide(7);
     }
 
     // ── Keyboard ──
     document.addEventListener('keydown', function(e){
       var formScreen = document.getElementById('form-screen');
       if (!formScreen.classList.contains('shown')) return;
-      if (current > TOTAL) return;
+      if (current === 7) return;
 
       if (e.key === 'Enter') {
         var active = document.activeElement;
         if (active && active.id === 'other-town') {
-          // Allow Enter to advance from town-other input
           if (data.community === 'other' && active.value.trim()) {
             e.preventDefault();
             data.community_other = active.value.trim();
             saveOnLeave(3);
-            current = 4; showSlide(4);
+            if (data.founding_20) {
+              current = 4; showSlide(4);
+            } else {
+              submitForm();
+            }
           }
           return;
         }
-        if (current === 1 || current === 4) {
+        if (current === 1 || current === 4 || current === 6) {
           e.preventDefault();
           nextSlide();
         }
+        return;
       }
 
-      // A–G for choice slides
-      if (current >= 2 && current <= 5) {
-        var k = e.key.toLowerCase();
-        var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
-        var idx = map[k];
-        if (idx === undefined) return;
-        if (document.activeElement && document.activeElement.id === 'other-town') return;
+      // A–G for choice slides, A–C for payment slide
+      var k = e.key.toLowerCase();
+      var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
+      var idx = map[k];
+      if (idx === undefined) return;
+      if (document.activeElement && document.activeElement.id === 'other-town') return;
 
-        var slide = document.querySelector('.slide[data-slide="'+current+'"]');
-        if (!slide) return;
-        var opts = slide.querySelectorAll('.choice');
-        if (!opts[idx]) return;
-
-        if (current === 2) selectLevel(opts[idx]);
-        else if (current === 3) selectTown(opts[idx]);
-        else if (current === 4) toggleMulti(opts[idx]);
-        else if (current === 5) selectUpdates(opts[idx]);
+      if (current === 6) {
+        var tiers = document.querySelectorAll('.stripe-tier');
+        if (tiers[idx]) selectStripeTier(tiers[idx]);
+        return;
       }
+
+      // Only act on the active choice slides
+      if (current < 2 || current > 4) return;
+
+      var slide = document.querySelector('.slide[data-slide="'+current+'"]');
+      if (!slide) return;
+      var opts = slide.querySelectorAll('.choice');
+      if (!opts[idx]) return;
+
+      if (current === 2) selectLevel(opts[idx]);
+      else if (current === 3) selectTown(opts[idx]);
+      else if (current === 4) toggleMulti(opts[idx]);
     });
+
+    // ── D3 CTA choice ──
+    var d3Choice = 'reserve';
+    window.d3Select = function(val) {
+      d3Choice = val;
+      var reserve = document.getElementById('d3-reserve');
+      var posted  = document.getElementById('d3-posted');
+      reserve.setAttribute('data-selected', val === 'reserve' ? 'true' : 'false');
+      posted.setAttribute('data-selected',  val === 'posted'  ? 'true' : 'false');
+      document.getElementById('d3-check-reserve').textContent = val === 'reserve' ? '\u2713' : '';
+      document.getElementById('d3-check-posted').textContent  = val === 'posted'  ? '\u2713' : '';
+    };
+    window.d3Continue = function() {
+      startForm(d3Choice === 'reserve');
+    };
 
     // Init
     showSlide(1);
