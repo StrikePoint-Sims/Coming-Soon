@@ -1346,7 +1346,18 @@
         });
 
         paymentElement = stripeElements.create('payment', {
-          layout: { type: 'tabs', defaultCollapsed: false }
+          layout: { type: 'tabs', defaultCollapsed: false },
+          wallets: {
+            applePay: 'auto',
+            googlePay: 'auto'
+          },
+          paymentMethodOrder: ['card'],
+          fields: {
+            billingDetails: {
+              name: 'auto',
+              email: 'auto'
+            }
+          }
         });
         paymentElement.mount('#payment-element');
         loading.style.display = 'none';
