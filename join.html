@@ -519,22 +519,18 @@
 
     .stripe-card-section { margin-top: 28px; display: none; }
 
-    #express-checkout-element { margin-top: 8px; margin-bottom: 14px; }
-    .stripe-payment-divider {
+    #express-checkout-element { margin-top: 8px; margin-bottom: 18px; }
+
+    .stripe-wallet-divider {
       display: flex; align-items: center; gap: 12px;
-      margin: 14px 0;
-      color: rgba(255,255,255,0.35);
-      font-size: 0.78rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      margin: 18px 0 14px;
+      color: rgba(255,255,255,0.38); font-size: 0.76rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
     }
-    .stripe-payment-divider::before,
-    .stripe-payment-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: rgba(255,255,255,0.1);
+    .stripe-wallet-divider::before, .stripe-wallet-divider::after {
+      content: ''; height: 1px; flex: 1; background: rgba(255,255,255,0.1);
     }
+
     #payment-element { margin-top: 8px; }
 
     .terms-agree {
@@ -925,7 +921,7 @@
         <div class="slide-inner">
           <p class="slide-step">Final step</p>
           <h2 class="slide-q">Choose your tier and lock it in.</h2>
-          <p class="slide-hint">Card saved today. First charge is your first month when we open. Your Founding savings stay locked for the life of your membership. 14-day money-back guarantee.</p>
+          <p class="slide-hint">$1 authorization to verify your card. No charges processed. First membership charge is when we open. 14-day money-back guarantee at opening.</p>
 
           <div class="stripe-tiers" id="stripe-tiers">
             <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
@@ -952,16 +948,16 @@
           </div>
 
           <div class="stripe-card-section" id="stripe-card-section">
+            <div id="express-checkout-element"></div>
+            <div class="stripe-wallet-divider">or use card</div>
+            <div id="payment-element"></div>
+            <p class="input-error" id="card-error"></p>
+            <p class="input-fine" id="card-charge-note"></p>
             <label class="terms-agree">
               <input type="checkbox" id="terms-check">
               <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a> and <a href="waiver.html" target="_blank">Liability Waiver</a></span>
             </label>
             <p class="input-error" id="terms-error"></p>
-            <div id="express-checkout-element"></div>
-            <div class="stripe-payment-divider" id="stripe-payment-divider">or use card</div>
-            <div id="payment-element"></div>
-            <p class="input-error" id="card-error"></p>
-            <p class="input-fine" id="card-charge-note"></p>
           </div>
 
           <div class="stripe-loading" id="stripe-loading">Securing your spot&hellip;</div>
@@ -999,7 +995,7 @@
     var current = 1;
     var TOTAL = 5; // working slides before payment/confirm
     var rowId = null;
-    var stripe = null, stripeElements = null, expressCheckoutElement = null, paymentElement = null, selectedTier = null;
+    var stripe = null, stripeElements = null, paymentElement = null, expressCheckoutElement = null, selectedTier = null;
 
     var data = {
       full_name: '', first_name: '', email: '',
@@ -1309,7 +1305,7 @@
       section.style.display = 'block';
 
       document.getElementById('card-charge-note').textContent =
-        'Card saved now. First charge of $' + selectedTier.price + '/mo when we open.';
+        '$1 authorization to verify your card. It will automatically disappear. First membership charge: $' + selectedTier.price + '/mo when we open.';
 
       fetchSetupIntentAndMount();
 
@@ -1328,7 +1324,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
-          action: 'create_setup_intent',
+          action: 'create_payment_intent',
           email: data.email,
           name: data.full_name,
           tier: selectedTier ? selectedTier.name : '',
@@ -1364,37 +1360,15 @@
         });
 
         expressCheckoutElement = stripeElements.create('expressCheckout', {
-          buttonType: {
-            applePay: 'plain',
-            googlePay: 'plain'
-          },
           wallets: {
             applePay: 'auto',
             googlePay: 'auto',
             link: 'never'
+          },
+          buttonType: {
+            applePay: 'plain',
+            googlePay: 'plain'
           }
-        });
-
-        expressCheckoutElement.on('ready', function(event) {
-          var expressEl = document.getElementById('express-checkout-element');
-          var dividerEl = document.getElementById('stripe-payment-divider');
-          if (!event.availablePaymentMethods || Object.keys(event.availablePaymentMethods).length === 0) {
-            if (expressEl) expressEl.style.display = 'none';
-            if (dividerEl) dividerEl.style.display = 'none';
-          }
-        });
-
-        expressCheckoutElement.on('click', function(event) {
-          var termsCheck = document.getElementById('terms-check');
-          var termsError = document.getElementById('terms-error');
-          if (termsCheck && !termsCheck.checked) {
-            if (termsError) termsError.textContent = 'Please agree to the Terms of Use to continue.';
-            termsCheck.focus();
-            if (event && typeof event.reject === 'function') event.reject();
-            return;
-          }
-          if (termsError) termsError.textContent = '';
-          if (event && typeof event.resolve === 'function') event.resolve();
         });
 
         expressCheckoutElement.on('confirm', function() {
@@ -1453,7 +1427,7 @@
       loading.style.display = 'block';
       document.getElementById('card-error').textContent = '';
 
-      stripe.confirmSetup({
+      stripe.confirmPayment({
         elements: stripeElements,
         redirect: 'if_required',
         confirmParams: {
@@ -1472,11 +1446,11 @@
         if (!rowId) rowId = generateId();
         saveToServer({
           row_id: rowId,
-          stripe_setup_intent: result.setupIntent.id,
-          stripe_payment_method: result.setupIntent.payment_method,
+          stripe_payment_intent: result.paymentIntent.id,
+          stripe_payment_method: result.paymentIntent.payment_method,
           membership_tier: selectedTier.name,
           membership_price: selectedTier.price,
-          status: 'payment_authorized'
+          status: 'payment_authorized_manual_capture'
         });
 
         submitForm();
