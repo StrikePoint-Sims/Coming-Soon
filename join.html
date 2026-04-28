@@ -72,9 +72,21 @@
       margin-bottom: 20px; letter-spacing: 0.01em;
     }
 
-    .offer-lead {
-      font-size: 1.05rem; font-weight: 400; line-height: 1.8;
-      color: var(--text-soft); margin-bottom: 48px; max-width: 640px;
+    .offer-lead-block {
+      max-width: 640px;
+      margin-bottom: 48px;
+    }
+
+    .offer-lead-block p {
+      font-size: 1.05rem;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-soft);
+      margin-bottom: 16px;
+    }
+
+    .offer-lead-block p:last-child {
+      margin-bottom: 0;
     }
 
     /* ── Perks list ── */
@@ -109,6 +121,7 @@
       color: var(--text-muted); margin-bottom: 16px; display: block;
     }
 
+    .tier-grid .tier { transform: rotate(1deg); }
     .tier-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -162,9 +175,30 @@
       font-size: 0.78rem; font-weight: 400; color: var(--text-muted);
       text-decoration: line-through; margin-bottom: 14px;
     }
+    .tier-row {
+      display: grid; grid-template-columns: 62px 1fr; gap: 8px; align-items: baseline;
+    }
+    .tier-row-label {
+      font-family: 'Oswald', sans-serif;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .tier-tagline {
+      font-size: 0.82rem; font-style: italic;
+      color: rgba(255,255,255,0.5);
+      padding-top: 10px; margin-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .tier--elite .tier-tagline { color: rgba(201,168,76,0.6); }
+    .tier-footnote {
+      font-size: 0.78rem; color: rgba(255,255,255,0.38);
+      margin: -28px 0 36px; letter-spacing: 0.02em;
+    }
     .tier-desc {
       font-size: 0.82rem; font-weight: 400; color: var(--text-muted);
       line-height: 1.55; padding-top: 14px;
+      display: flex; flex-direction: column; gap: 7px;
       border-top: 1px solid var(--border);
     }
 
@@ -621,56 +655,44 @@
 
       <span class="offer-eyebrow">Only 20 spots</span>
       <h1 class="offer-heading">The Founding 20</h1>
-      <p class="offer-lead">We're opening StrikePoint Sims with twenty Founding Members. Lock in your monthly savings &mdash; $30 off Range and Standard, $70 off Elite &mdash; for the life of your membership, as long as it stays active. Your card is saved at signup but you're not charged until the doors open. If it's not what we promised, you get your money back within 14 days.</p>
+      <div class="offer-lead-block">
+        <p>We’re opening with twenty Founding Members. Lock preferred pricing for as long as your membership stays active and save $30–$70/mo. Your card is saved today, and you won’t be charged until we open.</p>
+      </div>
 
       <!-- Founding member perks -->
       <div class="offer-perks">
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">Founding savings, locked for life</div>
-            <div class="perk-desc">$30/mo off Range and Standard, $70/mo off Elite &mdash; off our standard rates, forever, as long as your membership stays active. Cancel and the rate is gone.</div>
+            <div class="perk-name">Satisfaction guarantee</div>
+            <div class="perk-desc">If it’s not what we promised, cancel within 14 days for a full refund.</div>
           </div>
         </div>
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">14-day money-back guarantee</div>
-            <div class="perk-desc">If it's not what we promised, cancel within 14 days for a full refund.</div>
+            <div class="perk-name">Preferred pricing for life</div>
+            <div class="perk-desc">Save $30–$70/mo off public rates while your membership stays active.</div>
           </div>
         </div>
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">Opening week priority access</div>
-            <div class="perk-desc">First access to tee times when we open.</div>
+            <div class="perk-name">Founder recognition</div>
+            <div class="perk-desc">Your name on the Founding 20 wall, plus early-member perks.</div>
           </div>
         </div>
         <div class="perk">
           <div class="perk-dot"></div>
           <div class="perk-text">
-            <div class="perk-name">Private preview night</div>
-            <div class="perk-desc">Founders-only. Get in before anyone else.</div>
-          </div>
-        </div>
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">Your name on the wall</div>
-            <div class="perk-desc">Permanent recognition for the twenty who made this happen.</div>
-          </div>
-        </div>
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">Charged when we open, not today</div>
+            <div class="perk-name">No charge today</div>
             <div class="perk-desc">Your card is saved now. Billing starts when the doors open.</div>
           </div>
         </div>
       </div>
 
       <!-- Pricing tiers -->
-      <span class="pricing-label">Founding 20 pricing, locked for the life of your membership</span>
+      <span class="pricing-label">Founder pricing</span>
       <div class="tier-grid">
         <div class="tier">
           <div class="tier-name">Range</div>
@@ -679,7 +701,12 @@
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $149/mo</div>
-          <div class="tier-desc">Off-peak access only (weekdays before 5pm, nights 10pm&ndash;6am). 7-day advance booking.</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>Unlimited off-peak&thinsp;*<br><span style="color:rgba(255,255,255,0.35);font-size:0.82em">Peak hours not included</span></span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>7-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>1-hour blocks</span></div>
+            <div class="tier-tagline">Built for easy, consistent reps.</div>
+          </div>
         </div>
         <div class="tier">
           <div class="tier-name">Standard</div>
@@ -688,7 +715,12 @@
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $249/mo</div>
-          <div class="tier-desc">8 peak hours/month + unlimited off-peak. 10-day advance booking. 1 guest pass/month.</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>8 peak hours/month + unlimited off-peak</span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>10-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>2-hour blocks</span></div>
+            <div class="tier-tagline">Enough for regular rounds and flexible play.</div>
+          </div>
         </div>
         <div class="tier tier--elite">
           <div class="tier-flag">5 spots only</div>
@@ -698,19 +730,24 @@
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $399/mo</div>
-          <div class="tier-desc">Unlimited access any time. 14-day advance booking. 4 guest passes/month. First pick on opening week and league nights.</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>16 peak hours/month + unlimited off-peak</span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>14-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>4-hour blocks for full rounds</span></div>
+            <div class="tier-tagline">Priority access when demand is highest.</div>
+          </div>
         </div>
       </div>
 
-      <p class="hourly-note">Prefer to drop in? Hourly bays will be available at opening. No membership required.</p>
+      <p class="tier-footnote">* Off-peak: weekdays before 5pm &amp; nights 10pm&ndash;6am &nbsp;&middot;&nbsp; All tiers include guest privileges</p>
 
       <div class="offer-start-wrap">
-        <p class="d3-prompt">How would you like to proceed?</p>
+        <p class="d3-prompt">Reserve your spot in the Founding 20</p>
         <div class="d3-choice" id="d3-reserve" onclick="d3Select('reserve')" data-selected="true">
           <div class="d3-check" id="d3-check-reserve">&#10003;</div>
           <div>
             <div class="d3-choice-label">Reserve a founding spot</div>
-            <div class="d3-choice-sub">Card saved now &middot; charged at opening &middot; 14-day guarantee</div>
+            <div class="d3-choice-sub">Card saved now &middot; no charge today &middot; satisfaction guarantee</div>
           </div>
         </div>
         <div class="d3-choice" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
