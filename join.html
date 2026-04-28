@@ -921,7 +921,7 @@
         <div class="slide-inner">
           <p class="slide-step">Final step</p>
           <h2 class="slide-q">Choose your tier and lock it in.</h2>
-          <p class="slide-hint">$1 authorization to verify your card. No charges processed. First membership charge is when we open. 14-day money-back guarantee at opening.</p>
+          <p class="slide-hint">$1 authorization today to verify your card. It automatically disappears. First membership charge is when we open. 14-day money-back guarantee.</p>
 
           <div class="stripe-tiers" id="stripe-tiers">
             <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
@@ -1378,7 +1378,12 @@
         expressCheckoutElement.mount('#express-checkout-element');
 
         paymentElement = stripeElements.create('payment', {
-          layout: { type: 'tabs', defaultCollapsed: false },
+          // Keep Apple Pay / Google Pay prominent above, and keep card entry collapsed until opened.
+          layout: {
+            type: 'accordion',
+            defaultCollapsed: true,
+            radios: false
+          },
           wallets: {
             applePay: 'never',
             googlePay: 'never',
