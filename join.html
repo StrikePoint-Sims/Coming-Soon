@@ -17,6 +17,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Marcellus&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
   <script src="https://js.stripe.com/v3/"></script>
 
+  <!-- GA4 — TODO: Replace PLACEHOLDER_GA4_MEASUREMENT_ID with real ID from Mike, then uncomment
+  <script async src="https://www.googletagmanager.com/gtag/js?id=PLACEHOLDER_GA4_MEASUREMENT_ID"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','PLACEHOLDER_GA4_MEASUREMENT_ID');</script>
+  -->
+
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -516,16 +521,7 @@
 
     .stripe-card-section { margin-top: 28px; display: none; }
 
-    #card-element {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px 16px;
-      transition: border-color 0.3s;
-      margin-top: 8px;
-    }
-    #card-element.StripeElement--focus { border-color: var(--accent-light); }
-    #card-element.StripeElement--invalid { border-color: var(--error); }
+    #payment-element { margin-top: 8px; }
 
     .stripe-loading {
       display: none; text-align: center;
@@ -925,8 +921,7 @@
           </div>
 
           <div class="stripe-card-section" id="stripe-card-section">
-            <span class="input-label">Card details</span>
-            <div id="card-element"></div>
+            <div id="payment-element"></div>
             <p class="input-error" id="card-error"></p>
             <p class="input-fine" id="card-charge-note"></p>
           </div>
@@ -966,7 +961,7 @@
     var current = 1;
     var TOTAL = 5; // working slides before payment/confirm
     var rowId = null;
-    var stripe = null, stripeCard = null, selectedTier = null;
+    var stripe = null, stripeElements = null, paymentElement = null, selectedTier = null;
 
     var data = {
       full_name: '', first_name: '', email: '',
@@ -1278,40 +1273,68 @@
       document.getElementById('card-charge-note').textContent =
         'Card saved now. First charge of $' + selectedTier.price + '/mo when we open.';
 
-      // Mount Stripe card element if not already mounted
-      initAndMountCard();
+      fetchSetupIntentAndMount();
 
       document.getElementById('card-error').textContent = '';
     };
 
-    function initAndMountCard() {
-      if (stripe) return; // already initialized
-      try {
-        stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
-        var elements = stripe.elements({
-          fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap' }]
-        });
-        stripeCard = elements.create('card', {
-          style: {
-            base: {
-              color: '#ffffff',
+    function fetchSetupIntentAndMount() {
+      if (paymentElement) return; // already mounted
+      if (!stripe) stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+      var loading = document.getElementById('stripe-loading');
+      loading.textContent = 'Loading payment form…';
+      loading.style.display = 'block';
+
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+          action: 'create_setup_intent',
+          email: data.email,
+          name: data.full_name,
+          tier: selectedTier ? selectedTier.name : '',
+          row_id: rowId || ''
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(resp) {
+        if (!resp.client_secret) throw new Error(resp.error || 'Setup failed. Please try again.');
+
+        stripeElements = stripe.elements({
+          clientSecret: resp.client_secret,
+          appearance: {
+            theme: 'night',
+            variables: {
+              colorPrimary: '#8fa65e',
+              colorBackground: '#111111',
+              colorText: '#ffffff',
+              colorTextSecondary: 'rgba(255,255,255,0.7)',
+              colorDanger: '#e8735a',
               fontFamily: '"Lato", sans-serif',
-              fontSmoothing: 'antialiased',
-              fontSize: '16px',
-              fontWeight: '300',
-              '::placeholder': { color: 'rgba(255,255,255,0.28)' }
+              borderRadius: '8px'
             },
-            invalid: { color: '#e8735a', iconColor: '#e8735a' }
+            rules: {
+              '.Input': { border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.04)' },
+              '.Input:focus': { border: '1px solid #8fa65e', boxShadow: 'none' },
+              '.Tab': { border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#111111' },
+              '.Tab:hover': { border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.05)' },
+              '.Tab--selected': { border: '1px solid #8fa65e', backgroundColor: 'rgba(143,166,94,0.08)' },
+              '.Tab--selected:hover': { border: '1px solid #8fa65e', backgroundColor: 'rgba(143,166,94,0.08)' }
+            }
           }
         });
-        stripeCard.mount('#card-element');
-        stripeCard.on('change', function(e) {
-          document.getElementById('card-error').textContent = e.error ? e.error.message : '';
+
+        paymentElement = stripeElements.create('payment', {
+          layout: { type: 'tabs', defaultCollapsed: false }
         });
-      } catch(err) {
-        console.error('Stripe init error:', err);
-        document.getElementById('card-error').textContent = 'Payment system unavailable. Please contact us directly.';
-      }
+        paymentElement.mount('#payment-element');
+        loading.style.display = 'none';
+      })
+      .catch(function(err) {
+        loading.style.display = 'none';
+        document.getElementById('card-error').textContent = err.message || 'Payment system unavailable. Please try again.';
+      });
     }
 
     // ── Stripe submit ──
@@ -1320,8 +1343,8 @@
         document.getElementById('card-error').textContent = 'Please select a membership tier above.';
         return;
       }
-      if (!stripeCard) {
-        document.getElementById('card-error').textContent = 'Card entry not ready. Please wait a moment.';
+      if (!paymentElement) {
+        document.getElementById('card-error').textContent = 'Payment form not ready. Please wait a moment.';
         return;
       }
 
@@ -1329,35 +1352,19 @@
       var loading = document.getElementById('stripe-loading');
       nextBtn.disabled = true;
       nextBtn.textContent = 'Processing…';
+      loading.textContent = 'Securing your spot…';
       loading.style.display = 'block';
       document.getElementById('card-error').textContent = '';
 
-      // Request SetupIntent client_secret from Google Apps Script
-      fetch(FORM_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify({
-          action: 'create_setup_intent',
-          email: data.email,
-          name: data.full_name,
-          tier: selectedTier.name,
-          row_id: rowId || ''
-        })
-      })
-      .then(function(r) { return r.json(); })
-      .then(function(resp) {
-        if (!resp.client_secret) {
-          throw new Error(resp.error || 'Setup failed. Please try again.');
-        }
-        return stripe.confirmCardSetup(resp.client_secret, {
-          payment_method: {
-            card: stripeCard,
-            billing_details: {
-              name: data.full_name,
-              email: data.email
-            }
+      stripe.confirmSetup({
+        elements: stripeElements,
+        redirect: 'if_required',
+        confirmParams: {
+          return_url: 'https://www.strikepointsims.com/join',
+          payment_method_data: {
+            billing_details: { name: data.full_name, email: data.email }
           }
-        });
+        }
       })
       .then(function(result) {
         if (result.error) throw new Error(result.error.message);
@@ -1365,7 +1372,6 @@
         data.stripe_tier = selectedTier.name;
         data.stripe_price = selectedTier.price;
 
-        // Save payment method alongside the existing row
         if (!rowId) rowId = generateId();
         saveToServer({
           row_id: rowId,
