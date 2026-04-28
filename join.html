@@ -1002,7 +1002,9 @@
       community: '', community_other: '',
       golf_level: '', priority: [],
       founding_20: false, updates: '',
-      stripe_tier: '', stripe_price: ''
+      path: '',
+      stripe_tier: '', stripe_price: '',
+      stripe_customer: ''
     };
 
     // ── Server save ──
@@ -1024,6 +1026,7 @@
     // ── Start form ──
     window.startForm = function(asFounder) {
       data.founding_20 = !!asFounder;
+      data.path = asFounder ? 'card' : 'no_card';
       data.updates = 'Yes, keep me in the loop'; // default for both paths
       current = 1;
 
@@ -1140,6 +1143,8 @@
           full_name: data.full_name,
           email: data.email,
           founding_20: data.founding_20 ? 'Yes' : 'No',
+          path: data.path,
+          payment_status: data.founding_20 ? 'pending' : 'none',
           status: 'started'
         });
       }
@@ -1447,15 +1452,19 @@
 
         data.stripe_tier = selectedTier.name;
         data.stripe_price = selectedTier.price;
+        data.stripe_customer = result.paymentIntent.customer || '';
 
         if (!rowId) rowId = generateId();
         saveToServer({
           row_id: rowId,
+          path: 'card',
+          payment_status: 'authorized',
+          stripe_customer: result.paymentIntent.customer || '',
           stripe_payment_intent: result.paymentIntent.id,
           stripe_payment_method: result.paymentIntent.payment_method,
           membership_tier: selectedTier.name,
           membership_price: selectedTier.price,
-          status: 'payment_authorized_manual_capture'
+          status: 'card_authorized'
         });
 
         submitForm();
@@ -1481,11 +1490,14 @@
         updates: data.updates,
         founding_20: data.founding_20 ? 'Yes' : 'No',
         priority: data.priority.join(', '),
-        status: 'completed'
+        path: data.path,
+        payment_status: data.stripe_tier ? 'authorized' : 'none',
+        status: data.stripe_tier ? 'card_authorized' : 'lead_completed'
       };
       if (data.stripe_tier) {
         payload.membership_tier = data.stripe_tier;
         payload.membership_price = data.stripe_price;
+        payload.stripe_customer = data.stripe_customer;
       }
       saveToServer(payload);
 
