@@ -69,12 +69,17 @@
 
 .sp-btn--decline {
   background: transparent;
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.28);
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 9px 6px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  border-radius: 0;
 }
 .sp-btn--decline:hover {
-  color: rgba(255,255,255,0.85);
-  border-color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.5);
 }
 
 /* ── "Privacy Settings" trigger used in footers ── */

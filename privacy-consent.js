@@ -100,6 +100,24 @@ var SP_META_ID = '1890255115025836';
     }
   };
 
+  // ── Email reveal (replaces .sp-obf placeholders; defeats address harvesters) ──
+  function revealEmails() {
+    var els = document.querySelectorAll('.sp-obf');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var addr = el.getAttribute('data-p1') + '@' + el.getAttribute('data-p2') + '.' + el.getAttribute('data-p3');
+      var a = document.createElement('a');
+      a.href = 'mai' + 'lto:' + addr;
+      a.textContent = addr;
+      el.parentNode.replaceChild(a, el);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', revealEmails);
+  } else {
+    revealEmails();
+  }
+
   // ── Init ──
   var stored = getConsent();
   if (stored) {

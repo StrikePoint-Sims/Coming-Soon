@@ -8,13 +8,13 @@
   <meta name="theme-color" content="#0a0a0a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Marcellus&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="privacy-consent.css">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root { --bg: #0a0a0a; --text: #fff; --text-soft: rgba(255,255,255,0.88); --text-muted: rgba(255,255,255,0.6); --accent-light: #8fa65e; --border: rgba(255,255,255,0.08); }
     html { -webkit-text-size-adjust: 100%; }
-    body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+    body { font-family: 'Hanken Grotesk', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
 
     .topbar { display: flex; align-items: center; justify-content: space-between; padding: 24px 40px; background: var(--bg); border-bottom: 1px solid rgba(255,255,255,0.06); }
     .topbar-logo { height: 36px; width: auto; opacity: 0.9; }
@@ -24,7 +24,7 @@
     .doc-wrap { max-width: 720px; margin: 0 auto; padding: 64px 40px 96px; }
 
     .doc-eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent-light); display: block; margin-bottom: 16px; }
-    .doc-title { font-family: 'Marcellus', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 400; line-height: 1.2; margin-bottom: 10px; }
+    .doc-title { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 600; line-height: 1.08; letter-spacing: -0.01em; margin-bottom: 10px; }
     .doc-meta { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px; }
     .doc-subtitle { font-size: 0.92rem; font-weight: 700; color: var(--text-soft); margin-bottom: 12px; letter-spacing: 0.04em; }
     .doc-preamble { font-size: 0.88rem; font-weight: 700; color: var(--text-soft); margin-bottom: 48px; line-height: 1.6; }
@@ -32,7 +32,7 @@
     .doc-section { margin-bottom: 36px; padding-bottom: 36px; border-bottom: 1px solid var(--border); }
     .doc-section:last-child { border-bottom: none; }
 
-    .doc-section-title { font-family: 'Marcellus', serif; font-size: 1.05rem; font-weight: 400; color: var(--text); margin-bottom: 12px; }
+    .doc-section-title { font-family: 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 12px; }
     .doc-section p { font-size: 0.92rem; font-weight: 400; color: var(--text-soft); line-height: 1.8; margin-bottom: 10px; }
     .doc-section p:last-child { margin-bottom: 0; }
     .doc-section ul { padding-left: 18px; margin: 8px 0; }
@@ -132,7 +132,7 @@
 
     <div class="doc-section">
       <h2 class="doc-section-title">10. Photo and Video Release</h2>
-      <p>Participant consents to Strikepoint using photographs or video recorded at the Facility in which Participant appears for marketing and promotional purposes, including but not limited to use on the Strikepoint website, social media channels, and advertising materials. Participant grants this consent without entitlement to compensation. Participant may opt out of this consent at any time by providing written notice to <a href="mailto:operations@strikepointsims.com">operations@strikepointsims.com</a> prior to their session. Opt-out of marketing use does not affect Strikepoint&rsquo;s right to retain and use surveillance footage for security, safety, and incident documentation purposes as described in the Privacy Policy.</p>
+      <p>Participant consents to Strikepoint using photographs or video recorded at the Facility in which Participant appears for marketing and promotional purposes, including but not limited to use on the Strikepoint website, social media channels, and advertising materials. Participant grants this consent without entitlement to compensation. Participant may opt out of this consent at any time by providing written notice to <span class="sp-obf" data-p1="operations" data-p2="strikepointsims" data-p3="com"></span> prior to their session. Opt-out of marketing use does not affect Strikepoint&rsquo;s right to retain and use surveillance footage for security, safety, and incident documentation purposes as described in the Privacy Policy.</p>
     </div>
 
     <div class="doc-section">
@@ -165,7 +165,7 @@
           <span class="sig-underline" style="max-width:120px"></span>
         </div>
       </div>
-      <p style="margin-top:20px">Contact: <a href="mailto:operations@strikepointsims.com">operations@strikepointsims.com</a></p>
+      <p style="margin-top:20px">Contact: <span class="sp-obf" data-p1="operations" data-p2="strikepointsims" data-p3="com"></span></p>
     </div>
 
   </div>

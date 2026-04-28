@@ -14,7 +14,7 @@
   <meta name="theme-color" content="#0a0a0a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300&family=Marcellus&family=Oswald:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <script src="https://js.stripe.com/v3/"></script>
 
   <!-- GA4 + Meta Pixel loaded by privacy-consent.js after user consent. -->
@@ -29,9 +29,11 @@
       --accent-light: #8fa65e; --gold: #c9a84c;
       --border: rgba(255,255,255,0.1);
       --error: #e8735a;
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
     }
     html { -webkit-text-size-adjust: 100%; }
-    body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
     /* ── Top bar ── */
     .topbar {
@@ -63,16 +65,17 @@
     .offer-wrap { max-width: 860px; margin: 0 auto; }
 
     .offer-eyebrow {
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
       color: var(--gold); display: block; margin-bottom: 20px;
     }
 
     .offer-heading {
-      font-family: 'Marcellus', serif;
+      font-family: var(--font-serif);
       font-size: clamp(2rem, 5vw, 3.4rem);
-      font-weight: 400; line-height: 1.15;
-      margin-bottom: 20px; letter-spacing: 0.01em;
+      font-weight: 600; line-height: 1.05;
+      margin-bottom: 20px; letter-spacing: -0.02em;
     }
 
     .offer-lead-block {
@@ -101,9 +104,9 @@
     }
 
     .perk {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
       padding: 20px 22px;
       display: flex; align-items: flex-start; gap: 14px;
     }
@@ -114,17 +117,17 @@
     }
 
     .perk-text { flex: 1; }
-    .perk-name { font-size: 0.92rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-    .perk-desc { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); line-height: 1.55; }
+    .perk-name { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: 0.01em; }
+    .perk-desc { font-size: 0.83rem; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.55; }
 
     /* ── Pricing tiers ── */
     .pricing-label {
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase;
-      color: var(--text-muted); margin-bottom: 16px; display: block;
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px; display: block;
     }
 
-    .tier-grid .tier { transform: rotate(1deg); }
     .tier-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -133,10 +136,10 @@
     }
 
     .tier {
-      border: 1px solid var(--border);
+      border: 1px solid rgba(255,255,255,0.14);
       border-radius: 12px;
-      padding: 28px 22px 24px;
-      background: var(--bg-alt);
+      padding: 24px 22px 22px;
+      background: rgba(255,255,255,0.06);
       position: relative;
     }
     .tier--elite {
@@ -146,49 +149,60 @@
 
     .tier-flag {
       position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: var(--font-sans);
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.10em; text-transform: uppercase;
       padding: 4px 12px; background: var(--gold); color: #1a1a1a;
       border-radius: 20px; white-space: nowrap;
     }
 
     .tier-name {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.82rem; font-weight: 700;
-      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: var(--font-sans);
+      font-size: 0.88rem; font-weight: 600;
+      letter-spacing: 0.02em; text-transform: none;
       color: var(--accent-light);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .tier--elite .tier-name { color: var(--gold); }
 
     .tier-price {
-      display: flex; align-items: baseline; gap: 8px;
+      display: flex; align-items: flex-end; gap: 4px;
       margin-bottom: 6px;
     }
     .tier-price-num {
-      font-family: 'Oswald', sans-serif;
-      font-size: 2.6rem; font-weight: 700;
-      letter-spacing: -0.01em; line-height: 1; color: var(--text);
+      font-family: var(--font-serif);
+      font-size: clamp(2.7rem, 5.5vw, 3.6rem); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1; color: var(--text);
+    }
+    .tier-price-currency {
+      font-size: 0.60em;
+      font-weight: 600;
+      vertical-align: 0.18em;
+      margin-right: 1px;
+      letter-spacing: 0;
     }
     .tier-price-mo {
-      font-size: 0.9rem; font-weight: 400; color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 0.82rem; font-weight: 400; color: rgba(255,255,255,0.35);
+      margin-bottom: 0.2rem;
     }
     .tier-price-was {
-      font-size: 0.78rem; font-weight: 400; color: var(--text-muted);
-      text-decoration: line-through; margin-bottom: 14px;
+      font-family: var(--font-sans);
+      font-size: 0.78rem; font-weight: 300; color: var(--text-muted);
+      text-decoration: line-through; opacity: 0.7; margin-bottom: 14px;
     }
     .tier-row {
       display: grid; grid-template-columns: 62px 1fr; gap: 8px; align-items: baseline;
     }
     .tier-row-label {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.68rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: rgba(255,255,255,0.35);
+      font-family: var(--font-sans);
+      font-size: 0.60rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
     }
     .tier-tagline {
-      font-size: 0.82rem; font-style: italic;
+      font-family: var(--font-sans);
+      font-size: 0.82rem; font-style: italic; font-weight: 300;
       color: rgba(255,255,255,0.5);
       padding-top: 10px; margin-top: 4px;
       border-top: 1px solid var(--border);
@@ -196,7 +210,12 @@
     .tier--elite .tier-tagline { color: rgba(201,168,76,0.6); }
     .tier-footnote {
       font-size: 0.78rem; color: rgba(255,255,255,0.38);
-      margin: -28px 0 36px; letter-spacing: 0.02em;
+      margin: -20px 0 36px; letter-spacing: 0.02em;
+      line-height: 1.75; max-width: 560px;
+    }
+    .offer-lead-block strong {
+      font-weight: 600;
+      color: var(--text);
     }
     .tier-desc {
       font-size: 0.82rem; font-weight: 400; color: var(--text-muted);
@@ -235,20 +254,20 @@
       background: var(--accent-light); border-color: var(--accent-light);
     }
     .d3-choice-label {
-      font-family: 'Marcellus', serif; font-size: 1rem; color: var(--text); margin-bottom: 3px;
+      font-family: var(--font-sans); font-size: 1rem; font-weight: 500; color: var(--text); margin-bottom: 3px;
     }
     .d3-choice-sub {
       font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;
     }
     .d3-prompt {
-      font-family: 'Marcellus', serif; font-size: 1.05rem;
-      color: var(--text-soft); margin-bottom: 6px; line-height: 1.5;
+      font-family: var(--font-sans); font-size: 1rem; font-weight: 600;
+      color: var(--text); margin-bottom: 12px; line-height: 1.5;
     }
 
     .offer-btn {
       display: inline-block;
-      font-family: 'Marcellus', serif;
-      font-size: 1.05rem; font-weight: 400;
+      font-family: var(--font-sans);
+      font-size: 1rem; font-weight: 600;
       letter-spacing: 0.04em; color: #fff;
       text-decoration: none;
       background: var(--accent); border: none;
@@ -262,7 +281,7 @@
 
     .offer-secondary {
       background: none; border: none;
-      font-family: 'Lato', sans-serif;
+      font-family: var(--font-sans);
       font-size: 0.85rem; font-weight: 400;
       color: var(--text-muted);
       text-decoration: underline; text-underline-offset: 3px;
@@ -270,6 +289,25 @@
       transition: color 0.25s;
     }
     .offer-secondary:hover { color: var(--text); }
+
+    .d3-choice--secondary {
+      border-color: rgba(255,255,255,0.07);
+      background: transparent;
+      padding: 12px 18px;
+    }
+    .d3-choice--secondary .d3-choice-label {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .d3-choice--secondary .d3-choice-sub {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .d3-choice--secondary.d3-choice[data-selected="true"] {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.03);
+    }
 
     .offer-fine {
       font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.78);
@@ -364,17 +402,17 @@
     .slide-inner--center { text-align: center; }
 
     .slide-step {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.78rem; font-weight: 700;
-      letter-spacing: 0.18em; text-transform: uppercase;
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
       color: var(--accent-light);
       margin-bottom: 14px;
     }
 
     .slide-q {
-      font-family: 'Marcellus', serif;
+      font-family: var(--font-serif);
       font-size: clamp(1.4rem, 3.5vw, 2rem);
-      font-weight: 400; line-height: 1.3;
+      font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
       color: var(--text); margin-bottom: 8px;
     }
 
@@ -386,11 +424,12 @@
 
     /* ── Inputs ── */
     .input-group { margin-bottom: 20px; }
+    .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .input-label {
       display: block;
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.16em; text-transform: uppercase;
+      font-family: var(--font-sans);
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
       color: var(--text-muted); margin-bottom: 6px;
     }
     .slide-input {
@@ -398,7 +437,7 @@
       background: transparent; border: none;
       border-bottom: 2px solid rgba(255,255,255,0.18);
       padding: 12px 0;
-      font-family: 'Lato', sans-serif;
+      font-family: var(--font-sans);
       font-size: 1.15rem; font-weight: 300;
       color: var(--text); outline: none;
       transition: border-color 0.3s;
@@ -415,6 +454,24 @@
     .input-fine {
       font-size: 0.82rem; color: var(--text-muted);
       margin-top: 14px; font-style: italic;
+    }
+    .why-hold {
+      color: var(--accent-light);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      font-style: normal;
+    }
+    .why-hold-text {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.68);
+      line-height: 1.55;
+      font-style: normal;
     }
 
     /* ── Choices ── */
@@ -435,7 +492,7 @@
     }
 
     .choice-key {
-      font-family: 'Oswald', sans-serif;
+      font-family: var(--font-sans);
       width: 28px; height: 28px; min-width: 28px;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -457,7 +514,7 @@
     .choice-desc { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); line-height: 1.5; margin-top: 3px; }
 
     .choice-other-input {
-      width: 100%; font-family: 'Lato', sans-serif;
+      width: 100%; font-family: var(--font-sans);
       font-size: 0.92rem; font-weight: 300; color: var(--text);
       background: transparent; border: none;
       border-bottom: 1px solid var(--border);
@@ -490,7 +547,7 @@
     }
 
     .stripe-tier-key {
-      font-family: 'Oswald', sans-serif;
+      font-family: var(--font-sans);
       width: 28px; height: 28px; min-width: 28px;
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -568,7 +625,7 @@
 
     .nav-back-btn {
       background: none; border: none; cursor: pointer;
-      font-family: 'Lato', sans-serif; font-size: 0.88rem;
+      font-family: var(--font-sans); font-size: 0.88rem;
       font-weight: 400; color: var(--text-muted);
       padding: 8px 12px;
       transition: color 0.25s, opacity 0.25s;
@@ -579,8 +636,8 @@
     .nav-back-btn:disabled { opacity: 0; pointer-events: none; }
 
     .nav-next-btn {
-      font-family: 'Marcellus', serif;
-      font-size: 0.95rem; font-weight: 400;
+      font-family: var(--font-sans);
+      font-size: 0.92rem; font-weight: 600;
       letter-spacing: 0.04em; color: #fff;
       background: var(--accent); border: none;
       border-radius: 40px;
@@ -610,9 +667,9 @@
     .confirm-icon svg { width: 28px; height: 28px; stroke: #1a1a1a; stroke-width: 2.5; fill: none; }
 
     .confirm-heading {
-      font-family: 'Marcellus', serif;
+      font-family: var(--font-serif);
       font-size: clamp(1.6rem, 4vw, 2.2rem);
-      font-weight: 400; text-align: center; margin-bottom: 14px;
+      font-weight: 600; letter-spacing: -0.01em; text-align: center; margin-bottom: 14px;
     }
 
     .confirm-body {
@@ -621,12 +678,31 @@
       text-align: center; margin-bottom: 28px;
     }
 
+    .confirm-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .confirm-reserve-link {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 0.92rem; font-weight: 600;
+      color: #fff; text-decoration: none;
+      background: var(--accent);
+      border-radius: 40px;
+      padding: 14px 34px;
+      letter-spacing: 0.03em;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .confirm-reserve-link:hover { background: var(--accent-hover); transform: translateY(-1px); }
     .confirm-home-link {
       display: inline-block;
       padding: 12px 28px;
       border: 1px solid var(--border);
       border-radius: 40px;
-      font-family: 'Lato', sans-serif;
+      font-family: var(--font-sans);
       font-size: 0.88rem; font-weight: 400;
       color: var(--text-soft); text-decoration: none;
       letter-spacing: 0.03em;
@@ -645,7 +721,9 @@
       .slide { padding: 24px 24px 110px; }
       .slide-nav { padding: 14px 24px; }
       .nav-next-btn { padding: 13px 36px; }
-      .offer-btn { padding: 18px 56px; }      .d3-choice { max-width: 100%; }
+      .offer-btn { padding: 18px 56px; }
+      .name-grid { grid-template-columns: 1fr; gap: 0; }
+      .d3-choice { max-width: 100%; }
     }
 
     @media (max-width: 480px) {
@@ -655,7 +733,7 @@
       .choices { gap: 8px; }
       .choice { padding: 14px 16px; }
       .slide-hint-key { display: none; }
-      .tier-price-num { font-size: 2.2rem; }
+      .tier-price-num { font-size: 2.5rem; }
     }
   </style>
 </head>
@@ -676,7 +754,9 @@
       <span class="offer-eyebrow">Only 20 spots</span>
       <h1 class="offer-heading">The Founding 20</h1>
       <div class="offer-lead-block">
-        <p>We’re opening with twenty Founding Members. Lock preferred pricing for as long as your membership stays active and save $30–$70/mo. Your card is saved today, and you won’t be charged until we open.</p>
+        <p><strong>Twenty spots. Preferred pricing for life.</strong></p>
+        <p>Save $30–$70/mo versus public rates — locked in as long as your membership is active.</p>
+        <p>No membership charge today. A $1 temporary hold verifies your card and automatically disappears.</p>
       </div>
 
       <!-- Founding member perks -->
@@ -706,7 +786,7 @@
           <div class="perk-dot"></div>
           <div class="perk-text">
             <div class="perk-name">No charge today</div>
-            <div class="perk-desc">Your card is saved now. Billing starts when the doors open.</div>
+            <div class="perk-desc">A $1 temporary hold verifies your card. Billing starts when the doors open.</div>
           </div>
         </div>
       </div>
@@ -717,7 +797,7 @@
         <div class="tier">
           <div class="tier-name">Range</div>
           <div class="tier-price">
-            <span class="tier-price-num">$119</span>
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>119</span>
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $149/mo</div>
@@ -731,7 +811,7 @@
         <div class="tier">
           <div class="tier-name">Standard</div>
           <div class="tier-price">
-            <span class="tier-price-num">$219</span>
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>219</span>
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $249/mo</div>
@@ -746,7 +826,7 @@
           <div class="tier-flag">5 spots only</div>
           <div class="tier-name">Elite</div>
           <div class="tier-price">
-            <span class="tier-price-num">$329</span>
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>329</span>
             <span class="tier-price-mo">/mo</span>
           </div>
           <div class="tier-price-was">Regular $399/mo</div>
@@ -762,15 +842,15 @@
       <p class="tier-footnote">* Off-peak: weekdays before 5pm &amp; nights 10pm&ndash;6am &nbsp;&middot;&nbsp; All tiers include guest privileges</p>
 
       <div class="offer-start-wrap">
-        <p class="d3-prompt">Reserve your spot in the Founding 20</p>
+        <p class="d3-prompt">Ready to lock your spot?</p>
         <div class="d3-choice" id="d3-reserve" onclick="d3Select('reserve')" data-selected="true">
           <div class="d3-check" id="d3-check-reserve">&#10003;</div>
           <div>
             <div class="d3-choice-label">Reserve a founding spot</div>
-            <div class="d3-choice-sub">Card saved now &middot; no charge today &middot; satisfaction guarantee</div>
+            <div class="d3-choice-sub">$1 temporary hold &middot; no membership charge today &middot; satisfaction guarantee</div>
           </div>
         </div>
-        <div class="d3-choice" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
+        <div class="d3-choice d3-choice--secondary" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
           <div class="d3-check" id="d3-check-posted"></div>
           <div>
             <div class="d3-choice-label">Just keep me posted</div>
@@ -806,14 +886,21 @@
           <p class="slide-step" id="step-1">1 of 4</p>
           <div class="founding-notice" id="founding-notice" style="display:none">
             <span class="founding-notice-icon">&#128274;</span>
-            <span class="founding-notice-text">You&rsquo;ll save a card at the end &mdash; your first charge is your first month when we open. 14-day money-back guarantee.</span>
+            <span class="founding-notice-text">Card saved at the end. A $1 temporary hold verifies your card and automatically disappears. No membership charge until opening.</span>
           </div>
-          <h2 class="slide-q">First, where should we send updates?</h2>
-          <p class="slide-hint">No spam. Build progress and opening news only.</p>
-          <div class="input-group">
-            <span class="input-label">Name</span>
-            <input class="slide-input" type="text" id="field-name" name="full_name" placeholder="Your name" autocomplete="name" autocapitalize="words">
-            <p class="input-error" id="err-name"></p>
+          <h2 class="slide-q" id="slide-1-heading">Where should we send updates?</h2>
+          <p class="slide-hint" id="slide-1-hint">Build progress, opening news, and when bookings go live.</p>
+          <div class="name-grid">
+            <div class="input-group">
+              <span class="input-label">First name</span>
+              <input class="slide-input" type="text" id="field-first-name" name="first_name" placeholder="First name" autocomplete="given-name" autocapitalize="words">
+              <p class="input-error" id="err-first-name"></p>
+            </div>
+            <div class="input-group">
+              <span class="input-label">Last name</span>
+              <input class="slide-input" type="text" id="field-last-name" name="last_name" placeholder="Last name" autocomplete="family-name" autocapitalize="words">
+              <p class="input-error" id="err-last-name"></p>
+            </div>
           </div>
           <div class="input-group">
             <span class="input-label">Email</span>
@@ -828,33 +915,33 @@
         <div class="slide-inner">
           <p class="slide-step" id="step-2">2 of 4</p>
           <h2 class="slide-q">How does golf fit into your life?</h2>
-          <p class="slide-hint">There are membership options for all.</p>
+          <p class="slide-hint">We’ll use this to guide your experience.</p>
           <div class="choices" id="level-choices">
-            <div class="choice" data-value="The Competitor" onclick="selectLevel(this)">
+            <div class="choice" data-value="I play often and want to improve" onclick="selectLevel(this)">
               <div class="choice-key">A</div>
               <div class="choice-content">
-                <div class="choice-title">The Competitor</div>
+                <div class="choice-title">I play often and want to improve</div>
                 <div class="choice-desc">50+ rounds a year. Always sharpening my game.</div>
               </div>
             </div>
-            <div class="choice" data-value="The Regular" onclick="selectLevel(this)">
+            <div class="choice" data-value="I play regularly during the season" onclick="selectLevel(this)">
               <div class="choice-key">B</div>
               <div class="choice-content">
-                <div class="choice-title">The Regular</div>
+                <div class="choice-title">I play regularly during the season</div>
                 <div class="choice-desc">About once a week in season.</div>
               </div>
             </div>
-            <div class="choice" data-value="The Social Player" onclick="selectLevel(this)">
+            <div class="choice" data-value="I play occasionally, mostly with friends" onclick="selectLevel(this)">
               <div class="choice-key">C</div>
               <div class="choice-content">
-                <div class="choice-title">The Social Player</div>
+                <div class="choice-title">I play occasionally, mostly with friends</div>
                 <div class="choice-desc">A handful of rounds a year, mostly with friends.</div>
               </div>
             </div>
-            <div class="choice" data-value="The Newcomer" onclick="selectLevel(this)">
+            <div class="choice" data-value="I’m newer to golf or just getting into it" onclick="selectLevel(this)">
               <div class="choice-key">D</div>
               <div class="choice-content">
-                <div class="choice-title">The Newcomer</div>
+                <div class="choice-title">I’m newer to golf or just getting into it</div>
                 <div class="choice-desc">Curious about golf or just getting started.</div>
               </div>
             </div>
@@ -867,7 +954,7 @@
         <div class="slide-inner">
           <p class="slide-step" id="step-3">3 of 4</p>
           <h2 class="slide-q">Where are you coming from?</h2>
-          <p class="slide-hint">Helps us understand a bit about you.</p>
+          <p class="slide-hint">We’ll prioritize access and updates near you.</p>
           <div class="choices" id="town-choices">
             <div class="choice" data-value="Colchester" onclick="selectTown(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Colchester</div></div></div>
             <div class="choice" data-value="Hebron" onclick="selectTown(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Hebron</div></div></div>
@@ -891,7 +978,7 @@
         <div class="slide-inner">
           <p class="slide-step" id="step-4">4 of 4</p>
           <h2 class="slide-q">What matters most to you in a sim facility?</h2>
-          <p class="slide-hint">Choose as many as you like.</p>
+          <p class="slide-hint">Choose what matters—we’ll match you to the right membership.</p>
           <div class="choices" id="priority-choices">
             <div class="choice" data-value="Accuracy of the shot data" onclick="toggleMulti(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Accuracy of the shot data</div></div></div>
             <div class="choice" data-value="Being able to play on my own schedule" onclick="toggleMulti(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Being able to play on my own schedule</div></div></div>
@@ -903,25 +990,14 @@
         </div>
       </div>
 
-      <!-- Slide 5: Updates -->
-      <div class="slide" data-slide="5">
-        <div class="slide-inner">
-          <p class="slide-step">5 of 5</p>
-          <h2 class="slide-q">Want to follow along as we build?</h2>
-          <p class="slide-hint">Either way, no spam.</p>
-          <div class="choices" id="updates-choices">
-            <div class="choice" data-value="Yes, keep me in the loop" onclick="selectUpdates(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Yes, keep me in the loop</div></div></div>
-            <div class="choice" data-value="Just let me know when you're open" onclick="selectUpdates(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Just let me know when you're open</div></div></div>
-          </div>
-        </div>
-      </div>
-
       <!-- Slide 6: Payment (founding members only) -->
       <div class="slide" data-slide="6">
         <div class="slide-inner">
           <p class="slide-step">Final step</p>
           <h2 class="slide-q">Choose your tier and lock it in.</h2>
-          <p class="slide-hint">$1 authorization today to verify your card. It automatically disappears. First membership charge is when we open. 14-day money-back guarantee.</p>
+          <p class="slide-hint">We’ll place a $1 temporary hold to verify your card. It automatically disappears. Your first membership charge happens when we open.</p>
+          <p class="input-fine"><span class="why-hold" onclick="toggleWhyHold()">Why $1?</span></p>
+          <p class="input-fine why-hold-text" id="why-hold-text">This is a temporary hold to verify your card. It is not a charge and will automatically disappear.</p>
 
           <div class="stripe-tiers" id="stripe-tiers">
             <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
@@ -949,7 +1025,7 @@
 
           <div class="stripe-card-section" id="stripe-card-section">
             <div id="express-checkout-element"></div>
-            <div class="stripe-wallet-divider">or use card</div>
+            <div class="stripe-wallet-divider">Pay with card</div>
             <div id="payment-element"></div>
             <p class="input-error" id="card-error"></p>
             <p class="input-fine" id="card-charge-note"></p>
@@ -970,9 +1046,13 @@
           <div class="confirm-icon">
             <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
           </div>
-          <h2 class="confirm-heading" id="confirm-heading">You're on the Founding 20 list.</h2>
-          <p class="confirm-body" id="confirm-body">We'll reach out with more details as we approach opening.</p>
-          <a href="/" class="confirm-home-link">&#8592; Back to home</a>
+          <h2 class="confirm-heading" id="confirm-heading">You’re on the list.</h2>
+          <p class="confirm-body" id="confirm-body">You’ll get build updates, opening news, and when bookings go live.</p>
+          <p class="confirm-body" id="confirm-subbody" style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-top:-10px;">No spam. Just updates that matter.</p>
+          <div class="confirm-actions">
+            <a href="/join" class="confirm-reserve-link" id="confirm-reserve-link">Lock in founding pricing &#8594;</a>
+            <a href="/" class="confirm-home-link">Back to home</a>
+          </div>
         </div>
       </div>
 
@@ -993,12 +1073,12 @@
     var STRIPE_PUBLISHABLE_KEY = 'pk_test_51TQfuO6dJTC2t5WwqaSr5c44fIE9jpzG0lW5MKQ9jElKPaId7FQzrmK8zg9TgEzeqshPXoYp8BGkjhedLYHv55SH00ViZ1JZG2';
 
     var current = 1;
-    var TOTAL = 5; // working slides before payment/confirm
+    var TOTAL = 4; // working slides before payment/confirm
     var rowId = null;
     var stripe = null, stripeElements = null, paymentElement = null, expressCheckoutElement = null, selectedTier = null;
 
     var data = {
-      full_name: '', first_name: '', email: '',
+      first_name: '', last_name: '', full_name: '', email: '',
       community: '', community_other: '',
       golf_level: '', priority: [],
       founding_20: false, updates: '',
@@ -1033,12 +1113,18 @@
       // Show/hide founding notice + update step label on slide 1
       var notice = document.getElementById('founding-notice');
       var step1  = document.getElementById('step-1');
+      var slide1Heading = document.getElementById('slide-1-heading');
+      var slide1Hint = document.getElementById('slide-1-hint');
       if (asFounder) {
         if (notice) notice.style.display = 'flex';
         if (step1)  step1.textContent = '1 of 4';
+        if (slide1Heading) slide1Heading.textContent = 'Where should we send your reservation details?';
+        if (slide1Hint) slide1Hint.textContent = 'We’ll use this for your spot confirmation and opening updates.';
       } else {
         if (notice) notice.style.display = 'none';
         if (step1)  step1.textContent = '1 of 3';
+        if (slide1Heading) slide1Heading.textContent = 'Where should we send updates?';
+        if (slide1Hint) slide1Hint.textContent = 'Build progress, opening news, and when bookings go live.';
       }
       showSlide(1);
 
@@ -1049,7 +1135,7 @@
       document.body.style.overflow = 'hidden';
       setTimeout(function(){
         form.classList.add('shown');
-        var first = document.getElementById('field-name');
+        var first = document.getElementById('field-first-name');
         if (first) first.focus();
       }, 50);
       setTimeout(function(){ offer.style.display = 'none'; }, 500);
@@ -1140,6 +1226,8 @@
         if (!rowId) rowId = generateId();
         saveToServer({
           row_id: rowId,
+          first_name: data.first_name,
+          last_name: data.last_name,
           full_name: data.full_name,
           email: data.email,
           founding_20: data.founding_20 ? 'Yes' : 'No',
@@ -1164,20 +1252,31 @@
 
     // ── Validate slide 1 ──
     function validateSlide1() {
-      var nameInp = document.getElementById('field-name');
+      var firstInp = document.getElementById('field-first-name');
+      var lastInp = document.getElementById('field-last-name');
       var emailInp = document.getElementById('field-email');
-      var nm = nameInp.value.trim();
+      var first = firstInp.value.trim();
+      var last = lastInp.value.trim();
       var em = emailInp.value.trim();
       var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       var ok = true;
 
-      if (!nm) {
-        nameInp.classList.add('has-error');
-        document.getElementById('err-name').textContent = 'Please enter your name';
+      if (!first || first.length < 2) {
+        firstInp.classList.add('has-error');
+        document.getElementById('err-first-name').textContent = first ? 'Please enter your full first name' : 'Please enter your first name';
         ok = false;
       } else {
-        nameInp.classList.remove('has-error');
-        document.getElementById('err-name').textContent = '';
+        firstInp.classList.remove('has-error');
+        document.getElementById('err-first-name').textContent = '';
+      }
+
+      if (!last || last.length < 2) {
+        lastInp.classList.add('has-error');
+        document.getElementById('err-last-name').textContent = last ? 'Please enter your full last name' : 'Please enter your last name';
+        ok = false;
+      } else {
+        lastInp.classList.remove('has-error');
+        document.getElementById('err-last-name').textContent = '';
       }
 
       if (!em || !re.test(em)) {
@@ -1190,8 +1289,9 @@
       }
 
       if (ok) {
-        data.full_name = nm;
-        data.first_name = nm.split(' ')[0];
+        data.first_name = first;
+        data.last_name = last;
+        data.full_name = first + ' ' + last;
         data.email = em;
       }
       return ok;
@@ -1284,19 +1384,6 @@
       el.classList.toggle('is-selected');
     };
 
-    window.selectUpdates = function(el) {
-      var group = document.getElementById('updates-choices');
-      clearChoices(group);
-      el.classList.add('is-selected');
-      data.updates = el.getAttribute('data-value');
-      if (data.founding_20) {
-        // Founding member: go to payment slide
-        setTimeout(function(){ current = 6; showSlide(6); }, 280);
-      } else {
-        setTimeout(submitForm, 280);
-      }
-    };
-
     // ── Stripe tier selection ──
     window.selectStripeTier = function(el) {
       document.querySelectorAll('.stripe-tier').forEach(function(t){ t.classList.remove('is-selected'); });
@@ -1310,7 +1397,7 @@
       section.style.display = 'block';
 
       document.getElementById('card-charge-note').textContent =
-        '$1 authorization to verify your card. It will automatically disappear. First membership charge: $' + selectedTier.price + '/mo when we open.';
+        '$1 temporary hold to verify your card. It will automatically disappear. First membership charge: $' + selectedTier.price + '/mo when we open.';
 
       fetchSetupIntentAndMount();
 
@@ -1332,6 +1419,8 @@
           action: 'create_payment_intent',
           email: data.email,
           name: data.full_name,
+          first_name: data.first_name,
+          last_name: data.last_name,
           tier: selectedTier ? selectedTier.name : '',
           row_id: rowId || ''
         })
@@ -1350,7 +1439,7 @@
               colorText: '#ffffff',
               colorTextSecondary: 'rgba(255,255,255,0.7)',
               colorDanger: '#e8735a',
-              fontFamily: '"Lato", sans-serif',
+              fontFamily: '"Hanken Grotesk", system-ui, sans-serif',
               borderRadius: '8px'
             },
             rules: {
@@ -1383,10 +1472,10 @@
         expressCheckoutElement.mount('#express-checkout-element');
 
         paymentElement = stripeElements.create('payment', {
-          // Keep Apple Pay / Google Pay prominent above, and keep card entry collapsed until opened.
+          // Keep Apple Pay / Google Pay prominent above. Card is open on desktop, collapsed on mobile.
           layout: {
             type: 'accordion',
-            defaultCollapsed: true,
+            defaultCollapsed: window.innerWidth < 768,
             radios: false
           },
           wallets: {
@@ -1410,6 +1499,12 @@
         document.getElementById('card-error').textContent = err.message || 'Payment system unavailable. Please try again.';
       });
     }
+
+    window.toggleWhyHold = function() {
+      var el = document.getElementById('why-hold-text');
+      if (!el) return;
+      el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    };
 
     // ── Stripe submit ──
     window.handleStripeSubmit = function() {
@@ -1487,6 +1582,10 @@
 
       var payload = {
         row_id: rowId,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        full_name: data.full_name,
+        email: data.email,
         updates: data.updates,
         founding_20: data.founding_20 ? 'Yes' : 'No',
         priority: data.priority.join(', '),
@@ -1504,18 +1603,26 @@
       // Update confirm copy
       var heading = document.getElementById('confirm-heading');
       var body = document.getElementById('confirm-body');
+      var subbody = document.getElementById('confirm-subbody');
+      var reserveLink = document.getElementById('confirm-reserve-link');
       var icon = document.querySelector('.confirm-icon');
       if (data.founding_20 && data.stripe_tier) {
-        heading.textContent = data.first_name + ", you're in.";
-        body.textContent = 'Your ' + data.stripe_tier + ' spot is reserved. Your card won\'t be charged until we open. You\'ll hear from us first about preview night and opening day.';
+        heading.textContent = data.first_name ? ("You\'re in, " + data.first_name + ".") : "You\'re in.";
+        body.textContent = 'Your ' + data.stripe_tier + ' spot is reserved. Your first membership charge happens when we open.';
+        if (subbody) subbody.textContent = 'We’ll follow up as we get closer with membership details, preview timing, and opening updates.';
+        if (reserveLink) reserveLink.style.display = 'none';
         icon.classList.remove('confirm-icon--accent');
       } else if (data.founding_20) {
-        heading.textContent = "You're on the Founding 20 list, " + data.first_name + ".";
-        body.textContent = "We'll reach out with details as we approach opening.";
+        heading.textContent = data.first_name ? ("You\'re on the list, " + data.first_name + ".") : "You\'re on the list.";
+        body.textContent = "We’ll follow up as we get closer to opening with your membership details.";
+        if (subbody) subbody.textContent = 'No spam. Just updates that matter.';
+        if (reserveLink) reserveLink.style.display = 'none';
         icon.classList.remove('confirm-icon--accent');
       } else {
-        heading.textContent = "We'll be in touch, " + data.first_name + ".";
-        body.textContent = "We'll let you know when we're close to opening. Thanks for your interest.";
+        heading.textContent = data.first_name ? ("You’re on the list, " + data.first_name + ".") : "You’re on the list.";
+        body.textContent = "You’ll get build updates, opening news, and when bookings go live.";
+        if (subbody) subbody.textContent = 'No spam. Just updates that matter.';
+        if (reserveLink) reserveLink.style.display = 'inline-block';
         icon.classList.add('confirm-icon--accent');
       }
 
