@@ -318,6 +318,25 @@ body {
   font-size: 0.82rem;
 }
 
+.cta--secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.24);
+  color: var(--text-soft);
+}
+.cta--secondary:hover {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.4);
+}
+
+.founder-action-split {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
 /* ═══════════════════════════════════════════════
    STATS STRIP
    ═══════════════════════════════════════════════ */
@@ -1091,7 +1110,7 @@ body {
       <a href="/" class="nav-brand" aria-label="StrikePoint Sims home">
         <img src="logohorizontal.png" alt="StrikePoint Sims" class="nav-logo" loading="eager">
       </a>
-      <a href="join.html" class="nav-cta">Reserve a Spot</a>
+      <a href="#founder-20" class="nav-cta">Founder Offer</a>
     </header>
     <div class="hero-content">
       <p class="hero-eyebrow">Opening Fall 2026 in Colchester, CT</p>
@@ -1100,8 +1119,8 @@ body {
         Private bays &middot; Trackman Powered &middot; 24/7 access
       </p>
       <div class="hero-actions">
-        <a href="join.html" class="cta" id="hero-cta">Become a Founding Member</a>
-        <p class="hero-cta-micro">20 Founding spots &middot; No charge until opening &middot; Preferred pricing</p>
+        <a href="#founder-20" class="cta" id="hero-cta">See Founding Offer</a>
+        <p class="hero-cta-micro">Limited spots &middot; Lock in preferred pricing for life</p>
       </div>
       <a href="#what-we-built" class="hero-scroll-hint" aria-label="Scroll down">
         <span class="hero-scroll-line"></span>
@@ -1206,52 +1225,15 @@ body {
     <div class="founder-inner">
       <p class="section-eyebrow section-eyebrow--gold" data-anim>Only 20 spots</p>
       <h2 class="section-heading founder-heading" data-anim style="--anim-delay:0.1s">The Founding 20</h2>
-      <p class="founder-lead" data-anim style="--anim-delay:0.15s">Twenty spots. Preferred pricing for life.</p>
-      <p class="founder-lead" data-anim style="--anim-delay:0.15s">Save $30–$70/mo versus public rates — locked in as long as your membership is active.</p>
-      <p class="founder-lead" data-anim style="--anim-delay:0.15s">No charge today. Pay when we open.</p>
+      <p class="founder-lead" data-anim style="--anim-delay:0.15s">Twenty members. Preferred pricing for life.</p>
+      <p class="founder-lead" data-anim style="--anim-delay:0.18s">Lock in early-member savings of up to $70/mo for as long as your membership is active.</p>
 
-      <div class="founder-pricing" data-anim style="--anim-delay:0.2s">
-        <div class="fp-tier">
-          <div class="fp-name">Range</div>
-          <div class="fp-price"><span class="fp-price-num"><span class="fp-price-currency">$</span>119</span><span class="fp-price-mo">/mo</span></div>
-          <div class="fp-price-was">Regular $149/mo</div>
-          <div class="fp-rows">
-            <div class="fp-row"><span class="fp-row-label">Access</span><span>Unlimited off-peak&thinsp;*<br><span class="fp-row-sub">Peak hours not included</span></span></div>
-            <div class="fp-row"><span class="fp-row-label">Booking</span><span>7-day advance</span></div>
-            <div class="fp-row"><span class="fp-row-label">Sessions</span><span>1-hour blocks</span></div>
-            <div class="fp-tagline">Built for easy, consistent reps.</div>
-          </div>
-        </div>
-        <div class="fp-tier">
-          <div class="fp-name">Standard</div>
-          <div class="fp-price"><span class="fp-price-num"><span class="fp-price-currency">$</span>219</span><span class="fp-price-mo">/mo</span></div>
-          <div class="fp-price-was">Regular $249/mo</div>
-          <div class="fp-rows">
-            <div class="fp-row"><span class="fp-row-label">Access</span><span>8 peak hours/month + unlimited off-peak</span></div>
-            <div class="fp-row"><span class="fp-row-label">Booking</span><span>10-day advance</span></div>
-            <div class="fp-row"><span class="fp-row-label">Sessions</span><span>2-hour blocks</span></div>
-            <div class="fp-tagline">Enough for regular rounds and flexible play.</div>
-          </div>
-        </div>
-        <div class="fp-tier fp-tier--elite">
-          <div class="fp-flag">5 spots only</div>
-          <div class="fp-name">Elite</div>
-          <div class="fp-price"><span class="fp-price-num"><span class="fp-price-currency">$</span>329</span><span class="fp-price-mo">/mo</span></div>
-          <div class="fp-price-was">Regular $399/mo</div>
-          <div class="fp-rows">
-            <div class="fp-row"><span class="fp-row-label">Access</span><span>16 peak hours/month + unlimited off-peak</span></div>
-            <div class="fp-row"><span class="fp-row-label">Booking</span><span>14-day advance</span></div>
-            <div class="fp-row"><span class="fp-row-label">Sessions</span><span>4-hour blocks for full rounds</span></div>
-            <div class="fp-tagline fp-tagline--elite">Priority access when demand is highest.</div>
-          </div>
-        </div>
+      <div class="founder-action-split" data-anim style="--anim-delay:0.25s">
+        <a href="join.html" class="cta cta--founder" id="founder-cta">Explore Founder Offer &#8594;</a>
+        <a href="join.html?updates=1" class="cta cta--secondary">Just keep me updated</a>
       </div>
-      <p class="founder-savings-note" data-anim style="--anim-delay:0.22s">* Off-peak: weekdays before 5pm &amp; nights 10pm&ndash;6am &nbsp;&middot;&nbsp; All tiers include guest privileges &nbsp;&middot;&nbsp; Your founding discount stays in place as long as your membership is active.</p>
-      <div class="founder-cta-wrap" data-anim style="--anim-delay:0.3s">
-        <a href="join.html" class="cta cta--founder" id="founder-cta">Secure a Founding Spot &#8594;</a>
-        <p class="hero-cta-micro" style="margin-top:16px;text-align:center">No charge today &middot; Pay when we open</p>
-      </div>
-      <p class="founder-hourly" data-anim style="margin-top:24px;--anim-delay:0.25s">Prefer to drop in? Hourly bay rates also available at opening, no membership required.</p>
+      <p class="hero-cta-micro" style="margin-top:16px;text-align:center">Founder packages start at $119/mo &middot; No charge today &middot; 14-day money back guarantee after opening</p>
+      <p class="founder-hourly" data-anim style="margin-top:24px;--anim-delay:0.25s">Prefer to drop in? Hourly bay rates will also be available at opening.</p>
     </div>
   </section>
 

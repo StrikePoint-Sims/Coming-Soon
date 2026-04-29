@@ -34,6 +34,10 @@
     }
     html { -webkit-text-size-adjust: 100%; }
     body { font-family: var(--font-sans); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    /* Prevent Founding pricing flash when opening updates-only flow */
+    body.preload-hide #offer-screen { display: none !important; }
+    body.preload-hide #form-screen { display: none !important; }
+
 
     /* ── Top bar ── */
     .topbar {
@@ -146,6 +150,35 @@
       border-color: rgba(201,168,76,0.5);
       background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
     }
+    .tier-selectable {
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .tier-selectable:hover {
+      border-color: rgba(255,255,255,0.28);
+      transform: translateY(-1px);
+    }
+    .tier-selectable.is-selected {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.14);
+      box-shadow: 0 0 0 1px rgba(143,166,94,0.25);
+    }
+    .tier-selectable.tier--elite.is-selected {
+      border-color: var(--gold);
+      background: linear-gradient(180deg, rgba(201,168,76,0.14), rgba(201,168,76,0.04));
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.25);
+    }
+    .tier-selected-pill {
+      display: none;
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      color: var(--bg); background: var(--accent-light);
+      border-radius: 20px; padding: 4px 9px;
+    }
+    .tier-selectable.is-selected .tier-selected-pill { display: inline-block; }
+    .tier--elite .tier-selected-pill { background: var(--gold); }
 
     .tier-flag {
       position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
@@ -213,6 +246,40 @@
       margin: -20px 0 36px; letter-spacing: 0.02em;
       line-height: 1.75; max-width: 560px;
     }
+
+    .reservation-next {
+      display: none;
+      max-width: 640px;
+      margin: -10px 0 32px;
+      padding: 18px 20px;
+      border: 1px solid rgba(201,168,76,0.24);
+      border-radius: 12px;
+      background: rgba(201,168,76,0.055);
+    }
+    .reservation-next.is-visible { display: block; }
+    .reservation-next-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+    .reservation-next-list {
+      list-style: none;
+      display: grid;
+      gap: 7px;
+    }
+    .reservation-next-list li {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.74);
+    }
+    .reservation-next-list li::before {
+      content: '•';
+      color: var(--gold);
+      margin-right: 8px;
+    }
+
     .offer-lead-block strong {
       font-weight: 600;
       color: var(--text);
@@ -277,6 +344,7 @@
       -webkit-tap-highlight-color: transparent;
     }
     .offer-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .offer-btn:disabled { opacity: 0.48; cursor: not-allowed; transform: none; }
     .offer-btn:active { transform: scale(0.97); }
 
     .offer-secondary {
@@ -312,6 +380,7 @@
     .offer-fine {
       font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.78);
       letter-spacing: 0.04em;
+      opacity: 0.6;
     }
 
     /* ── Founding notice banner in slide 1 ── */
@@ -335,6 +404,49 @@
     .hourly-note {
       font-size: 0.92rem; font-weight: 400; color: rgba(255,255,255,0.78);
       text-align: center; margin: 0 0 36px; line-height: 1.6;
+    }
+
+    .offer-mini-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 8px;
+    }
+
+    .offer-mini-card {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .offer-mini-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .offer-mini-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.4;
+    }
+
+    .offer-mini-card .dot {
+      width: 8px;
+      height: 8px;
+      background: #9BE15D;
+      border-radius: 50%;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .offer-mini-cards {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* ═══════════════════════════════════════════
@@ -623,10 +735,144 @@
     .terms-agree-text a { color: #8fa65e; text-decoration: underline; text-underline-offset: 2px; }
     .terms-agree-text a:hover { color: #fff; }
 
+    .selected-plan-summary {
+      border: 1px solid rgba(201,168,76,0.36);
+      background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.025));
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin: 24px 0 18px;
+      color: var(--text-soft);
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+    .checkout-plan-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 16px;
+    }
+    .checkout-plan-label {
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 8px;
+    }
+    .checkout-plan-name {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+    }
+    .checkout-price {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .checkout-price-currency {
+      font-size: 1.25rem;
+      line-height: 1;
+      margin-bottom: 0.24rem;
+      opacity: 0.92;
+    }
+    .checkout-price-number {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+    .checkout-price-mo {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 0.22rem;
+    }
+    .checkout-plan-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.64);
+      font-size: 0.86rem;
+    }
+    .checkout-plan-meta strong {
+      color: rgba(255,255,255,0.88);
+      font-weight: 600;
+    }
+    .checkout-plan-meta s { color: rgba(255,255,255,0.48); }
+    .checkout-plan-note {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.58);
+      line-height: 1.5;
+    }
+    .selected-plan-summary strong { color: var(--text); font-weight: 600; }
+    @media (max-width: 520px) {
+      .checkout-plan-top { flex-direction: column; gap: 14px; }
+      .selected-plan-summary { padding: 20px; }
+    }
+
     .stripe-loading {
       display: none; text-align: center;
       padding: 24px 0;
       color: var(--text-muted); font-size: 0.92rem;
+    }
+
+
+    .inline-slide-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .inline-primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 210px;
+      font-family: var(--font-sans);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 40px;
+      padding: 15px 34px;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.25s, opacity 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .inline-primary-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .inline-primary-btn:active { transform: scale(0.98); }
+    .inline-primary-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+      background: rgba(143,166,94,0.45);
+    }
+    .inline-action-note {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.46);
+      line-height: 1.45;
+    }
+    .payment-submit-row {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    @media (max-width: 600px) {
+      .inline-primary-btn { width: 100%; min-width: 0; }
     }
 
     /* ── Slide nav ── */
@@ -756,7 +1002,14 @@
     }
   </style>
 </head>
-<body>
+<body class="preload-hide">
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      window.__SP_START_MODE = (params.get('mode') === 'updates') ? 'updates' : 'default';
+    })();
+  </script>
+
 
   <!-- ── Fixed top bar ── -->
   <div class="topbar">
@@ -771,50 +1024,35 @@
     <div class="offer-wrap">
 
       <span class="offer-eyebrow">Only 20 spots</span>
-      <h1 class="offer-heading">The Founding 20</h1>
+      <h1 class="offer-heading">Choose your Founding membership</h1>
       <div class="offer-lead-block">
-        <p><strong>Twenty spots. Preferred pricing for life.</strong></p>
-        <p>Save $30–$70/mo versus public rates — locked in as long as your membership is active.</p>
-        <p>No charge today. Your card is saved now and charged only when we open.</p>
-      </div>
+        <p><strong>Twenty spots. Lifetime preferred pricing. Your name displayed on the wall.</strong></p>
+        <div class="offer-mini-cards">
 
-      <!-- Founding member perks -->
-      <div class="offer-perks">
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">Satisfaction guarantee</div>
-            <div class="perk-desc">If it’s not what we promised, cancel within 14 days for a full refund.</div>
+          <div class="offer-mini-card">
+            <span class="dot"></span>
+            <div>
+              <strong>Satisfaction guarantee</strong>
+              <p>If it’s not what we promised, cancel within 14 days after opening for a full refund.</p>
+            </div>
           </div>
-        </div>
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">Preferred pricing for life</div>
-            <div class="perk-desc">Save $30–$70/mo off public rates while your membership stays active.</div>
+
+          <div class="offer-mini-card">
+            <span class="dot"></span>
+            <div>
+              <strong>Preferred pricing for life</strong>
+              <p>Save $30–$70/mo off public rates while your membership stays active.</p>
+            </div>
           </div>
-        </div>
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">Founder recognition</div>
-            <div class="perk-desc">Your name on the Founding 20 wall, plus early-member perks.</div>
-          </div>
-        </div>
-        <div class="perk">
-          <div class="perk-dot"></div>
-          <div class="perk-text">
-            <div class="perk-name">No charge today</div>
-            <div class="perk-desc">Your card is saved now. Billing starts when the doors open.</div>
-          </div>
+
         </div>
       </div>
 
-      <!-- Pricing tiers -->
       <span class="pricing-label">Founder pricing</span>
-      <div class="tier-grid">
-        <div class="tier">
-          <div class="tier-name">Range</div>
+      <div class="tier-grid" id="offer-tier-grid">
+        <div class="tier tier-selectable" data-tier="Practice" data-price="119" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
+          <div class="tier-name">Practice</div>
           <div class="tier-price">
             <span class="tier-price-num"><span class="tier-price-currency">$</span>119</span>
             <span class="tier-price-mo">/mo</span>
@@ -823,11 +1061,12 @@
           <div class="tier-desc">
             <div class="tier-row"><span class="tier-row-label">Access</span><span>Unlimited off-peak&thinsp;*<br><span style="color:rgba(255,255,255,0.35);font-size:0.82em">Peak hours not included</span></span></div>
             <div class="tier-row"><span class="tier-row-label">Booking</span><span>7-day advance</span></div>
-            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>1-hour blocks</span></div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Practice and off-peak play</span></div>
             <div class="tier-tagline">Built for easy, consistent reps.</div>
           </div>
         </div>
-        <div class="tier">
+        <div class="tier tier-selectable" data-tier="Standard" data-price="219" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
           <div class="tier-name">Standard</div>
           <div class="tier-price">
             <span class="tier-price-num"><span class="tier-price-currency">$</span>219</span>
@@ -837,11 +1076,12 @@
           <div class="tier-desc">
             <div class="tier-row"><span class="tier-row-label">Access</span><span>8 peak hours/month + unlimited off-peak</span></div>
             <div class="tier-row"><span class="tier-row-label">Booking</span><span>10-day advance</span></div>
-            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>2-hour blocks</span></div>
-            <div class="tier-tagline">Enough for regular rounds and flexible play.</div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Regular rounds and flexible play</span></div>
+            <div class="tier-tagline">The core membership.</div>
           </div>
         </div>
-        <div class="tier tier--elite">
+        <div class="tier tier--elite tier-selectable" data-tier="Elite" data-price="329" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
           <div class="tier-flag">5 spots only</div>
           <div class="tier-name">Elite</div>
           <div class="tier-price">
@@ -852,7 +1092,7 @@
           <div class="tier-desc">
             <div class="tier-row"><span class="tier-row-label">Access</span><span>16 peak hours/month + unlimited off-peak</span></div>
             <div class="tier-row"><span class="tier-row-label">Booking</span><span>14-day advance</span></div>
-            <div class="tier-row"><span class="tier-row-label">Sessions</span><span>4-hour blocks for full rounds</span></div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Priority access and full rounds</span></div>
             <div class="tier-tagline">Priority access when demand is highest.</div>
           </div>
         </div>
@@ -860,27 +1100,20 @@
 
       <p class="tier-footnote">* Off-peak: weekdays before 5pm &amp; nights 10pm&ndash;6am &nbsp;&middot;&nbsp; All tiers include guest privileges</p>
 
-      <div class="offer-start-wrap">
-        <p class="d3-prompt">Ready to lock your spot?</p>
-        <div class="d3-choice" id="d3-reserve" onclick="d3Select('reserve')" data-selected="true">
-          <div class="d3-check" id="d3-check-reserve">&#10003;</div>
-          <div>
-            <div class="d3-choice-label">Reserve a founding spot</div>
-            <div class="d3-choice-sub">Card saved now &middot; no charge today &middot; satisfaction guarantee</div>
-          </div>
-        </div>
-        <div class="d3-choice d3-choice--secondary" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
-          <div class="d3-check" id="d3-check-posted"></div>
-          <div>
-            <div class="d3-choice-label">Just keep me posted</div>
-            <div class="d3-choice-sub">No card needed</div>
-          </div>
-        </div>
-        <button class="offer-btn" id="start-form-btn" onclick="d3Continue()">Continue &#8594;</button>
+      <div class="reservation-next" id="reservation-next">
+        <div class="reservation-next-title">What happens next</div>
+        <ul class="reservation-next-list">
+          <li>Your card is saved today to reserve your spot</li>
+          <li>You are not charged until we open in Fall 2026</li>
+          <li>You can cancel anytime before opening</li>
+          <li>14-day satisfaction guarantee after launch</li>
+        </ul>
       </div>
-      <p style="margin-top:20px;font-size:0.78rem;color:rgba(255,255,255,0.3);text-align:left">
 
-      </p>
+      <div class="offer-start-wrap">
+        <button class="offer-btn" id="start-form-btn" onclick="startForm(true)" disabled>Choose a membership above</button>
+        <p class="offer-fine">No charge today. Billing begins when we open.</p>
+      </div>
 
     </div>
   </div>
@@ -1006,6 +1239,10 @@
             <div class="choice" data-value="Access to a wide variety of courses" onclick="toggleMulti(this)"><div class="choice-key">E</div><div class="choice-content"><div class="choice-title">Access to a wide variety of courses</div></div></div>
             <div class="choice" data-value="Leagues and competitive events" onclick="toggleMulti(this)"><div class="choice-key">F</div><div class="choice-content"><div class="choice-title">Leagues and competitive events</div></div></div>
           </div>
+          <div class="inline-slide-actions">
+            <button class="inline-primary-btn" type="button" onclick="nextSlide()">Continue &#8594;</button>
+            <span class="inline-action-note">Optional — choose any that apply.</span>
+          </div>
         </div>
       </div>
 
@@ -1013,52 +1250,52 @@
       <div class="slide payment-slide" data-slide="6">
         <div class="slide-inner">
           <p class="slide-step">Final step</p>
-          <h2 class="slide-q">Choose your tier and lock it in.</h2>
+          <h2 class="slide-q">Finish your reservation</h2>
           <p class="slide-hint">
-            Choose a membership tier and save your card. No membership charge until we open.
+            Save your card to secure your Founder spot. No membership charges until we open.
           </p>
-          <p class="input-fine hold-note" id="hold-note">
-            Your card will be verified with a $1 temporary hold. It automatically disappears. <span class="why-hold" onclick="toggleWhyHold()">Why $1?</span>
-          </p>
-          <p class="input-fine why-hold-text" id="why-hold-text">A small authorization is required to verify your card. The $1 is not a payment and will automatically disappear from your pending charges in 3-10 days.</p>
 
-          <div class="stripe-tiers" id="stripe-tiers">
-            <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
-              <span class="stripe-tier-key">A</span>
-              <div class="stripe-tier-info">
-                <span class="stripe-tier-name">Range</span>
-                <span class="stripe-tier-meta">$119/mo &middot; regular $149 &middot; off-peak only (before 5pm + nights)</span>
+          <div class="selected-plan-summary" id="selected-plan-summary">
+            <div class="checkout-plan-top">
+              <div>
+                <span class="checkout-plan-label">Selected membership</span>
+                <strong class="checkout-plan-name" id="selected-plan-name">Founder membership</strong>
+              </div>
+              <div class="checkout-price" aria-label="Founder membership price">
+                <span class="checkout-price-currency">$</span>
+                <span class="checkout-price-number" id="selected-plan-price">—</span>
+                <span class="checkout-price-mo">/mo</span>
               </div>
             </div>
-            <div class="stripe-tier" data-tier="Standard" data-price="219" onclick="selectStripeTier(this)">
-              <span class="stripe-tier-key">B</span>
-              <div class="stripe-tier-info">
-                <span class="stripe-tier-name">Standard</span>
-                <span class="stripe-tier-meta">$219/mo &middot; regular $249 &middot; 8 peak hrs + unlimited off-peak</span>
-              </div>
+            <div class="checkout-plan-meta">
+              <span><strong>Founder rate</strong></span>
+              <span>Regular <s id="selected-plan-regular">—</s></span>
+              <span id="selected-plan-savings">Preferred pricing locked while active</span>
             </div>
-            <div class="stripe-tier stripe-tier--elite" data-tier="Elite" data-price="329" onclick="selectStripeTier(this)">
-              <span class="stripe-tier-key">C</span>
-              <div class="stripe-tier-info">
-                <span class="stripe-tier-name">Elite</span>
-                <span class="stripe-tier-meta">$329/mo &middot; regular $399 &middot; unlimited + priority &middot; 5 spots only</span>
-              </div>
-            </div>
+            <p class="checkout-plan-note">Only 20 founding memberships available. Your card is saved today; membership billing starts when we open.</p>
           </div>
+
+          <p class="input-fine hold-note" id="hold-note">
+            Your card will be verified with a $1 temporary hold. It automatically disappears.<span class="why-hold" onclick="toggleWhyHold()">Why $1?</span>
+          </p>
+          <p class="input-fine why-hold-text" id="why-hold-text">The $1 authorization confirms the card is valid so we can hold your Founding spot. It is not captured as a payment and typically disappears from pending charges in 3-10 days.</p>
 
           <div class="stripe-card-section" id="stripe-card-section">
             <label class="terms-agree">
               <input type="checkbox" id="terms-check">
-              <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a> and <a href="waiver.html" target="_blank">Liability Waiver</a></span>
+              <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a></span>
             </label>
             <div id="express-checkout-element"></div>
-            <div class="stripe-wallet-divider">Pay with card</div>
+            <div class="stripe-wallet-divider">Card verification</div>
             <div id="payment-element"></div>
             <p class="input-error" id="card-error"></p>
             <p class="input-error" id="terms-error"></p>
+            <div class="payment-submit-row">
+              <button class="inline-primary-btn" id="payment-submit-btn" type="button" onclick="handleStripeSubmit()" disabled>Loading secure card form…</button>
+            </div>
           </div>
 
-          <div class="stripe-loading" id="stripe-loading">Securing your spot&hellip;</div>
+          <div class="stripe-loading" id="stripe-loading">Loading secure card form&hellip;</div>
         </div>
       </div>
 
@@ -1098,6 +1335,7 @@
     var TOTAL = 4; // working slides before payment/confirm
     var rowId = null;
     var stripe = null, stripeElements = null, paymentElement = null, expressCheckoutElement = null, selectedTier = null;
+    var cardComplete = false;
 
     var data = {
       first_name: '', last_name: '', full_name: '', email: '',
@@ -1125,8 +1363,30 @@
       return 'sp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
+
+    window.selectOfferTier = function(el) {
+      document.querySelectorAll('.tier-selectable').forEach(function(t){ t.classList.remove('is-selected'); });
+      el.classList.add('is-selected');
+      selectedTier = {
+        name: el.getAttribute('data-tier'),
+        price: el.getAttribute('data-price')
+      };
+      var btn = document.getElementById('start-form-btn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Continue with ' + selectedTier.name + ' →';
+      }
+      var nextBlock = document.getElementById('reservation-next');
+      if (nextBlock) nextBlock.classList.add('is-visible');
+    };
+
     // ── Start form ──
     window.startForm = function(asFounder) {
+      if (asFounder && !selectedTier) {
+        var btn = document.getElementById('start-form-btn');
+        if (btn) btn.textContent = 'Choose a membership first';
+        return;
+      }
       data.founding_20 = !!asFounder;
       data.path = asFounder ? 'card' : 'no_card';
       data.updates = 'Yes, keep me in the loop'; // default for both paths
@@ -1140,8 +1400,8 @@
       if (asFounder) {
         if (notice) notice.style.display = 'flex';
         if (step1)  step1.textContent = '1 of 4';
-        if (slide1Heading) slide1Heading.textContent = 'Where should we send your reservation details?';
-        if (slide1Hint) slide1Hint.textContent = 'We’ll use this for your spot confirmation and opening updates.';
+        if (slide1Heading) slide1Heading.textContent = 'Finish your ' + (selectedTier ? selectedTier.name : 'Founder') + ' reservation.';
+        if (slide1Hint) slide1Hint.textContent = 'We’ll use this for your confirmation and opening updates.';
       } else {
         if (notice) notice.style.display = 'none';
         if (step1)  step1.textContent = '1 of 3';
@@ -1211,12 +1471,28 @@
       if (n === 7) {
         nav.style.display = 'none';
       } else if (n === 6) {
-        nav.style.display = 'flex';
+        nav.style.display = 'none';
         backBtn.disabled = false;
         nextBtn.style.display = 'inline-block';
         nextBtn.disabled = false;
         nextBtn.textContent = 'Secure my spot \u2192';
         keyHint.textContent = '';
+        if (selectedTier) {
+          var planName = document.getElementById('selected-plan-name');
+          var planPrice = document.getElementById('selected-plan-price');
+          var planRegular = document.getElementById('selected-plan-regular');
+          var planSavings = document.getElementById('selected-plan-savings');
+          var regularPrices = { Practice: 149, Standard: 249, Elite: 399 };
+          var founderPrice = parseInt(selectedTier.price, 10);
+          var regularPrice = regularPrices[selectedTier.name] || null;
+          if (planName) planName.textContent = selectedTier.name;
+          if (planPrice) planPrice.textContent = selectedTier.price;
+          if (planRegular && regularPrice) planRegular.textContent = '$' + regularPrice + '/mo';
+          if (planSavings && regularPrice && founderPrice) planSavings.textContent = 'Saves $' + (regularPrice - founderPrice) + '/mo';
+        }
+        var cardSection = document.getElementById('stripe-card-section');
+        if (cardSection) cardSection.style.display = 'block';
+        if (selectedTier) fetchSetupIntentAndMount();
       } else {
         nav.style.display = 'flex';
         backBtn.disabled = n <= 1;
@@ -1224,6 +1500,7 @@
           nextBtn.style.display = 'none';
           keyHint.textContent = 'press A\u2013G to choose';
         } else if (n === 4) {
+          nav.style.display = 'none';
           nextBtn.style.display = 'inline-block';
           nextBtn.disabled = false;
           nextBtn.textContent = 'OK \u2192';
@@ -1255,6 +1532,8 @@
           founding_20: data.founding_20 ? 'Yes' : 'No',
           path: data.path,
           payment_status: data.founding_20 ? 'pending' : 'none',
+          membership_tier: selectedTier ? selectedTier.name : '',
+          membership_price: selectedTier ? selectedTier.price : '',
           status: 'started'
         });
       }
@@ -1423,6 +1702,28 @@
       document.getElementById('card-error').textContent = '';
     };
 
+
+    function updatePaymentCtaState() {
+      var btn = document.getElementById('payment-submit-btn');
+      var termsCheck = document.getElementById('terms-check');
+      if (!btn) return;
+
+      if (!paymentElement) {
+        btn.disabled = true;
+        btn.textContent = 'Loading secure card form…';
+        return;
+      }
+
+      if (termsCheck && !termsCheck.checked) {
+        btn.disabled = true;
+        btn.textContent = 'Agree to terms to continue';
+        return;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Verify card & reserve spot →';
+    }
+
     function fetchSetupIntentAndMount() {
       if (paymentElement) return; // already mounted
       if (!stripe) stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
@@ -1441,6 +1742,8 @@
           first_name: data.first_name,
           last_name: data.last_name,
           tier: selectedTier ? selectedTier.name : '',
+          membership_tier: selectedTier ? selectedTier.name : '',
+          membership_price: selectedTier ? selectedTier.price : '',
           row_id: rowId || ''
         })
       })
@@ -1485,7 +1788,7 @@
         });
 
         expressCheckoutElement.on('confirm', function() {
-          handleStripeSubmit();
+          handleStripeSubmit(true);
         });
 
         expressCheckoutElement.mount('#express-checkout-element');
@@ -1511,6 +1814,22 @@
           }
         });
         paymentElement.mount('#payment-element');
+        paymentElement.on('change', function(event) {
+          cardComplete = !!event.complete;
+          var err = document.getElementById('card-error');
+          if (err) err.textContent = event.error ? event.error.message : '';
+          updatePaymentCtaState();
+        });
+        var termsCheck = document.getElementById('terms-check');
+        if (termsCheck && !termsCheck.__sp_bound) {
+          termsCheck.__sp_bound = true;
+          termsCheck.addEventListener('change', function() {
+            var termsError = document.getElementById('terms-error');
+            if (termsError && termsCheck.checked) termsError.textContent = '';
+            updatePaymentCtaState();
+          });
+        }
+        updatePaymentCtaState();
         loading.style.display = 'none';
       })
       .catch(function(err) {
@@ -1526,7 +1845,7 @@
     };
 
     // ── Stripe submit ──
-    window.handleStripeSubmit = function() {
+    window.handleStripeSubmit = function(skipCardCompleteCheck) {
       if (!selectedTier) {
         document.getElementById('card-error').textContent = 'Please select a membership tier above.';
         return;
@@ -1535,6 +1854,7 @@
       if (termsCheck && !termsCheck.checked) {
         document.getElementById('terms-error').textContent = 'Please agree to the Terms of Use to continue.';
         termsCheck.focus();
+        updatePaymentCtaState();
         return;
       }
       if (document.getElementById('terms-error')) document.getElementById('terms-error').textContent = '';
@@ -1542,11 +1862,11 @@
         document.getElementById('card-error').textContent = 'Payment form not ready. Please wait a moment.';
         return;
       }
-
       var nextBtn = document.getElementById('next-btn');
+      var payBtn = document.getElementById('payment-submit-btn');
       var loading = document.getElementById('stripe-loading');
-      nextBtn.disabled = true;
-      nextBtn.textContent = 'Processing…';
+      if (nextBtn) nextBtn.disabled = true;
+      if (payBtn) { payBtn.disabled = true; payBtn.textContent = 'Processing…'; }
       loading.textContent = 'Securing your spot…';
       loading.style.display = 'block';
       document.getElementById('card-error').textContent = '';
@@ -1585,9 +1905,13 @@
       })
       .catch(function(err) {
         document.getElementById('card-error').textContent = err.message || 'Something went wrong. Please try again.';
-        nextBtn.disabled = false;
-        nextBtn.textContent = 'Secure my spot →';
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'Secure my spot →';
+        }
+        if (payBtn) payBtn.textContent = 'Verify card & reserve spot →';
         loading.style.display = 'none';
+        updatePaymentCtaState();
       });
     };
 
@@ -1677,18 +2001,13 @@
         return;
       }
 
-      // A–G for choice slides, A–C for payment slide
+      // A–G for choice slides
       var k = e.key.toLowerCase();
       var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
       var idx = map[k];
       if (idx === undefined) return;
       if (document.activeElement && document.activeElement.id === 'other-town') return;
 
-      if (current === 6) {
-        var tiers = document.querySelectorAll('.stripe-tier');
-        if (tiers[idx]) selectStripeTier(tiers[idx]);
-        return;
-      }
 
       // Only act on the active choice slides
       if (current < 2 || current > 4) return;
@@ -1709,17 +2028,34 @@
       d3Choice = val;
       var reserve = document.getElementById('d3-reserve');
       var posted  = document.getElementById('d3-posted');
+      var cr = document.getElementById('d3-check-reserve');
+      var cp = document.getElementById('d3-check-posted');
+      if (!reserve || !posted || !cr || !cp) return;
       reserve.setAttribute('data-selected', val === 'reserve' ? 'true' : 'false');
       posted.setAttribute('data-selected',  val === 'posted'  ? 'true' : 'false');
-      document.getElementById('d3-check-reserve').textContent = val === 'reserve' ? '\u2713' : '';
-      document.getElementById('d3-check-posted').textContent  = val === 'posted'  ? '\u2713' : '';
+      cr.textContent = val === 'reserve' ? '\u2713' : '';
+      cp.textContent = val === 'posted'  ? '\u2713' : '';
     };
     window.d3Continue = function() {
       startForm(d3Choice === 'reserve');
     };
 
     // Init
-    showSlide(1);
+    function initStartMode() {
+      showSlide(1);
+      var params = new URLSearchParams(window.location.search);
+      var updatesOnly = window.__SP_START_MODE === 'updates' || params.get('updates') === '1' || params.get('mode') === 'updates';
+      if (updatesOnly) {
+        startForm(false);
+      }
+      document.body.classList.remove('preload-hide');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStartMode);
+    } else {
+      initStartMode();
+    }
   })();
   </script>
 

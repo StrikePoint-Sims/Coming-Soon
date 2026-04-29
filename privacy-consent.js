@@ -74,7 +74,7 @@ var SP_META_ID = '1890255115025836';
         '<a href="/privacy-policy.html" class="sp-banner-policy">Privacy Policy</a></p>' +
         '<div class="sp-banner-actions">' +
           '<button class="sp-btn sp-btn--accept" id="sp-accept">Accept</button>' +
-          '<button class="sp-btn sp-btn--decline" id="sp-decline">Decline tracking</button>' +
+          '<button class="sp-btn sp-btn--decline" id="sp-decline">Decline</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(b);
