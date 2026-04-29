@@ -474,6 +474,25 @@
       font-style: normal;
     }
 
+
+    /* ── Payment slide spacing polish ── */
+    .payment-slide .slide-hint {
+      margin-bottom: 6px;
+    }
+    .hold-note {
+      margin-top: 4px;
+      margin-bottom: 20px;
+      opacity: 0.82;
+    }
+    .hold-note .why-hold {
+      margin-left: 4px;
+      font-size: 0.95em;
+    }
+    .payment-slide .why-hold-text {
+      margin-top: 6px;
+      margin-bottom: 16px;
+    }
+
     /* ── Choices ── */
     .choices { display: flex; flex-direction: column; gap: 10px; }
     .choice {
@@ -592,7 +611,7 @@
 
     .terms-agree {
       display: flex; align-items: flex-start; gap: 10px;
-      margin-top: 20px; cursor: pointer;
+      margin-bottom: 20px; cursor: pointer;
     }
     .terms-agree input[type="checkbox"] {
       width: 16px; height: 16px; min-width: 16px;
@@ -756,7 +775,7 @@
       <div class="offer-lead-block">
         <p><strong>Twenty spots. Preferred pricing for life.</strong></p>
         <p>Save $30–$70/mo versus public rates — locked in as long as your membership is active.</p>
-        <p>No membership charge today. A $1 temporary hold verifies your card and automatically disappears.</p>
+        <p>No charge today. Your card is saved now and charged only when we open.</p>
       </div>
 
       <!-- Founding member perks -->
@@ -786,7 +805,7 @@
           <div class="perk-dot"></div>
           <div class="perk-text">
             <div class="perk-name">No charge today</div>
-            <div class="perk-desc">A $1 temporary hold verifies your card. Billing starts when the doors open.</div>
+            <div class="perk-desc">Your card is saved now. Billing starts when the doors open.</div>
           </div>
         </div>
       </div>
@@ -847,7 +866,7 @@
           <div class="d3-check" id="d3-check-reserve">&#10003;</div>
           <div>
             <div class="d3-choice-label">Reserve a founding spot</div>
-            <div class="d3-choice-sub">$1 temporary hold &middot; no membership charge today &middot; satisfaction guarantee</div>
+            <div class="d3-choice-sub">Card saved now &middot; no charge today &middot; satisfaction guarantee</div>
           </div>
         </div>
         <div class="d3-choice d3-choice--secondary" id="d3-posted" onclick="d3Select('posted')" data-selected="false">
@@ -860,7 +879,7 @@
         <button class="offer-btn" id="start-form-btn" onclick="d3Continue()">Continue &#8594;</button>
       </div>
       <p style="margin-top:20px;font-size:0.78rem;color:rgba(255,255,255,0.3);text-align:left">
-        <button class="sp-privacy-btn" onclick="updatePrivacyPreferences()">Privacy Settings</button>
+
       </p>
 
     </div>
@@ -886,7 +905,7 @@
           <p class="slide-step" id="step-1">1 of 4</p>
           <div class="founding-notice" id="founding-notice" style="display:none">
             <span class="founding-notice-icon">&#128274;</span>
-            <span class="founding-notice-text">Card saved at the end. A $1 temporary hold verifies your card and automatically disappears. No membership charge until opening.</span>
+            <span class="founding-notice-text">Card saved at the end. No membership charge until opening. 14-day money-back guarantee.</span>
           </div>
           <h2 class="slide-q" id="slide-1-heading">Where should we send updates?</h2>
           <p class="slide-hint" id="slide-1-hint">Build progress, opening news, and when bookings go live.</p>
@@ -991,13 +1010,17 @@
       </div>
 
       <!-- Slide 6: Payment (founding members only) -->
-      <div class="slide" data-slide="6">
+      <div class="slide payment-slide" data-slide="6">
         <div class="slide-inner">
           <p class="slide-step">Final step</p>
           <h2 class="slide-q">Choose your tier and lock it in.</h2>
-          <p class="slide-hint">We’ll place a $1 temporary hold to verify your card. It automatically disappears. Your first membership charge happens when we open.</p>
-          <p class="input-fine"><span class="why-hold" onclick="toggleWhyHold()">Why $1?</span></p>
-          <p class="input-fine why-hold-text" id="why-hold-text">This is a temporary hold to verify your card. It is not a charge and will automatically disappear.</p>
+          <p class="slide-hint">
+            Choose a membership tier and save your card. No membership charge until we open.
+          </p>
+          <p class="input-fine hold-note" id="hold-note">
+            Your card will be verified with a $1 temporary hold. It automatically disappears. <span class="why-hold" onclick="toggleWhyHold()">Why $1?</span>
+          </p>
+          <p class="input-fine why-hold-text" id="why-hold-text">A small authorization is required to verify your card. The $1 is not a payment and will automatically disappear from your pending charges in 3-10 days.</p>
 
           <div class="stripe-tiers" id="stripe-tiers">
             <div class="stripe-tier" data-tier="Range" data-price="119" onclick="selectStripeTier(this)">
@@ -1024,15 +1047,14 @@
           </div>
 
           <div class="stripe-card-section" id="stripe-card-section">
-            <div id="express-checkout-element"></div>
-            <div class="stripe-wallet-divider">Pay with card</div>
-            <div id="payment-element"></div>
-            <p class="input-error" id="card-error"></p>
-            <p class="input-fine" id="card-charge-note"></p>
             <label class="terms-agree">
               <input type="checkbox" id="terms-check">
               <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a> and <a href="waiver.html" target="_blank">Liability Waiver</a></span>
             </label>
+            <div id="express-checkout-element"></div>
+            <div class="stripe-wallet-divider">Pay with card</div>
+            <div id="payment-element"></div>
+            <p class="input-error" id="card-error"></p>
             <p class="input-error" id="terms-error"></p>
           </div>
 
@@ -1395,9 +1417,6 @@
 
       var section = document.getElementById('stripe-card-section');
       section.style.display = 'block';
-
-      document.getElementById('card-charge-note').textContent =
-        '$1 temporary hold to verify your card. It will automatically disappear. First membership charge: $' + selectedTier.price + '/mo when we open.';
 
       fetchSetupIntentAndMount();
 
