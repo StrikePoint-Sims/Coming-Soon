@@ -3,477 +3,2078 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Reserve a Founder Spot — StrikePoint Sims | Indoor Golf Simulator Eastern CT</title>
-  <meta name="description" content="Reserve one of 20 Founder spots at StrikePoint Sims. Lock in below-launch membership rates for 24 months. Opening November 2026 in Colchester, Connecticut.">
+  <title>Reserve a Founding Spot | StrikePoint Sims | Opening Fall 2026</title>
+  <meta name="description" content="Reserve one of 20 Founding spots at StrikePoint Sims. Lock in monthly savings for life. Card saved at signup, charged when we open. Opening Fall 2026 in Colchester, CT.">
   <link rel="canonical" href="https://www.strikepointsims.com/join">
-  <meta property="og:title" content="Reserve a Founder Spot — StrikePoint Sims">
-  <meta property="og:description" content="Be one of the Founding 20. Lock in below-launch rates for 24 months. Opening November 2026 in Colchester, CT.">
+  <meta property="og:title" content="Reserve a Founding Spot | StrikePoint Sims">
+  <meta property="og:description" content="20 spots. Founding savings locked for life. Card saved, charged when we open.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.strikepointsims.com/join">
   <meta property="og:image" content="https://www.strikepointsims.com/og-image.jpg">
-  <meta name="theme-color" content="#2c3618">
+  <meta name="theme-color" content="#0a0a0a">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700;1,300;1,400&family=Marcellus&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://js.stripe.com/v3/"></script>
 
-  <!-- GA4 — TODO: Replace PLACEHOLDER_GA4_MEASUREMENT_ID with real ID from Mike, then uncomment
-  <script async src="https://www.googletagmanager.com/gtag/js?id=PLACEHOLDER_GA4_MEASUREMENT_ID"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'PLACEHOLDER_GA4_MEASUREMENT_ID');
-    gtag('event', 'founder_form_view');
-  </script>
-  -->
-
-  <!-- Meta Pixel — TODO: Replace PLACEHOLDER_META_PIXEL_ID with real ID from Mike, then uncomment
-  <script>
-    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-    n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-    n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-    t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-    document,'script','https://connect.facebook.net/en_US/fbevents.js');
-    fbq('init','PLACEHOLDER_META_PIXEL_ID');
-    fbq('track','PageView');
-    fbq('track','ViewContent');
-  </script>
-  <noscript><img height="1" width="1" style="display:none"
-    src="https://www.facebook.com/tr?id=PLACEHOLDER_META_PIXEL_ID&ev=ViewContent&noscript=1"/></noscript>
-  -->
+  <!-- GA4 + Meta Pixel loaded by privacy-consent.js after user consent. -->
+  <link rel="stylesheet" href="privacy-consent.css">
 
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --bg: #2c3618;
-      --bg-dark: #1e2610;
-      --bg-section: #243013;
-      --text: #ffffff;
-      --text-muted: rgba(255,255,255,0.50);
-      --text-soft: rgba(255,255,255,0.75);
-      --accent: #8fa65e;
-      --accent-hover: #a3bb72;
-      --accent-dim: rgba(143,166,94,0.12);
-      --input-border: rgba(255,255,255,0.18);
-      --input-focus: rgba(255,255,255,0.45);
+      --bg: #0a0a0a; --bg-alt: #0f0f0f; --bg-green: #1e2e12;
+      --text: #fff; --text-soft: rgba(255,255,255,0.92); --text-muted: rgba(255,255,255,0.75);
+      --accent: #4a6e34; --accent-hover: #5a8040; --accent-dark: #3a5a28;
+      --accent-light: #8fa65e; --gold: #c9a84c;
+      --border: rgba(255,255,255,0.1);
       --error: #e8735a;
-      --gold: #c9a84c;
-      --gold-dim: rgba(201,168,76,0.10);
-      --gold-border: rgba(201,168,76,0.30);
+      --font-serif: 'Playfair Display', Georgia, serif;
+      --font-sans: 'Hanken Grotesk', system-ui, sans-serif;
     }
-
     html { -webkit-text-size-adjust: 100%; }
-    body { font-family: 'Lato', sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-    a { color: inherit; }
+    body { font-family: var(--font-sans); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    /* Prevent Founding pricing flash when opening updates-only flow */
+    body.preload-hide #offer-screen { display: none !important; }
+    body.preload-hide #form-screen { display: none !important; }
 
-    .topbar { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; background: var(--bg-dark); border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .topbar-logo { height: 32px; width: auto; opacity: 0.9; transition: opacity 0.3s; }
-    .topbar-logo:hover { opacity: 1; }
-    .topbar-home { font-size: 0.8rem; font-weight: 400; color: var(--text-muted); text-decoration: none; letter-spacing: 0.03em; transition: color 0.25s; }
-    .topbar-home:hover { color: var(--text); }
 
-    .counter-section { background: var(--bg-dark); padding: 40px 40px 36px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
-    .founder-counter { font-family: 'Marcellus', serif; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 400; color: var(--gold); letter-spacing: 0.02em; line-height: 1.2; }
-    .counter-sub { font-size: 0.82rem; font-weight: 300; color: var(--text-muted); margin-top: 8px; letter-spacing: 0.04em; text-transform: uppercase; }
-
-    .offer-section { padding: 64px 40px; background: var(--bg-section); }
-    .offer-inner { max-width: 860px; margin: 0 auto; }
-    .offer-heading { font-family: 'Marcellus', serif; font-size: clamp(1.5rem, 3.5vw, 2rem); font-weight: 400; margin-bottom: 12px; }
-    .offer-intro { font-size: 0.95rem; font-weight: 300; color: var(--text-soft); line-height: 1.75; margin-bottom: 40px; }
-
-    .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
-    .tier-box { border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 24px 22px; background: rgba(0,0,0,0.2); }
-    .tier-box--unlimited { border-color: var(--gold-border); background: var(--gold-dim); }
-    .tier-name { font-family: 'Marcellus', serif; font-size: 1rem; font-weight: 400; color: var(--text); margin-bottom: 8px; }
-    .tier-price { font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1; margin-bottom: 4px; font-family: 'Lato', sans-serif; }
-    .tier-price--unlimited { color: var(--gold); }
-    .tier-opens { font-size: 0.78rem; font-weight: 300; color: var(--text-muted); margin-bottom: 14px; }
-    .tier-desc { font-size: 0.85rem; font-weight: 300; color: var(--text-soft); line-height: 1.65; }
-    .tier-cap { font-size: 0.75rem; font-weight: 400; color: var(--gold); margin-top: 8px; font-style: italic; }
-
-    .perks-block { border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 24px 28px; margin-bottom: 24px; background: rgba(0,0,0,0.15); }
-    .perks-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
-    .perks-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .perks-list li { font-size: 0.9rem; font-weight: 300; color: var(--text-soft); line-height: 1.5; padding-left: 18px; position: relative; }
-    .perks-list li::before { content: '—'; position: absolute; left: 0; color: var(--accent); }
-
-    .reassurance { border: 1px solid var(--gold-border); border-radius: 8px; padding: 18px 22px; background: var(--gold-dim); }
-    .reassurance p { font-size: 0.88rem; font-weight: 300; color: var(--text-soft); line-height: 1.7; }
-    .reassurance strong { font-weight: 400; color: var(--gold); }
-
-    .form-section { padding: 64px 40px 80px; background: var(--bg); }
-    .form-inner { max-width: 600px; margin: 0 auto; }
-    .form-heading { font-family: 'Marcellus', serif; font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 400; margin-bottom: 8px; }
-    .form-sub { font-size: 0.9rem; font-weight: 300; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
-
-    .field-group { margin-bottom: 32px; }
-    .field-label { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-    .field-question { font-family: 'Marcellus', serif; font-size: 1rem; font-weight: 400; color: var(--text-soft); margin-bottom: 14px; line-height: 1.4; }
-    .field-input { width: 100%; font-family: 'Lato', sans-serif; font-size: 1rem; font-weight: 300; color: var(--text); background: transparent; border: none; border-bottom: 2px solid var(--input-border); padding: 10px 0; outline: none; transition: border-color 0.3s; caret-color: var(--accent); }
-    .field-input::placeholder { color: var(--text-muted); font-weight: 300; }
-    .field-input:focus { border-color: var(--input-focus); }
-    .field-input.has-error { border-color: var(--error); }
-    .field-error { font-size: 0.78rem; color: var(--error); margin-top: 6px; min-height: 1.1em; }
-    .field-fine { font-size: 0.78rem; color: var(--text-muted); margin-top: 8px; font-style: italic; }
-
-    .options { display: flex; flex-direction: column; gap: 8px; }
-    .option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border: 1px solid var(--input-border); border-radius: 8px; cursor: pointer; transition: border-color 0.2s, background 0.2s; -webkit-tap-highlight-color: transparent; }
-    .option:hover { border-color: var(--accent); background: var(--accent-dim); }
-    .option.is-selected { border-color: var(--accent); background: var(--accent-dim); }
-    .option-indicator { width: 18px; height: 18px; min-width: 18px; border: 1.5px solid var(--input-border); border-radius: 50%; margin-top: 2px; transition: border-color 0.2s, background 0.2s; flex-shrink: 0; }
-    .option.is-selected .option-indicator { border-color: var(--accent); background: var(--accent); }
-    .option-indicator--check { border-radius: 4px; }
-    .option.is-selected .option-indicator--check { background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpolyline points='2 6 5 9 10 3' stroke='%232c3618' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") center / 10px no-repeat; }
-    .option-text { flex: 1; }
-    .option-title { font-size: 0.92rem; font-weight: 400; color: var(--text-soft); line-height: 1.35; }
-    .option.is-selected .option-title { color: var(--text); }
-    .option-desc { font-size: 0.8rem; font-weight: 300; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
-    .option-other-input { width: 100%; font-family: 'Lato', sans-serif; font-size: 0.9rem; font-weight: 300; color: var(--text); background: transparent; border: none; border-bottom: 1px solid var(--input-border); padding: 6px 0; margin-top: 8px; outline: none; caret-color: var(--accent); }
-    .option-other-input::placeholder { color: var(--text-muted); }
-    .option-other-input:focus { border-color: var(--input-focus); }
-
-    .submit-btn { display: block; width: 100%; font-family: 'Marcellus', serif; font-size: 1.05rem; font-weight: 400; letter-spacing: 0.04em; color: var(--bg); background: var(--accent); border: none; border-radius: 8px; padding: 18px 32px; cursor: pointer; transition: background 0.25s, transform 0.2s; margin-top: 16px; -webkit-tap-highlight-color: transparent; }
-    .submit-btn:hover { background: var(--accent-hover); }
-    .submit-btn:active { transform: scale(0.98); }
-    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-    .submit-fine { font-size: 0.78rem; font-weight: 300; color: var(--text-muted); text-align: center; margin-top: 12px; line-height: 1.6; }
-
-    .ty-state { display: none; padding: 64px 40px 80px; background: var(--bg); }
-    .ty-state.is-visible { display: block; }
-    .ty-inner { max-width: 600px; margin: 0 auto; }
-    .ty-check { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--accent); margin-bottom: 28px; }
-    .ty-check svg { width: 26px; height: 26px; stroke: var(--bg); stroke-width: 2.5; fill: none; }
-    .ty-heading { font-family: 'Marcellus', serif; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 400; margin-bottom: 20px; }
-    .ty-body { font-size: 0.95rem; font-weight: 300; line-height: 1.85; color: var(--text-soft); margin-bottom: 16px; }
-    .ty-sig { font-size: 0.95rem; font-weight: 400; color: var(--text); margin-top: 28px; }
-    .share-btn { display: inline-flex; align-items: center; gap: 8px; font-family: 'Lato', sans-serif; font-size: 0.88rem; font-weight: 400; color: var(--bg); background: var(--accent); border: none; border-radius: 6px; padding: 12px 24px; cursor: pointer; margin-top: 20px; transition: background 0.25s; -webkit-tap-highlight-color: transparent; }
-    .share-btn:hover { background: var(--accent-hover); }
-    .share-toast { display: inline-block; font-size: 0.78rem; color: var(--accent); margin-left: 12px; opacity: 0; transition: opacity 0.3s; vertical-align: middle; }
-    .share-toast.is-visible { opacity: 1; }
-    .ty-home { display: inline-block; margin-top: 24px; font-size: 0.82rem; font-weight: 400; color: var(--text-muted); text-decoration: underline; text-underline-offset: 3px; }
-    .ty-home:hover { color: var(--text-soft); }
-
-    @media (max-width: 700px) {
-      .topbar { padding: 16px 20px; }
-      .counter-section { padding: 32px 20px 28px; }
-      .offer-section { padding: 48px 20px; }
-      .form-section { padding: 48px 20px 64px; }
-      .ty-state { padding: 48px 20px 64px; }
-      .tier-grid { grid-template-columns: 1fr; gap: 12px; }
+    /* ── Top bar ── */
+    .topbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 40px;
+      background: rgba(10,10,10,0.88);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
     }
+    .topbar-logo { height: 36px; width: auto; opacity: 0.92; }
+    .topbar-back { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; letter-spacing: 0.04em; transition: color 0.25s; }
+    .topbar-back:hover { color: var(--text); }
+
+    /* ═══════════════════════════════════════════
+       OFFER SCREEN
+    ═══════════════════════════════════════════ */
+    #offer-screen {
+      min-height: 100vh;
+      padding: 112px 40px 80px;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+    #offer-screen.hiding {
+      opacity: 0;
+      transform: translateY(-24px);
+      pointer-events: none;
+    }
+
+    .offer-wrap { max-width: 860px; margin: 0 auto; }
+
+    .offer-eyebrow {
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--gold); display: block; margin-bottom: 20px;
+    }
+
+    .offer-heading {
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 600; line-height: 1.05;
+      margin-bottom: 20px; letter-spacing: -0.02em;
+    }
+
+    .offer-lead-block {
+      max-width: 640px;
+      margin-bottom: 48px;
+    }
+
+    .offer-lead-block p {
+      font-size: 1.05rem;
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-soft);
+      margin-bottom: 16px;
+    }
+
+    .offer-lead-block p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── Perks list ── */
+    .offer-perks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 56px;
+    }
+
+    .perk {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 20px 22px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+
+    .perk-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent-light); margin-top: 7px; flex-shrink: 0;
+    }
+
+    .perk-text { flex: 1; }
+    .perk-name { font-size: 0.92rem; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: 0.01em; }
+    .perk-desc { font-size: 0.83rem; font-weight: 400; color: rgba(255,255,255,0.62); line-height: 1.55; }
+
+    /* ── Pricing tiers ── */
+    .pricing-label {
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 16px; display: block;
+    }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    .tier {
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 12px;
+      padding: 24px 22px 22px;
+      background: rgba(255,255,255,0.06);
+      position: relative;
+    }
+    .tier--elite {
+      border-color: rgba(201,168,76,0.5);
+      background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+    }
+    .tier-selectable {
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .tier-selectable:hover {
+      border-color: rgba(255,255,255,0.28);
+      transform: translateY(-1px);
+    }
+    .tier-selectable.is-selected {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.14);
+      box-shadow: 0 0 0 1px rgba(143,166,94,0.25);
+    }
+    .tier-selectable.tier--elite.is-selected {
+      border-color: var(--gold);
+      background: linear-gradient(180deg, rgba(201,168,76,0.14), rgba(201,168,76,0.04));
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.25);
+    }
+    .tier-selected-pill {
+      display: none;
+      position: absolute;
+      top: 12px; right: 12px;
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      color: var(--bg); background: var(--accent-light);
+      border-radius: 20px; padding: 4px 9px;
+    }
+    .tier-selectable.is-selected .tier-selected-pill { display: inline-block; }
+    .tier--elite .tier-selected-pill { background: var(--gold); }
+
+    .tier-flag {
+      position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-sans);
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.10em; text-transform: uppercase;
+      padding: 4px 12px; background: var(--gold); color: #1a1a1a;
+      border-radius: 20px; white-space: nowrap;
+    }
+
+    .tier-name {
+      font-family: var(--font-sans);
+      font-size: 0.88rem; font-weight: 600;
+      letter-spacing: 0.02em; text-transform: none;
+      color: var(--accent-light);
+      margin-bottom: 12px;
+    }
+    .tier--elite .tier-name { color: var(--gold); }
+
+    .tier-price {
+      display: flex; align-items: flex-end; gap: 4px;
+      margin-bottom: 6px;
+    }
+    .tier-price-num {
+      font-family: var(--font-serif);
+      font-size: clamp(2.7rem, 5.5vw, 3.6rem); font-weight: 700;
+      letter-spacing: -0.02em; line-height: 1; color: var(--text);
+    }
+    .tier-price-currency {
+      font-size: 0.60em;
+      font-weight: 600;
+      vertical-align: 0.18em;
+      margin-right: 1px;
+      letter-spacing: 0;
+    }
+    .tier-price-mo {
+      font-family: var(--font-sans);
+      font-size: 0.82rem; font-weight: 400; color: rgba(255,255,255,0.35);
+      margin-bottom: 0.2rem;
+    }
+    .tier-price-was {
+      font-family: var(--font-sans);
+      font-size: 0.78rem; font-weight: 300; color: var(--text-muted);
+      text-decoration: line-through; opacity: 0.7; margin-bottom: 14px;
+    }
+    .tier-row {
+      display: grid; grid-template-columns: 62px 1fr; gap: 8px; align-items: baseline;
+    }
+    .tier-row-label {
+      font-family: var(--font-sans);
+      font-size: 0.60rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+    }
+    .tier-tagline {
+      font-family: var(--font-sans);
+      font-size: 0.82rem; font-style: italic; font-weight: 300;
+      color: rgba(255,255,255,0.5);
+      padding-top: 10px; margin-top: 4px;
+      border-top: 1px solid var(--border);
+    }
+    .tier--elite .tier-tagline { color: rgba(201,168,76,0.6); }
+    .tier-footnote {
+      font-size: 0.78rem; color: rgba(255,255,255,0.38);
+      margin: -20px 0 36px; letter-spacing: 0.02em;
+      line-height: 1.75; max-width: 560px;
+    }
+
+    .reservation-next {
+      display: none;
+      max-width: 640px;
+      margin: -10px 0 32px;
+      padding: 18px 20px;
+      border: 1px solid rgba(201,168,76,0.24);
+      border-radius: 12px;
+      background: rgba(201,168,76,0.055);
+    }
+    .reservation-next.is-visible { display: block; }
+    .reservation-next-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+      letter-spacing: 0.02em;
+    }
+    .reservation-next-list {
+      list-style: none;
+      display: grid;
+      gap: 7px;
+    }
+    .reservation-next-list li {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: rgba(255,255,255,0.74);
+    }
+    .reservation-next-list li::before {
+      content: '•';
+      color: var(--gold);
+      margin-right: 8px;
+    }
+
+    .offer-lead-block strong {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .tier-desc {
+      font-size: 0.82rem; font-weight: 400; color: var(--text-muted);
+      line-height: 1.55; padding-top: 14px;
+      display: flex; flex-direction: column; gap: 7px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Start button ── */
+    .offer-start-wrap {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+    }
+
+    .d3-choice {
+      width: 100%; max-width: 400px;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 20px; border-radius: 10px;
+      border: 1px solid var(--border);
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .d3-choice:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.025); }
+    .d3-choice[data-selected="true"] {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.08);
+    }
+    .d3-check {
+      width: 22px; height: 22px; min-width: 22px; border-radius: 5px;
+      border: 1.5px solid rgba(255,255,255,0.22);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--bg);
+      transition: background 0.2s, border-color 0.2s;
+      margin-top: 2px;
+    }
+    .d3-choice[data-selected="true"] .d3-check {
+      background: var(--accent-light); border-color: var(--accent-light);
+    }
+    .d3-choice-label {
+      font-family: var(--font-sans); font-size: 1rem; font-weight: 500; color: var(--text); margin-bottom: 3px;
+    }
+    .d3-choice-sub {
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .d3-prompt {
+      font-family: var(--font-sans); font-size: 1rem; font-weight: 600;
+      color: var(--text); margin-bottom: 12px; line-height: 1.5;
+    }
+
+    .offer-btn {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 1rem; font-weight: 600;
+      letter-spacing: 0.04em; color: #fff;
+      text-decoration: none;
+      background: var(--accent); border: none;
+      border-radius: 40px; padding: 20px 72px;
+      cursor: pointer; text-align: center;
+      transition: background 0.3s, transform 0.3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .offer-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .offer-btn:disabled { opacity: 0.48; cursor: not-allowed; transform: none; }
+    .offer-btn:active { transform: scale(0.97); }
+
+    .offer-secondary {
+      background: none; border: none;
+      font-family: var(--font-sans);
+      font-size: 0.85rem; font-weight: 400;
+      color: var(--text-muted);
+      text-decoration: underline; text-underline-offset: 3px;
+      cursor: pointer; padding: 4px 0;
+      transition: color 0.25s;
+    }
+    .offer-secondary:hover { color: var(--text); }
+
+    .d3-choice--secondary {
+      border-color: rgba(255,255,255,0.07);
+      background: transparent;
+      padding: 12px 18px;
+    }
+    .d3-choice--secondary .d3-choice-label {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+    .d3-choice--secondary .d3-choice-sub {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.35);
+    }
+    .d3-choice--secondary.d3-choice[data-selected="true"] {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .offer-fine {
+      font-size: 0.85rem; font-weight: 400; color: rgba(255,255,255,0.78);
+      letter-spacing: 0.04em;
+      opacity: 0.6;
+    }
+
+    /* ── Founding notice banner in slide 1 ── */
+    .founding-notice {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(201,168,76,0.08);
+      border: 1px solid rgba(201,168,76,0.3);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 24px;
+    }
+    .founding-notice-icon {
+      font-size: 0.9rem; line-height: 1.6; flex-shrink: 0;
+    }
+    .founding-notice-text {
+      font-size: 0.85rem; font-weight: 400;
+      color: rgba(201,168,76,0.9);
+      line-height: 1.55;
+    }
+
+    .hourly-note {
+      font-size: 0.92rem; font-weight: 400; color: rgba(255,255,255,0.78);
+      text-align: center; margin: 0 0 36px; line-height: 1.6;
+    }
+
+    .offer-mini-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 20px 0 8px;
+    }
+
+    .offer-mini-card {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .offer-mini-card strong {
+      display: block;
+      font-size: 0.95rem;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .offer-mini-card p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.65);
+      line-height: 1.4;
+    }
+
+    .offer-mini-card .dot {
+      width: 8px;
+      height: 8px;
+      background: #9BE15D;
+      border-radius: 50%;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 600px) {
+      .offer-mini-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ═══════════════════════════════════════════
+       TYPEFORM SCREEN
+    ═══════════════════════════════════════════ */
+    #form-screen {
+      position: fixed; inset: 0;
+      display: none;
+      flex-direction: column;
+      background: var(--bg);
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #form-screen.visible { display: flex; }
+    #form-screen.shown { opacity: 1; }
+
+    .form-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .form-topbar-logo { height: 30px; width: auto; opacity: 0.85; }
+    .form-close-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-muted); font-size: 1.5rem; line-height: 1;
+      padding: 4px; transition: color 0.25s;
+    }
+    .form-close-btn:hover { color: var(--text); }
+
+    .form-progress-bar {
+      height: 3px;
+      background: rgba(255,255,255,0.06);
+      flex-shrink: 0;
+    }
+    .form-progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent-dark), var(--accent-light));
+      transition: width 0.5s cubic-bezier(0.22,1,0.36,1);
+      width: 0%;
+    }
+
+    .slides-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 32px 110px;
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      pointer-events: none;
+      overflow-y: auto;
+    }
+    .slide.is-active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .slide.is-exiting { opacity: 0; transform: translateY(-28px); pointer-events: none; }
+
+    .slide-inner { width: 100%; max-width: 580px; }
+    .slide-inner--center { text-align: center; }
+
+    .slide-step {
+      font-family: var(--font-sans);
+      font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--accent-light);
+      margin-bottom: 14px;
+    }
+
+    .slide-q {
+      font-family: var(--font-serif);
+      font-size: clamp(1.4rem, 3.5vw, 2rem);
+      font-weight: 600; line-height: 1.1; letter-spacing: -0.01em;
+      color: var(--text); margin-bottom: 8px;
+    }
+
+    .slide-hint {
+      font-size: 0.88rem; font-weight: 400;
+      color: var(--text-muted);
+      margin-bottom: 32px; line-height: 1.55;
+    }
+
+    /* ── Inputs ── */
+    .input-group { margin-bottom: 20px; }
+    .name-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .input-label {
+      display: block;
+      font-family: var(--font-sans);
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.13em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 6px;
+    }
+    .slide-input {
+      width: 100%;
+      background: transparent; border: none;
+      border-bottom: 2px solid rgba(255,255,255,0.18);
+      padding: 12px 0;
+      font-family: var(--font-sans);
+      font-size: 1.15rem; font-weight: 300;
+      color: var(--text); outline: none;
+      transition: border-color 0.3s;
+      -webkit-appearance: none;
+      caret-color: var(--accent-light);
+    }
+    .slide-input:focus { border-color: var(--accent-light); }
+    .slide-input.has-error { border-color: var(--error); }
+    .slide-input::placeholder { color: rgba(255,255,255,0.25); }
+    .input-error {
+      font-size: 0.8rem; color: var(--error);
+      margin-top: 6px; min-height: 1.1em;
+    }
+    .input-fine {
+      font-size: 0.82rem; color: var(--text-muted);
+      margin-top: 14px; font-style: italic;
+    }
+    .why-hold {
+      color: var(--accent-light);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      font-style: normal;
+    }
+    .why-hold-text {
+      display: none;
+      margin-top: 8px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.04);
+      color: rgba(255,255,255,0.68);
+      line-height: 1.55;
+      font-style: normal;
+    }
+
+
+    /* ── Payment slide spacing polish ── */
+    .payment-slide .slide-hint {
+      margin-bottom: 6px;
+    }
+    .hold-note {
+      margin-top: 4px;
+      margin-bottom: 20px;
+      opacity: 0.82;
+    }
+    .hold-note .why-hold {
+      margin-left: 4px;
+      font-size: 0.95em;
+    }
+    .payment-slide .why-hold-text {
+      margin-top: 6px;
+      margin-bottom: 16px;
+    }
+
+    /* ── Choices ── */
+    .choices { display: flex; flex-direction: column; gap: 10px; }
+    .choice {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .choice:hover { border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.04); }
+    .choice.is-selected {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.12);
+    }
+
+    .choice-key {
+      font-family: var(--font-sans);
+      width: 28px; height: 28px; min-width: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--text-muted);
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      margin-top: 1px;
+    }
+    .choice.is-selected .choice-key {
+      border-color: var(--accent-light);
+      background: var(--accent-light);
+      color: var(--bg);
+    }
+
+    .choice-content { flex: 1; }
+    .choice-title { font-size: 0.98rem; font-weight: 400; color: var(--text-soft); line-height: 1.4; }
+    .choice.is-selected .choice-title { color: var(--text); }
+    .choice-desc { font-size: 0.85rem; font-weight: 400; color: var(--text-muted); line-height: 1.5; margin-top: 3px; }
+
+    .choice-other-input {
+      width: 100%; font-family: var(--font-sans);
+      font-size: 0.92rem; font-weight: 300; color: var(--text);
+      background: transparent; border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 6px 0; margin-top: 6px;
+      outline: none; caret-color: var(--accent-light);
+    }
+    .choice-other-input::placeholder { color: var(--text-muted); }
+    .choice-other-input:focus { border-color: var(--accent-light); }
+
+    /* ── Stripe payment slide ── */
+    .stripe-tiers { display: flex; flex-direction: column; gap: 8px; }
+
+    .stripe-tier {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .stripe-tier:hover { border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.03); }
+    .stripe-tier.is-selected {
+      border-color: var(--accent-light);
+      background: rgba(74,110,52,0.12);
+    }
+    .stripe-tier--elite.is-selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.08);
+    }
+
+    .stripe-tier-key {
+      font-family: var(--font-sans);
+      width: 28px; height: 28px; min-width: 28px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 700;
+      color: var(--text-muted);
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      flex-shrink: 0;
+    }
+    .stripe-tier.is-selected .stripe-tier-key {
+      border-color: var(--accent-light);
+      background: var(--accent-light);
+      color: var(--bg);
+    }
+    .stripe-tier--elite.is-selected .stripe-tier-key {
+      border-color: var(--gold);
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .stripe-tier-info { flex: 1; }
+    .stripe-tier-name { font-size: 0.98rem; font-weight: 400; color: var(--text-soft); display: block; line-height: 1.4; }
+    .stripe-tier.is-selected .stripe-tier-name { color: var(--text); }
+    .stripe-tier-meta { font-size: 0.82rem; font-weight: 400; color: var(--text-muted); }
+    .stripe-tier--elite .stripe-tier-meta { color: rgba(201,168,76,0.8); }
+
+    .stripe-card-section { margin-top: 28px; display: none; }
+
+    #express-checkout-element { margin-top: 8px; margin-bottom: 18px; }
+
+    .stripe-wallet-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 18px 0 14px;
+      color: rgba(255,255,255,0.38); font-size: 0.76rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .stripe-wallet-divider::before, .stripe-wallet-divider::after {
+      content: ''; height: 1px; flex: 1; background: rgba(255,255,255,0.1);
+    }
+
+    #payment-element { margin-top: 8px; }
+
+    .terms-agree {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-bottom: 20px; cursor: pointer;
+    }
+    .terms-agree input[type="checkbox"] {
+      width: 16px; height: 16px; min-width: 16px;
+      margin-top: 3px; accent-color: #8fa65e; cursor: pointer;
+    }
+    .terms-agree-text {
+      font-size: 0.83rem; color: rgba(255,255,255,0.6); line-height: 1.55;
+    }
+    .terms-agree-text a { color: #8fa65e; text-decoration: underline; text-underline-offset: 2px; }
+    .terms-agree-text a:hover { color: #fff; }
+
+    .selected-plan-summary {
+      border: 1px solid rgba(201,168,76,0.36);
+      background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.025));
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin: 24px 0 18px;
+      color: var(--text-soft);
+      line-height: 1.45;
+      font-size: 0.92rem;
+    }
+    .checkout-plan-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 16px;
+    }
+    .checkout-plan-label {
+      display: block;
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 8px;
+    }
+    .checkout-plan-name {
+      display: block;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 0.01em;
+    }
+    .checkout-price {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      white-space: nowrap;
+      color: var(--text);
+    }
+    .checkout-price-currency {
+      font-size: 1.25rem;
+      line-height: 1;
+      margin-bottom: 0.24rem;
+      opacity: 0.92;
+    }
+    .checkout-price-number {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 5vw, 3rem);
+      font-weight: 700;
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+    .checkout-price-mo {
+      font-size: 0.76rem;
+      color: rgba(255,255,255,0.42);
+      margin-bottom: 0.22rem;
+    }
+    .checkout-plan-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.10);
+      color: rgba(255,255,255,0.64);
+      font-size: 0.86rem;
+    }
+    .checkout-plan-meta strong {
+      color: rgba(255,255,255,0.88);
+      font-weight: 600;
+    }
+    .checkout-plan-meta s { color: rgba(255,255,255,0.48); }
+    .checkout-plan-note {
+      margin-top: 12px;
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.58);
+      line-height: 1.5;
+    }
+    .selected-plan-summary strong { color: var(--text); font-weight: 600; }
+    @media (max-width: 520px) {
+      .checkout-plan-top { flex-direction: column; gap: 14px; }
+      .selected-plan-summary { padding: 20px; }
+    }
+
+    .stripe-loading {
+      display: none; text-align: center;
+      padding: 24px 0;
+      color: var(--text-muted); font-size: 0.92rem;
+    }
+
+
+    .inline-slide-actions {
+      margin-top: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .inline-primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 210px;
+      font-family: var(--font-sans);
+      font-size: 0.92rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      background: var(--accent);
+      border: none;
+      border-radius: 40px;
+      padding: 15px 34px;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.25s, opacity 0.25s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .inline-primary-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .inline-primary-btn:active { transform: scale(0.98); }
+    .inline-primary-btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      transform: none;
+      background: rgba(143,166,94,0.45);
+    }
+    .inline-action-note {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.46);
+      line-height: 1.45;
+    }
+    .payment-submit-row {
+      margin-top: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    @media (max-width: 600px) {
+      .inline-primary-btn { width: 100%; min-width: 0; }
+    }
+
+    /* ── Slide nav ── */
+    .slide-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      z-index: 210;
+      gap: 16px;
+    }
+
+    .nav-back-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-sans); font-size: 0.88rem;
+      font-weight: 400; color: var(--text-muted);
+      padding: 8px 12px;
+      transition: color 0.25s, opacity 0.25s;
+      letter-spacing: 0.04em;
+      border-radius: 4px;
+    }
+    .nav-back-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+    .nav-back-btn:disabled { opacity: 0; pointer-events: none; }
+
+    .nav-next-btn {
+      font-family: var(--font-sans);
+      font-size: 0.92rem; font-weight: 600;
+      letter-spacing: 0.04em; color: #fff;
+      background: var(--accent); border: none;
+      border-radius: 40px;
+      padding: 14px 44px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s, opacity 0.3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-next-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .nav-next-btn:active { transform: scale(0.97); }
+    .nav-next-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .slide-hint-key {
+      font-size: 0.74rem; font-weight: 400;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Confirm slide ── */
+    .confirm-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+    }
+    .confirm-icon--accent { background: var(--accent-light); }
+    .confirm-icon svg { width: 28px; height: 28px; stroke: #1a1a1a; stroke-width: 2.5; fill: none; }
+
+    .confirm-heading {
+      font-family: var(--font-serif);
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 600; letter-spacing: -0.01em; text-align: center; margin-bottom: 14px;
+    }
+
+    .confirm-body {
+      font-size: 1rem; font-weight: 400;
+      color: var(--text-soft); line-height: 1.75;
+      text-align: center; margin-bottom: 28px;
+    }
+
+    .confirm-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-top: 24px;
+    }
+    .confirm-reserve-link {
+      display: inline-block;
+      font-family: var(--font-sans);
+      font-size: 0.92rem; font-weight: 600;
+      color: #fff; text-decoration: none;
+      background: var(--accent);
+      border-radius: 40px;
+      padding: 14px 34px;
+      letter-spacing: 0.03em;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .confirm-reserve-link:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    .confirm-home-link {
+      display: inline-block;
+      padding: 12px 28px;
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      font-family: var(--font-sans);
+      font-size: 0.88rem; font-weight: 400;
+      color: var(--text-soft); text-decoration: none;
+      letter-spacing: 0.03em;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .confirm-home-link:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.18); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .topbar { padding: 16px 24px; }
+      #offer-screen { padding: 88px 24px 64px; }
+      .offer-perks { grid-template-columns: 1fr; }
+      .tier-grid { grid-template-columns: 1fr; gap: 16px; }
+      .tier { padding: 22px 22px 20px; }
+      .form-topbar { padding: 16px 24px; }
+      .slide { padding: 24px 24px 110px; }
+      .slide-nav { padding: 14px 24px; }
+      .nav-next-btn { padding: 13px 36px; }
+      .offer-btn { padding: 18px 56px; }
+      .name-grid { grid-template-columns: 1fr; gap: 0; }
+      .d3-choice { max-width: 100%; }
+    }
+
     @media (max-width: 480px) {
-      .topbar-logo { height: 28px; }
-      .perks-block { padding: 20px; }
-      .reassurance { padding: 16px 18px; }
-    }
-    @supports (padding: env(safe-area-inset-bottom)) {
-      .form-section { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
-      .topbar { padding-top: calc(18px + env(safe-area-inset-top)); }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition-duration: 0.05ms !important; }
+      .topbar-logo { height: 30px; }
+      .offer-btn { padding: 17px 40px; }
+      .slide-q { font-size: 1.35rem; }
+      .choices { gap: 8px; }
+      .choice { padding: 14px 16px; }
+      .slide-hint-key { display: none; }
+      .tier-price-num { font-size: 2.5rem; }
     }
   </style>
 </head>
+<body class="preload-hide">
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      window.__SP_START_MODE = (params.get('mode') === 'updates') ? 'updates' : 'default';
+    })();
+  </script>
 
-<body>
 
+  <!-- ── Fixed top bar ── -->
   <div class="topbar">
-    <a href="/"><img src="logosmall.png" alt="StrikePoint Sims" class="topbar-logo" loading="eager"></a>
-    <a href="/" class="topbar-home">&#8592; strikepointsims.com</a>
+    <a href="/"><img src="logohorizontal.png" alt="StrikePoint Sims" class="topbar-logo" loading="eager"></a>
+    <a href="/" class="topbar-back">&#8592; Home</a>
   </div>
 
-  <div class="counter-section">
-    <div class="founder-counter"><span class="founder-counter-num">20</span> of 20 Founder spots remaining</div>
-    <p class="counter-sub">Opening November 2026 &middot; Colchester, Connecticut &middot; No card required</p>
-  </div>
+  <!-- ═══════════════════════════════════════════
+       SCREEN 1 — OFFER
+  ═══════════════════════════════════════════ -->
+  <div id="offer-screen">
+    <div class="offer-wrap">
 
-  <section class="offer-section">
-    <div class="offer-inner">
-      <h2 class="offer-heading">What Founders get</h2>
-      <p class="offer-intro">Rate lock — 24 months. Whatever the public pays when we open, you pay less. For two full years.</p>
+      <span class="offer-eyebrow">Only 20 spots</span>
+      <h1 class="offer-heading">Choose your Founding membership</h1>
+      <div class="offer-lead-block">
+        <p><strong>Twenty spots. Lifetime preferred pricing. Your name displayed on the wall.</strong></p>
+        <div class="offer-mini-cards">
 
-      <div class="tier-grid">
-        <div class="tier-box">
-          <div class="tier-name">Off-Peak</div>
-          <div class="tier-price">$109<span style="font-size:1rem;font-weight:300">/mo</span></div>
-          <div class="tier-opens">Opens at $139</div>
-          <p class="tier-desc">Unlimited off-peak access. Built for shift workers, early birds, night owls, and anyone who can play outside 4–10pm weekdays or prime weekend hours.</p>
-        </div>
-        <div class="tier-box">
-          <div class="tier-name">Standard</div>
-          <div class="tier-price">$199<span style="font-size:1rem;font-weight:300">/mo</span></div>
-          <div class="tier-opens">Opens at $249</div>
-          <p class="tier-desc">8 hours of prime time per month plus unlimited off-peak. For the weekly player.</p>
-        </div>
-        <div class="tier-box tier-box--unlimited">
-          <div class="tier-name">Unlimited</div>
-          <div class="tier-price tier-price--unlimited">$329<span style="font-size:1rem;font-weight:300">/mo</span></div>
-          <div class="tier-opens">Opens at $399</div>
-          <p class="tier-desc">Everything, anytime.</p>
-          <p class="tier-cap">Capped at 5 Founder spots. Next cohort opens at $449.</p>
+          <div class="offer-mini-card">
+            <span class="dot"></span>
+            <div>
+              <strong>Satisfaction guarantee</strong>
+              <p>If it’s not what we promised, cancel within 14 days after opening for a full refund.</p>
+            </div>
+          </div>
+
+          <div class="offer-mini-card">
+            <span class="dot"></span>
+            <div>
+              <strong>Preferred pricing for life</strong>
+              <p>Save $30–$70/mo off public rates while your membership stays active.</p>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div class="perks-block">
-        <div class="perks-label">Every Founder also gets</div>
-        <ul class="perks-list">
-          <li>First access to every tee slot in opening week</li>
-          <li>Private Founders preview night before public opening</li>
-          <li>Branded quarter-zip</li>
-          <li>Your name on the wall, permanently</li>
-          <li>30-day satisfaction guarantee from the day we open</li>
+      <span class="pricing-label">Founder pricing</span>
+      <div class="tier-grid" id="offer-tier-grid">
+        <div class="tier tier-selectable" data-tier="Practice" data-price="119" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
+          <div class="tier-name">Practice</div>
+          <div class="tier-price">
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>119</span>
+            <span class="tier-price-mo">/mo</span>
+          </div>
+          <div class="tier-price-was">Regular $149/mo</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>Unlimited off-peak&thinsp;*<br><span style="color:rgba(255,255,255,0.35);font-size:0.82em">Peak hours not included</span></span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>7-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Practice and off-peak play</span></div>
+            <div class="tier-tagline">Built for easy, consistent reps.</div>
+          </div>
+        </div>
+        <div class="tier tier-selectable" data-tier="Standard" data-price="229" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
+          <div class="tier-name">Standard</div>
+          <div class="tier-price">
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>229</span>
+            <span class="tier-price-mo">/mo</span>
+          </div>
+          <div class="tier-price-was">Regular $279/mo</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>8 peak hours/month + unlimited off-peak</span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>10-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Regular rounds and flexible play</span></div>
+            <div class="tier-tagline">The core membership.</div>
+          </div>
+        </div>
+        <div class="tier tier--elite tier-selectable" data-tier="Elite" data-price="349" onclick="selectOfferTier(this)">
+          <span class="tier-selected-pill">Selected</span>
+          <div class="tier-flag">5 spots only</div>
+          <div class="tier-name">Elite</div>
+          <div class="tier-price">
+            <span class="tier-price-num"><span class="tier-price-currency">$</span>349</span>
+            <span class="tier-price-mo">/mo</span>
+          </div>
+          <div class="tier-price-was">Regular $419/mo</div>
+          <div class="tier-desc">
+            <div class="tier-row"><span class="tier-row-label">Access</span><span>16 peak hours/month + unlimited off-peak</span></div>
+            <div class="tier-row"><span class="tier-row-label">Booking</span><span>14-day advance</span></div>
+            <div class="tier-row"><span class="tier-row-label">Best for</span><span>Priority access and full rounds</span></div>
+            <div class="tier-tagline">Priority access when demand is highest.</div>
+          </div>
+        </div>
+      </div>
+
+      <p class="tier-footnote">* Off-peak: weekdays before 5pm &amp; nights 10pm&ndash;6am &nbsp;&middot;&nbsp; All tiers include guest privileges</p>
+
+      <div class="reservation-next" id="reservation-next">
+        <div class="reservation-next-title">What happens next</div>
+        <ul class="reservation-next-list">
+          <li>Your card is saved today to reserve your spot</li>
+          <li>You are not charged until we open in Fall 2026</li>
+          <li>You can cancel anytime before opening</li>
+          <li>14-day satisfaction guarantee after launch</li>
         </ul>
       </div>
 
-      <div class="reassurance">
-        <p><strong>No card required today.</strong> Monthly billing begins when we open. If we're delayed more than 60 days past our announced open date, you walk away with no obligation.</p>
+      <div class="offer-start-wrap">
+        <button class="offer-btn" id="start-form-btn" onclick="startForm(true)" disabled>Choose a membership above</button>
+        <p class="offer-fine">No charge today. Billing begins when we open.</p>
       </div>
-    </div>
-  </section>
 
-  <section class="form-section" id="form-section">
-    <div class="form-inner">
-      <h2 class="form-heading">Reserve your spot</h2>
-      <p class="form-sub">Takes about 60 seconds. No card required.</p>
-
-      <form id="waitlist-form" novalidate>
-
-        <div class="field-group">
-          <label class="field-label" for="full_name">Name</label>
-          <input class="field-input" type="text" id="full_name" name="full_name" placeholder="Your name" autocomplete="name" required>
-          <div class="field-error" id="name-error"></div>
-        </div>
-        <div class="field-group">
-          <label class="field-label" for="email">Email</label>
-          <input class="field-input" type="email" id="email" name="email" placeholder="name@example.com" autocomplete="email" required>
-          <div class="field-error" id="email-error"></div>
-          <p class="field-fine">No spam — just StrikePoint Sims news.</p>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">How does golf fit into your life?</div>
-          <div class="options" role="radiogroup" id="golf-level-group">
-            <label class="option" onclick="selectRadio(this,'golf_level')">
-              <div class="option-indicator"></div>
-              <div class="option-text"><div class="option-title">The Competitor</div><div class="option-desc">50+ rounds a year. Always looking to sharpen my game.</div></div>
-            </label>
-            <label class="option" onclick="selectRadio(this,'golf_level')">
-              <div class="option-indicator"></div>
-              <div class="option-text"><div class="option-title">The Regular</div><div class="option-desc">About once a week in season.</div></div>
-            </label>
-            <label class="option" onclick="selectRadio(this,'golf_level')">
-              <div class="option-indicator"></div>
-              <div class="option-text"><div class="option-title">The Social Player</div><div class="option-desc">A handful of rounds a year, mostly with friends.</div></div>
-            </label>
-            <label class="option" onclick="selectRadio(this,'golf_level')">
-              <div class="option-indicator"></div>
-              <div class="option-text"><div class="option-title">The Newcomer</div><div class="option-desc">Curious about golf or just getting started.</div></div>
-            </label>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">Where are you coming from?</div>
-          <div class="options" role="radiogroup" id="town-group">
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Colchester</div></div></label>
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Hebron</div></div></label>
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Marlborough</div></div></label>
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Glastonbury</div></div></label>
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">East Hampton</div></div></label>
-            <label class="option" onclick="selectRadio(this,'community')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Lebanon</div></div></label>
-            <label class="option" id="town-other-option" onclick="selectRadio(this,'community')">
-              <div class="option-indicator"></div>
-              <div class="option-text">
-                <div class="option-title">Somewhere else</div>
-                <input class="option-other-input" type="text" id="other-town" placeholder="Your town" style="display:none" onclick="event.stopPropagation()">
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">What matters most to you in a simulator facility?</div>
-          <p class="field-fine" style="margin-bottom:12px;margin-top:-4px">Choose as many as you like</p>
-          <div class="options" role="group" id="priority-group">
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">Accuracy of the shot data</div></div></label>
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">Being able to play on my own schedule</div></div></label>
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">Having somewhere to play year-round</div></div></label>
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">A golf-focused atmosphere</div></div></label>
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">Access to a wide variety of courses</div></div></label>
-            <label class="option" onclick="toggleCheck(this)"><div class="option-indicator option-indicator--check"></div><div class="option-text"><div class="option-title">Leagues and competitive events</div></div></label>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">Are you interested in a Founder spot?</div>
-          <div class="options" role="radiogroup" id="founding-group">
-            <label class="option" onclick="selectRadio(this,'founding_20')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Yes &#8212; reserve my Founder spot</div></div></label>
-            <label class="option" onclick="selectRadio(this,'founding_20')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Maybe &#8212; tell me more first</div></div></label>
-            <label class="option" onclick="selectRadio(this,'founding_20')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Just add me to general updates</div></div></label>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">How did you hear about us? <span style="font-weight:300;font-size:0.85em;color:var(--text-muted)">(optional)</span></div>
-          <div class="options" role="radiogroup" id="referral-group">
-            <label class="option" onclick="selectRadio(this,'referral_source')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Word of mouth / friend told me</div></div></label>
-            <label class="option" onclick="selectRadio(this,'referral_source')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Facebook / social</div></div></label>
-            <label class="option" onclick="selectRadio(this,'referral_source')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Google search</div></div></label>
-            <label class="option" onclick="selectRadio(this,'referral_source')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Local pro shop</div></div></label>
-            <label class="option" onclick="selectRadio(this,'referral_source')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Saw a sign / drove by</div></div></label>
-            <label class="option" id="referral-other-option" onclick="selectRadio(this,'referral_source')">
-              <div class="option-indicator"></div>
-              <div class="option-text">
-                <div class="option-title">Other</div>
-                <input class="option-other-input" type="text" id="other-referral" placeholder="Tell us" style="display:none" onclick="event.stopPropagation()">
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <div class="field-question">Want to follow along as we build this out?</div>
-          <div class="options" role="radiogroup" id="updates-group">
-            <label class="option" onclick="selectRadio(this,'updates')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Yes, keep me in the loop</div></div></label>
-            <label class="option" onclick="selectRadio(this,'updates')"><div class="option-indicator"></div><div class="option-text"><div class="option-title">Just let me know when you're open</div></div></label>
-          </div>
-          <p class="field-fine" style="margin-top:12px">Either way &#8212; no spam.</p>
-        </div>
-
-        <div class="field-error" id="form-error" style="margin-bottom:12px"></div>
-        <button type="submit" class="submit-btn" id="submit-btn">Reserve My Spot &#8594;</button>
-        <p class="submit-fine">No card required. Monthly billing begins when we open.</p>
-
-      </form>
-    </div>
-  </section>
-
-  <div class="ty-state" id="ty-state">
-    <div class="ty-inner">
-      <div class="ty-check">
-        <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
-      </div>
-      <h2 class="ty-heading">You're on the list.</h2>
-      <p class="ty-body">Check your email &#8212; confirmation is on the way within 24 hours.</p>
-      <p class="ty-body" id="ty-founder-msg" style="display:none">If you chose to reserve a Founder spot, we'll follow up personally to confirm your tier and answer questions. No pressure, no payment, just a conversation.</p>
-      <p class="ty-body">In the meantime: tell a golfer. The best thing you can do to help us open is send this page to someone who'd love it.</p>
-      <div>
-        <button class="share-btn" id="share-btn" type="button">Share strikepointsims.com</button>
-        <span class="share-toast" id="share-toast">Copied!</span>
-      </div>
-      <p class="ty-sig">&#8212; Mike</p>
-      <a href="/" class="ty-home">&#8592; Back to StrikePoint Sims</a>
     </div>
   </div>
 
+  <!-- ═══════════════════════════════════════════
+       SCREEN 2 — TYPEFORM
+  ═══════════════════════════════════════════ -->
+  <div id="form-screen">
+    <div class="form-topbar">
+      <img src="logohorizontal.png" alt="StrikePoint Sims" class="form-topbar-logo" loading="eager">
+      <button class="form-close-btn" onclick="closeForm()" aria-label="Back to offer">&times;</button>
+    </div>
+    <div class="form-progress-bar">
+      <div class="form-progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div class="slides-stage">
+
+      <!-- Slide 1: Name + Email -->
+      <div class="slide is-active" data-slide="1">
+        <div class="slide-inner">
+          <p class="slide-step" id="step-1">1 of 4</p>
+          <h2 class="slide-q" id="slide-1-heading">Where should we send updates?</h2>
+          <p class="slide-hint" id="slide-1-hint">Build progress, opening news, and when bookings go live.</p>
+          <div class="name-grid">
+            <div class="input-group">
+              <span class="input-label">First name</span>
+              <input class="slide-input" type="text" id="field-first-name" name="first_name" placeholder="First name" autocomplete="given-name" autocapitalize="words">
+              <p class="input-error" id="err-first-name"></p>
+            </div>
+            <div class="input-group">
+              <span class="input-label">Last name</span>
+              <input class="slide-input" type="text" id="field-last-name" name="last_name" placeholder="Last name" autocomplete="family-name" autocapitalize="words">
+              <p class="input-error" id="err-last-name"></p>
+            </div>
+          </div>
+          <div class="input-group">
+            <span class="input-label">Email</span>
+            <input class="slide-input" type="email" id="field-email" name="email" placeholder="name@example.com" autocomplete="email" inputmode="email" spellcheck="false">
+            <p class="input-error" id="err-email"></p>
+          </div>
+          <div class="founding-notice" id="founding-notice" style="display:none">
+            <span class="founding-notice-icon">&#9971;</span>
+            <span class="founding-notice-text">You're only a few short steps away from securing your spot.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 2: Golf level -->
+      <div class="slide" data-slide="2">
+        <div class="slide-inner">
+          <p class="slide-step" id="step-2">2 of 4</p>
+          <h2 class="slide-q">How does golf fit into your life?</h2>
+          <div class="choices" id="level-choices">
+            <div class="choice" data-value="I play often and want to improve" onclick="selectLevel(this)">
+              <div class="choice-key">A</div>
+              <div class="choice-content">
+                <div class="choice-title">I play often and want to improve</div>
+                <div class="choice-desc">50+ rounds a year. Always sharpening my game.</div>
+              </div>
+            </div>
+            <div class="choice" data-value="I play regularly during the season" onclick="selectLevel(this)">
+              <div class="choice-key">B</div>
+              <div class="choice-content">
+                <div class="choice-title">I play regularly during the season</div>
+                <div class="choice-desc">About once a week in season.</div>
+              </div>
+            </div>
+            <div class="choice" data-value="I play occasionally, mostly with friends" onclick="selectLevel(this)">
+              <div class="choice-key">C</div>
+              <div class="choice-content">
+                <div class="choice-title">I play occasionally, mostly with friends</div>
+                <div class="choice-desc">A handful of rounds a year, mostly with friends.</div>
+              </div>
+            </div>
+            <div class="choice" data-value="I’m newer to golf or just getting into it" onclick="selectLevel(this)">
+              <div class="choice-key">D</div>
+              <div class="choice-content">
+                <div class="choice-title">I’m newer to golf or just getting into it</div>
+                <div class="choice-desc">Curious about golf or just getting started.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 3: Town -->
+      <div class="slide" data-slide="3">
+        <div class="slide-inner">
+          <p class="slide-step" id="step-3">3 of 4</p>
+          <h2 class="slide-q">Where are you coming from?</h2>
+          <div class="choices" id="town-choices">
+            <div class="choice" data-value="Colchester" onclick="selectTown(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Colchester</div></div></div>
+            <div class="choice" data-value="Hebron" onclick="selectTown(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Hebron</div></div></div>
+            <div class="choice" data-value="Marlborough" onclick="selectTown(this)"><div class="choice-key">C</div><div class="choice-content"><div class="choice-title">Marlborough</div></div></div>
+            <div class="choice" data-value="Glastonbury" onclick="selectTown(this)"><div class="choice-key">D</div><div class="choice-content"><div class="choice-title">Glastonbury</div></div></div>
+            <div class="choice" data-value="East Hampton" onclick="selectTown(this)"><div class="choice-key">E</div><div class="choice-content"><div class="choice-title">East Hampton</div></div></div>
+            <div class="choice" data-value="Lebanon" onclick="selectTown(this)"><div class="choice-key">F</div><div class="choice-content"><div class="choice-title">Lebanon</div></div></div>
+            <div class="choice" data-value="other" onclick="selectTown(this)">
+              <div class="choice-key">G</div>
+              <div class="choice-content">
+                <div class="choice-title">Somewhere else</div>
+                <input class="choice-other-input" type="text" id="other-town" placeholder="Your town" style="display:none" onclick="event.stopPropagation()">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 4: Priority (multi-select) -->
+      <div class="slide" data-slide="4">
+        <div class="slide-inner">
+          <p class="slide-step" id="step-4">4 of 4</p>
+          <h2 class="slide-q">What matters most to you in a sim facility?</h2>
+          <div class="choices" id="priority-choices">
+            <div class="choice" data-value="Accuracy of the shot data" onclick="toggleMulti(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Accuracy of the shot data</div></div></div>
+            <div class="choice" data-value="Being able to play on my own schedule" onclick="toggleMulti(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Being able to play on my own schedule</div></div></div>
+            <div class="choice" data-value="Having somewhere to play year-round" onclick="toggleMulti(this)"><div class="choice-key">C</div><div class="choice-content"><div class="choice-title">Having somewhere to play year-round</div></div></div>
+            <div class="choice" data-value="A golf-focused atmosphere" onclick="toggleMulti(this)"><div class="choice-key">D</div><div class="choice-content"><div class="choice-title">A golf-focused atmosphere</div></div></div>
+            <div class="choice" data-value="Access to a wide variety of courses" onclick="toggleMulti(this)"><div class="choice-key">E</div><div class="choice-content"><div class="choice-title">Access to a wide variety of courses</div></div></div>
+            <div class="choice" data-value="Leagues and competitive events" onclick="toggleMulti(this)"><div class="choice-key">F</div><div class="choice-content"><div class="choice-title">Leagues and competitive events</div></div></div>
+          </div>
+          <div class="inline-slide-actions">
+            <button class="inline-primary-btn" type="button" onclick="nextSlide()">Continue &#8594;</button>
+            <span class="inline-action-note">Optional — choose any that apply.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slide 6: Payment (founding members only) -->
+      <div class="slide payment-slide" data-slide="6">
+        <div class="slide-inner">
+          <p class="slide-step">Final step</p>
+          <h2 class="slide-q">Finish your reservation</h2>
+          <p class="slide-hint">
+            Save your card to secure your Founder spot. No membership charges until we open.
+          </p>
+
+          <div class="selected-plan-summary" id="selected-plan-summary">
+            <div class="checkout-plan-top">
+              <div>
+                <span class="checkout-plan-label">Selected membership</span>
+                <strong class="checkout-plan-name" id="selected-plan-name">Founder membership</strong>
+              </div>
+              <div class="checkout-price" aria-label="Founder membership price">
+                <span class="checkout-price-currency">$</span>
+                <span class="checkout-price-number" id="selected-plan-price">—</span>
+                <span class="checkout-price-mo">/mo</span>
+              </div>
+            </div>
+            <div class="checkout-plan-meta">
+              <span><strong>Founder rate</strong></span>
+              <span>Regular <s id="selected-plan-regular">—</s></span>
+              <span id="selected-plan-savings">Preferred pricing locked while active</span>
+            </div>
+            <p class="checkout-plan-note">Only 20 founding memberships available. Your card is saved today; membership billing starts when we open.</p>
+          </div>
+
+          <p class="input-fine hold-note" id="hold-note">
+            Your card will be verified with a $1 temporary hold. It automatically disappears.<span class="why-hold" onclick="toggleWhyHold()">Why $1?</span>
+          </p>
+          <p class="input-fine why-hold-text" id="why-hold-text">The $1 authorization confirms the card is valid so we can hold your Founding spot. It is not captured as a payment and typically disappears from pending charges in 3-10 days.</p>
+
+          <div class="stripe-card-section" id="stripe-card-section">
+            <label class="terms-agree">
+              <input type="checkbox" id="terms-check">
+              <span class="terms-agree-text">I agree to the <a href="terms.html" target="_blank">Terms of Use &amp; Membership Agreement</a></span>
+            </label>
+            <div id="express-checkout-element"></div>
+            <div class="stripe-wallet-divider">Card verification</div>
+            <div id="payment-element"></div>
+            <p class="input-error" id="card-error"></p>
+            <p class="input-error" id="terms-error"></p>
+            <div class="payment-submit-row">
+              <button class="inline-primary-btn" id="payment-submit-btn" type="button" onclick="handleStripeSubmit()" disabled>Loading secure card form…</button>
+            </div>
+          </div>
+
+          <div class="stripe-loading" id="stripe-loading">Loading secure card form&hellip;</div>
+        </div>
+      </div>
+
+      <!-- Slide 7: Confirm -->
+      <div class="slide" data-slide="7">
+        <div class="slide-inner slide-inner--center">
+          <div class="confirm-icon">
+            <svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg>
+          </div>
+          <h2 class="confirm-heading" id="confirm-heading">You’re on the list.</h2>
+          <p class="confirm-body" id="confirm-body">You’ll get build updates, opening news, and when bookings go live.</p>
+          <p class="confirm-body" id="confirm-subbody" style="font-size:0.9rem;color:rgba(255,255,255,0.6);margin-top:-10px;">No spam. Just updates that matter.</p>
+          <div class="confirm-actions">
+            <a href="/join" class="confirm-reserve-link" id="confirm-reserve-link">Lock in founding pricing &#8594;</a>
+            <a href="/" class="confirm-home-link">Back to home</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /slides-stage -->
+
+    <div class="slide-nav" id="slide-nav">
+      <button class="nav-back-btn" id="back-btn" onclick="prevSlide()" disabled>&#8592; Back</button>
+      <span class="slide-hint-key" id="key-hint">press Enter &#8629;</span>
+      <button class="nav-next-btn" id="next-btn" onclick="nextSlide()">OK &#8594;</button>
+    </div>
+  </div><!-- /form-screen -->
+
   <script>
+  (function(){
     var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxEbYdo1E3B2oKPfaSvQ4J24kfxNdQI1ViSZknVxtnP59rx36GpORaLp09T_8YFAilUyg/exec';
 
-    function selectRadio(el, group) {
-      var parent = el.closest('[role="radiogroup"]');
-      if (!parent) return;
-      parent.querySelectorAll('.option').forEach(function(o){ o.classList.remove('is-selected'); });
+    // ── Replace with your Stripe publishable key (pk_live_... or pk_test_...) ──
+    var STRIPE_PUBLISHABLE_KEY = 'pk_test_51TQfuO6dJTC2t5WwqaSr5c44fIE9jpzG0lW5MKQ9jElKPaId7FQzrmK8zg9TgEzeqshPXoYp8BGkjhedLYHv55SH00ViZ1JZG2';
+
+    var current = 1;
+    var TOTAL = 4; // working slides before payment/confirm
+    var rowId = null;
+    var stripe = null, stripeElements = null, paymentElement = null, expressCheckoutElement = null, selectedTier = null;
+    var cardComplete = false;
+
+    var data = {
+      first_name: '', last_name: '', full_name: '', email: '',
+      community: '', community_other: '',
+      golf_level: '', priority: [],
+      founding_20: false, updates: '',
+      path: '',
+      stripe_tier: '', stripe_price: '',
+      stripe_customer: ''
+    };
+
+    // ── Server save ──
+    function saveToServer(payload) {
+      if (rowId) payload.row_id = rowId;
+      try {
+        fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload)
+        }).catch(function(err){ console.error('Save error:', err); });
+      } catch(e) { console.error('Save error:', e); }
+    }
+
+    function generateId() {
+      return 'sp_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+
+    window.selectOfferTier = function(el) {
+      document.querySelectorAll('.tier-selectable').forEach(function(t){ t.classList.remove('is-selected'); });
       el.classList.add('is-selected');
-      if (group === 'community') {
-        var ot = document.getElementById('other-town');
-        ot.style.display = (el === document.getElementById('town-other-option')) ? 'block' : 'none';
-        if (el === document.getElementById('town-other-option')) ot.focus();
-      }
-      if (group === 'referral_source') {
-        var or_ = document.getElementById('other-referral');
-        or_.style.display = (el === document.getElementById('referral-other-option')) ? 'block' : 'none';
-        if (el === document.getElementById('referral-other-option')) or_.focus();
-      }
-    }
-
-    function toggleCheck(el) { el.classList.toggle('is-selected'); }
-
-    function collectData() {
-      var d = {
-        full_name: document.getElementById('full_name').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        golf_level: '', community: '', priority: '',
-        founding_20: '', referral_source: '', updates: '',
-        submitted: new Date().toISOString()
+      selectedTier = {
+        name: el.getAttribute('data-tier'),
+        price: el.getAttribute('data-price')
       };
-      var ls = document.querySelector('#golf-level-group .option.is-selected');
-      if (ls) d.golf_level = ls.querySelector('.option-title').textContent.trim();
-      var ts = document.querySelector('#town-group .option.is-selected');
-      if (ts) {
-        if (ts === document.getElementById('town-other-option'))
-          d.community = document.getElementById('other-town').value.trim() || 'Somewhere else';
-        else d.community = ts.querySelector('.option-title').textContent.trim();
+      var btn = document.getElementById('start-form-btn');
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Continue with ' + selectedTier.name + ' →';
       }
-      var ps = [];
-      document.querySelectorAll('#priority-group .option.is-selected').forEach(function(o){
-        ps.push(o.querySelector('.option-title').textContent.trim());
+      var nextBlock = document.getElementById('reservation-next');
+      if (nextBlock) nextBlock.classList.add('is-visible');
+    };
+
+    // ── Start form ──
+    window.startForm = function(asFounder) {
+      if (asFounder && !selectedTier) {
+        var btn = document.getElementById('start-form-btn');
+        if (btn) btn.textContent = 'Choose a membership first';
+        return;
+      }
+      data.founding_20 = !!asFounder;
+      data.path = asFounder ? 'card' : 'no_card';
+      data.updates = 'Yes, keep me in the loop'; // default for both paths
+      current = 1;
+
+      // Show/hide founding notice + update step label on slide 1
+      var notice = document.getElementById('founding-notice');
+      var step1  = document.getElementById('step-1');
+      var slide1Heading = document.getElementById('slide-1-heading');
+      var slide1Hint = document.getElementById('slide-1-hint');
+      if (asFounder) {
+        if (notice) notice.style.display = 'flex';
+        if (step1)  step1.textContent = '1 of 4';
+        if (slide1Heading) slide1Heading.textContent = 'Finish your ' + (selectedTier ? selectedTier.name : 'Founder') + ' reservation.';
+        if (slide1Hint) slide1Hint.textContent = 'We’ll use this for your confirmation and opening updates.';
+      } else {
+        if (notice) notice.style.display = 'none';
+        if (step1)  step1.textContent = '1 of 3';
+        if (slide1Heading) slide1Heading.textContent = 'Where should we send updates?';
+        if (slide1Hint) slide1Hint.textContent = 'Build progress, opening news, and when bookings go live.';
+      }
+      showSlide(1);
+
+      var offer = document.getElementById('offer-screen');
+      var form  = document.getElementById('form-screen');
+      offer.classList.add('hiding');
+      form.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function(){
+        form.classList.add('shown');
+        var first = document.getElementById('field-first-name');
+        if (first) first.focus();
+      }, 50);
+      setTimeout(function(){ offer.style.display = 'none'; }, 500);
+    };
+
+    window.closeForm = function() {
+      var offer = document.getElementById('offer-screen');
+      var form = document.getElementById('form-screen');
+      form.classList.remove('shown');
+      setTimeout(function(){
+        form.classList.remove('visible');
+        offer.style.display = '';
+        offer.classList.remove('hiding');
+        document.body.style.overflow = '';
+      }, 400);
+    };
+
+    // ── Slide transitions ──
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(function(s){
+        s.classList.remove('is-active','is-exiting');
       });
-      d.priority = ps.join(', ');
-      var fs = document.querySelector('#founding-group .option.is-selected');
-      if (fs) d.founding_20 = fs.querySelector('.option-title').textContent.trim();
-      var rs = document.querySelector('#referral-group .option.is-selected');
-      if (rs) {
-        if (rs === document.getElementById('referral-other-option'))
-          d.referral_source = document.getElementById('other-referral').value.trim() || 'Other';
-        else d.referral_source = rs.querySelector('.option-title').textContent.trim();
+      var target = document.querySelector('.slide[data-slide="'+n+'"]');
+      if (target) target.classList.add('is-active');
+
+      // Path-aware progress
+      var fill = document.getElementById('progress-fill');
+      var pct;
+      if (data.founding_20) {
+        pct = { 1:12, 2:32, 3:52, 4:72, 6:93, 7:100 };
+      } else {
+        pct = { 1:18, 2:52, 3:86, 7:100 };
       }
-      var us = document.querySelector('#updates-group .option.is-selected');
-      if (us) d.updates = us.querySelector('.option-title').textContent.trim();
-      return d;
+      fill.style.width = (pct[n] || 0) + '%';
+
+      // Path-aware step labels
+      var stepLabels;
+      if (data.founding_20) {
+        stepLabels = { 1:'1 of 4', 2:'2 of 4', 3:'3 of 4', 4:'4 of 4', 6:'Final step' };
+      } else {
+        stepLabels = { 1:'1 of 3', 2:'2 of 3', 3:'3 of 3' };
+      }
+      var stepEl = document.getElementById('step-' + n);
+      if (stepEl && stepLabels[n]) stepEl.textContent = stepLabels[n];
+
+      var nav     = document.getElementById('slide-nav');
+      var backBtn = document.getElementById('back-btn');
+      var nextBtn = document.getElementById('next-btn');
+      var keyHint = document.getElementById('key-hint');
+
+      if (n === 7) {
+        nav.style.display = 'none';
+      } else if (n === 6) {
+        nav.style.display = 'none';
+        backBtn.disabled = false;
+        nextBtn.style.display = 'inline-block';
+        nextBtn.disabled = false;
+        nextBtn.textContent = 'Secure my spot \u2192';
+        keyHint.textContent = '';
+        if (selectedTier) {
+          var planName = document.getElementById('selected-plan-name');
+          var planPrice = document.getElementById('selected-plan-price');
+          var planRegular = document.getElementById('selected-plan-regular');
+          var planSavings = document.getElementById('selected-plan-savings');
+          var regularPrices = { Practice: 149, Standard: 279, Elite: 419 };
+          var founderPrice = parseInt(selectedTier.price, 10);
+          var regularPrice = regularPrices[selectedTier.name] || null;
+          if (planName) planName.textContent = selectedTier.name;
+          if (planPrice) planPrice.textContent = selectedTier.price;
+          if (planRegular && regularPrice) planRegular.textContent = '$' + regularPrice + '/mo';
+          if (planSavings && regularPrice && founderPrice) planSavings.textContent = 'Saves $' + (regularPrice - founderPrice) + '/mo';
+        }
+        var cardSection = document.getElementById('stripe-card-section');
+        if (cardSection) cardSection.style.display = 'block';
+        if (selectedTier) fetchSetupIntentAndMount();
+      } else {
+        nav.style.display = 'flex';
+        backBtn.disabled = n <= 1;
+        if (n === 2 || n === 3 || n === 5) {
+          nextBtn.style.display = 'none';
+          keyHint.textContent = 'press A\u2013G to choose';
+        } else if (n === 4) {
+          nav.style.display = 'none';
+          nextBtn.style.display = 'inline-block';
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'OK \u2192';
+          keyHint.textContent = 'choose any \u00b7 then Enter';
+        } else {
+          nextBtn.style.display = 'inline-block';
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'OK \u2192';
+          keyHint.textContent = 'press Enter \u21b5';
+        }
+      }
+
+      setTimeout(function(){
+        var inp = target ? target.querySelector('.slide-input') : null;
+        if (inp) inp.focus();
+      }, 240);
     }
 
-    function validate() {
-      var nm = document.getElementById('full_name').value.trim();
-      var em = document.getElementById('email').value.trim();
+    // ── Save per-slide ──
+    function saveOnLeave(n) {
+      if (n === 1 && data.email) {
+        if (!rowId) rowId = generateId();
+        saveToServer({
+          row_id: rowId,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          full_name: data.full_name,
+          email: data.email,
+          founding_20: data.founding_20 ? 'Yes' : 'No',
+          path: data.path,
+          payment_status: data.founding_20 ? 'pending' : 'none',
+          membership_tier: selectedTier ? selectedTier.name : '',
+          membership_price: selectedTier ? selectedTier.price : '',
+          status: 'started'
+        });
+      }
+      if (n === 2 && data.golf_level) {
+        saveToServer({ row_id: rowId, golf_level: data.golf_level });
+      }
+      if (n === 3 && data.community) {
+        var town = data.community === 'other' ? data.community_other : data.community;
+        saveToServer({ row_id: rowId, community: town });
+      }
+      if (n === 4) {
+        var sel = document.querySelectorAll('#priority-choices .choice.is-selected');
+        var arr = Array.from(sel).map(function(el){ return el.getAttribute('data-value'); });
+        if (arr.length) saveToServer({ row_id: rowId, priority: arr.join(', ') });
+      }
+    }
+
+    // ── Validate slide 1 ──
+    function validateSlide1() {
+      var firstInp = document.getElementById('field-first-name');
+      var lastInp = document.getElementById('field-last-name');
+      var emailInp = document.getElementById('field-email');
+      var first = firstInp.value.trim();
+      var last = lastInp.value.trim();
+      var em = emailInp.value.trim();
       var re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       var ok = true;
-      document.getElementById('full_name').classList.toggle('has-error', !nm);
-      document.getElementById('name-error').textContent = nm ? '' : 'Please enter your name';
-      if (!nm) ok = false;
-      var emOk = em && re.test(em);
-      document.getElementById('email').classList.toggle('has-error', !emOk);
-      document.getElementById('email-error').textContent = emOk ? '' : (em ? "That doesn't look like a valid email" : 'Please enter your email');
-      if (!emOk) ok = false;
+
+      if (!first || first.length < 2) {
+        firstInp.classList.add('has-error');
+        document.getElementById('err-first-name').textContent = first ? 'Please enter your full first name' : 'Please enter your first name';
+        ok = false;
+      } else {
+        firstInp.classList.remove('has-error');
+        document.getElementById('err-first-name').textContent = '';
+      }
+
+      if (!last || last.length < 2) {
+        lastInp.classList.add('has-error');
+        document.getElementById('err-last-name').textContent = last ? 'Please enter your full last name' : 'Please enter your last name';
+        ok = false;
+      } else {
+        lastInp.classList.remove('has-error');
+        document.getElementById('err-last-name').textContent = '';
+      }
+
+      if (!em || !re.test(em)) {
+        emailInp.classList.add('has-error');
+        document.getElementById('err-email').textContent = em ? "That doesn't look right" : 'Please enter your email';
+        ok = false;
+      } else {
+        emailInp.classList.remove('has-error');
+        document.getElementById('err-email').textContent = '';
+      }
+
+      if (ok) {
+        data.first_name = first;
+        data.last_name = last;
+        data.full_name = first + ' ' + last;
+        data.email = em;
+      }
       return ok;
     }
 
-    document.getElementById('waitlist-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      if (!validate()) return;
-      var btn = document.getElementById('submit-btn');
-      btn.disabled = true;
-      btn.textContent = 'Sending…';
-      var data = collectData();
+    // ── Nav ──
+    window.nextSlide = function() {
+      if (current === 6) { handleStripeSubmit(); return; }
+      if (current === 1 && !validateSlide1()) return;
+      saveOnLeave(current);
+
+      // Slide 3 → route by path
+      if (current === 3) {
+        if (data.community === 'other') {
+          var otherVal = document.getElementById('other-town').value.trim();
+          if (!otherVal) return;
+          data.community_other = otherVal;
+        }
+        if (data.founding_20) {
+          current = 4; showSlide(4);
+        } else {
+          submitForm();
+        }
+        return;
+      }
+
+      // Slide 4 → founding goes straight to payment (skip slide 5)
+      if (current === 4) {
+        current = 6; showSlide(6);
+        return;
+      }
+
+      if (current < TOTAL) {
+        current++;
+        showSlide(current);
+      }
+    };
+
+    window.prevSlide = function() {
+      // From payment, back to slide 4 (slide 5 is not in either path)
+      if (current === 6) { current = 4; showSlide(4); return; }
+      if (current > 1 && current <= TOTAL) {
+        current--;
+        showSlide(current);
+      }
+    };
+
+    // ── Choice handlers ──
+    function clearChoices(group) {
+      group.querySelectorAll('.choice').forEach(function(c){
+        c.classList.remove('is-selected');
+      });
+    }
+
+    window.selectLevel = function(el) {
+      var group = document.getElementById('level-choices');
+      clearChoices(group);
+      el.classList.add('is-selected');
+      data.golf_level = el.getAttribute('data-value');
+      setTimeout(function(){ saveOnLeave(2); current = 3; showSlide(3); }, 280);
+    };
+
+    window.selectTown = function(el) {
+      var group = document.getElementById('town-choices');
+      clearChoices(group);
+      el.classList.add('is-selected');
+      var val = el.getAttribute('data-value');
+      data.community = val;
+      var otherInp = document.getElementById('other-town');
+      otherInp.style.display = 'none';
+      if (val === 'other') {
+        otherInp.style.display = 'block';
+        setTimeout(function(){ otherInp.focus(); }, 50);
+        document.getElementById('next-btn').style.display = 'inline-block';
+        document.getElementById('next-btn').textContent = 'OK \u2192';
+        document.getElementById('key-hint').textContent = 'type your town \u00b7 then Enter';
+      } else {
+        setTimeout(function(){
+          saveOnLeave(3);
+          if (data.founding_20) {
+            current = 4; showSlide(4);
+          } else {
+            submitForm();
+          }
+        }, 280);
+      }
+    };
+
+    window.toggleMulti = function(el) {
+      el.classList.toggle('is-selected');
+    };
+
+    // ── Stripe tier selection ──
+    window.selectStripeTier = function(el) {
+      document.querySelectorAll('.stripe-tier').forEach(function(t){ t.classList.remove('is-selected'); });
+      el.classList.add('is-selected');
+      selectedTier = {
+        name: el.getAttribute('data-tier'),
+        price: el.getAttribute('data-price')
+      };
+
+      var section = document.getElementById('stripe-card-section');
+      section.style.display = 'block';
+
+      fetchSetupIntentAndMount();
+
+      document.getElementById('card-error').textContent = '';
+    };
+
+
+    function updatePaymentCtaState() {
+      var btn = document.getElementById('payment-submit-btn');
+      var termsCheck = document.getElementById('terms-check');
+      if (!btn) return;
+
+      if (!paymentElement) {
+        btn.disabled = true;
+        btn.textContent = 'Loading secure card form…';
+        return;
+      }
+
+      if (!cardComplete) {
+        btn.disabled = true;
+        btn.textContent = 'Enter card details to continue';
+        return;
+      }
+
+      if (termsCheck && !termsCheck.checked) {
+        btn.disabled = true;
+        btn.textContent = 'Agree to terms to continue';
+        return;
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Verify card & reserve spot →';
+    }
+
+    function fetchSetupIntentAndMount() {
+      if (paymentElement) return; // already mounted
+      if (!stripe) stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+
+      var loading = document.getElementById('stripe-loading');
+      loading.textContent = 'Loading payment form…';
+      loading.style.display = 'block';
+
       fetch(FORM_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain' },
-        body: JSON.stringify(data)
-      }).catch(function(){}).finally(function() {
-        if (typeof gtag === 'function') gtag('event', 'founder_form_submit');
-        if (typeof fbq === 'function') fbq('track', 'Lead');
-        document.getElementById('form-section').style.display = 'none';
-        var ty = document.getElementById('ty-state');
-        ty.classList.add('is-visible');
-        var isFounder = data.founding_20 && data.founding_20.toLowerCase().indexOf('reserve') !== -1;
-        if (isFounder) document.getElementById('ty-founder-msg').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        body: JSON.stringify({
+          action: 'create_payment_intent',
+          email: data.email,
+          name: data.full_name,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          tier: selectedTier ? selectedTier.name : '',
+          membership_tier: selectedTier ? selectedTier.name : '',
+          membership_price: selectedTier ? selectedTier.price : '',
+          row_id: rowId || ''
+        })
+      })
+      .then(function(r) {
+        return r.text().then(function(text) {
+          var parsed;
+          try { parsed = JSON.parse(text); }
+          catch (e) { throw new Error('Payment setup returned a non-JSON response. Check Apps Script deployment and logs.'); }
+          if (!r.ok) throw new Error(parsed.error || ('Payment setup failed with status ' + r.status));
+          return parsed;
+        });
+      })
+      .then(function(resp) {
+        if (!resp.client_secret) throw new Error(resp.error || 'Setup failed. Please try again.');
+
+        stripeElements = stripe.elements({
+          clientSecret: resp.client_secret,
+          appearance: {
+            theme: 'night',
+            variables: {
+              colorPrimary: '#8fa65e',
+              colorBackground: '#111111',
+              colorText: '#ffffff',
+              colorTextSecondary: 'rgba(255,255,255,0.7)',
+              colorDanger: '#e8735a',
+              fontFamily: '"Hanken Grotesk", system-ui, sans-serif',
+              borderRadius: '8px'
+            },
+            rules: {
+              '.Input': { border: '1px solid rgba(255,255,255,0.1)', backgroundColor: 'rgba(255,255,255,0.04)' },
+              '.Input:focus': { border: '1px solid #8fa65e', boxShadow: 'none' },
+              '.Tab': { border: '1px solid rgba(255,255,255,0.1)', backgroundColor: '#111111' },
+              '.Tab:hover': { border: '1px solid rgba(255,255,255,0.2)', backgroundColor: 'rgba(255,255,255,0.05)' },
+              '.Tab--selected': { border: '1px solid #8fa65e', backgroundColor: 'rgba(143,166,94,0.08)' },
+              '.Tab--selected:hover': { border: '1px solid #8fa65e', backgroundColor: 'rgba(143,166,94,0.08)' }
+            }
+          }
+        });
+
+        expressCheckoutElement = stripeElements.create('expressCheckout', {
+          wallets: {
+            applePay: 'auto',
+            googlePay: 'auto',
+            link: 'never'
+          },
+          buttonType: {
+            applePay: 'plain',
+            googlePay: 'plain'
+          }
+        });
+
+        expressCheckoutElement.on('confirm', function() {
+          handleStripeSubmit(true);
+        });
+
+        expressCheckoutElement.mount('#express-checkout-element');
+
+        paymentElement = stripeElements.create('payment', {
+          // Keep Apple Pay / Google Pay prominent above. Card is open on desktop, collapsed on mobile.
+          layout: {
+            type: 'accordion',
+            defaultCollapsed: window.innerWidth < 768,
+            radios: false
+          },
+          wallets: {
+            applePay: 'never',
+            googlePay: 'never',
+            link: 'never'
+          },
+          paymentMethodOrder: ['card'],
+          fields: {
+            billingDetails: {
+              name: 'auto',
+              email: 'auto'
+            }
+          }
+        });
+        paymentElement.mount('#payment-element');
+        paymentElement.on('change', function(event) {
+          cardComplete = !!event.complete;
+          var err = document.getElementById('card-error');
+          if (err) err.textContent = event.error ? event.error.message : '';
+          updatePaymentCtaState();
+        });
+        var termsCheck = document.getElementById('terms-check');
+        if (termsCheck && !termsCheck.__sp_bound) {
+          termsCheck.__sp_bound = true;
+          termsCheck.addEventListener('change', function() {
+            var termsError = document.getElementById('terms-error');
+            if (termsError && termsCheck.checked) termsError.textContent = '';
+            updatePaymentCtaState();
+          });
+        }
+        updatePaymentCtaState();
+        loading.style.display = 'none';
+      })
+      .catch(function(err) {
+        loading.style.display = 'none';
+        document.getElementById('card-error').textContent = err.message || 'Payment system unavailable. Please try again.';
       });
+    }
+
+    window.toggleWhyHold = function() {
+      var el = document.getElementById('why-hold-text');
+      if (!el) return;
+      el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    };
+
+    // ── Stripe submit ──
+    window.handleStripeSubmit = function(skipCardCompleteCheck) {
+      if (!selectedTier) {
+        document.getElementById('card-error').textContent = 'Please select a membership tier above.';
+        return;
+      }
+      var termsCheck = document.getElementById('terms-check');
+      if (termsCheck && !termsCheck.checked) {
+        document.getElementById('terms-error').textContent = 'Please agree to the Terms of Use to continue.';
+        termsCheck.focus();
+        updatePaymentCtaState();
+        return;
+      }
+      if (document.getElementById('terms-error')) document.getElementById('terms-error').textContent = '';
+      if (!paymentElement) {
+        document.getElementById('card-error').textContent = 'Payment form not ready. Please wait a moment.';
+        return;
+      }
+      if (!skipCardCompleteCheck && !cardComplete) {
+        document.getElementById('card-error').textContent = 'Please complete your card details.';
+        updatePaymentCtaState();
+        return;
+      }
+      var nextBtn = document.getElementById('next-btn');
+      var payBtn = document.getElementById('payment-submit-btn');
+      var loading = document.getElementById('stripe-loading');
+      if (nextBtn) nextBtn.disabled = true;
+      if (payBtn) { payBtn.disabled = true; payBtn.textContent = 'Processing…'; }
+      loading.textContent = 'Securing your spot…';
+      loading.style.display = 'block';
+      document.getElementById('card-error').textContent = '';
+
+      stripe.confirmPayment({
+        elements: stripeElements,
+        redirect: 'if_required',
+        confirmParams: {
+          return_url: 'https://www.strikepointsims.com/join',
+          payment_method_data: {
+            billing_details: { name: data.full_name, email: data.email }
+          }
+        }
+      })
+      .then(function(result) {
+        if (result.error) throw new Error(result.error.message);
+
+        data.stripe_tier = selectedTier.name;
+        data.stripe_price = selectedTier.price;
+        data.stripe_customer = result.paymentIntent.customer || '';
+
+        if (!rowId) rowId = generateId();
+        saveToServer({
+          row_id: rowId,
+          path: 'card',
+          payment_status: 'authorized',
+          stripe_customer: result.paymentIntent.customer || '',
+          stripe_payment_intent: result.paymentIntent.id,
+          stripe_payment_method: result.paymentIntent.payment_method,
+          membership_tier: selectedTier.name,
+          membership_price: selectedTier.price,
+          status: 'card_authorized'
+        });
+
+        submitForm();
+      })
+      .catch(function(err) {
+        document.getElementById('card-error').textContent = err.message || 'Something went wrong. Please try again.';
+        if (nextBtn) {
+          nextBtn.disabled = false;
+          nextBtn.textContent = 'Secure my spot →';
+        }
+        if (payBtn) payBtn.textContent = 'Verify card & reserve spot →';
+        loading.style.display = 'none';
+        updatePaymentCtaState();
+      });
+    };
+
+    // ── Final submit ──
+    function submitForm() {
+      if (data.community === 'other') {
+        data.community_other = document.getElementById('other-town').value.trim();
+      }
+      var sel = document.querySelectorAll('#priority-choices .choice.is-selected');
+      data.priority = Array.from(sel).map(function(el){ return el.getAttribute('data-value'); });
+
+      var payload = {
+        row_id: rowId,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        full_name: data.full_name,
+        email: data.email,
+        updates: data.updates,
+        founding_20: data.founding_20 ? 'Yes' : 'No',
+        priority: data.priority.join(', '),
+        path: data.path,
+        payment_status: data.stripe_tier ? 'authorized' : 'none',
+        status: data.stripe_tier ? 'card_authorized' : 'lead_completed'
+      };
+      if (data.stripe_tier) {
+        payload.membership_tier = data.stripe_tier;
+        payload.membership_price = data.stripe_price;
+        payload.stripe_customer = data.stripe_customer;
+      }
+      saveToServer(payload);
+
+      // Update confirm copy
+      var heading = document.getElementById('confirm-heading');
+      var body = document.getElementById('confirm-body');
+      var subbody = document.getElementById('confirm-subbody');
+      var reserveLink = document.getElementById('confirm-reserve-link');
+      var icon = document.querySelector('.confirm-icon');
+      if (data.founding_20 && data.stripe_tier) {
+        heading.textContent = data.first_name ? ("You\'re in, " + data.first_name + ".") : "You\'re in.";
+        body.textContent = 'Your ' + data.stripe_tier + ' spot is reserved. Your first membership charge happens when we open.';
+        if (subbody) subbody.textContent = 'We’ll follow up as we get closer with membership details, preview timing, and opening updates.';
+        if (reserveLink) reserveLink.style.display = 'none';
+        icon.classList.remove('confirm-icon--accent');
+      } else if (data.founding_20) {
+        heading.textContent = data.first_name ? ("You\'re on the list, " + data.first_name + ".") : "You\'re on the list.";
+        body.textContent = "We’ll follow up as we get closer to opening with your membership details.";
+        if (subbody) subbody.textContent = 'No spam. Just updates that matter.';
+        if (reserveLink) reserveLink.style.display = 'none';
+        icon.classList.remove('confirm-icon--accent');
+      } else {
+        heading.textContent = data.first_name ? ("You’re on the list, " + data.first_name + ".") : "You’re on the list.";
+        body.textContent = "You’ll get build updates, opening news, and when bookings go live.";
+        if (subbody) subbody.textContent = 'No spam. Just updates that matter.';
+        if (reserveLink) reserveLink.style.display = 'inline-block';
+        icon.classList.add('confirm-icon--accent');
+      }
+
+      current = 7;
+      showSlide(7);
+    }
+
+    // ── Keyboard ──
+    document.addEventListener('keydown', function(e){
+      var formScreen = document.getElementById('form-screen');
+      if (!formScreen.classList.contains('shown')) return;
+      if (current === 7) return;
+
+      if (e.key === 'Enter') {
+        var active = document.activeElement;
+        if (active && active.id === 'other-town') {
+          if (data.community === 'other' && active.value.trim()) {
+            e.preventDefault();
+            data.community_other = active.value.trim();
+            saveOnLeave(3);
+            if (data.founding_20) {
+              current = 4; showSlide(4);
+            } else {
+              submitForm();
+            }
+          }
+          return;
+        }
+        if (current === 1 || current === 4 || current === 6) {
+          e.preventDefault();
+          nextSlide();
+        }
+        return;
+      }
+
+      // A–G for choice slides
+      var k = e.key.toLowerCase();
+      var map = { a:0, b:1, c:2, d:3, e:4, f:5, g:6 };
+      var idx = map[k];
+      if (idx === undefined) return;
+      if (document.activeElement && document.activeElement.id === 'other-town') return;
+
+
+      // Only act on the active choice slides
+      if (current < 2 || current > 4) return;
+
+      var slide = document.querySelector('.slide[data-slide="'+current+'"]');
+      if (!slide) return;
+      var opts = slide.querySelectorAll('.choice');
+      if (!opts[idx]) return;
+
+      if (current === 2) selectLevel(opts[idx]);
+      else if (current === 3) selectTown(opts[idx]);
+      else if (current === 4) toggleMulti(opts[idx]);
     });
 
-    document.getElementById('share-btn').addEventListener('click', function() {
-      var url = 'https://strikepointsims.com';
-      if (navigator.share) {
-        navigator.share({ title: 'StrikePoint Sims — Reserve a Founder Spot', url: url });
-      } else {
-        navigator.clipboard.writeText(url).then(function() {
-          var t = document.getElementById('share-toast');
-          t.classList.add('is-visible');
-          setTimeout(function(){ t.classList.remove('is-visible'); }, 2500);
-        });
+    // ── D3 CTA choice ──
+    var d3Choice = 'reserve';
+    window.d3Select = function(val) {
+      d3Choice = val;
+      var reserve = document.getElementById('d3-reserve');
+      var posted  = document.getElementById('d3-posted');
+      var cr = document.getElementById('d3-check-reserve');
+      var cp = document.getElementById('d3-check-posted');
+      if (!reserve || !posted || !cr || !cp) return;
+      reserve.setAttribute('data-selected', val === 'reserve' ? 'true' : 'false');
+      posted.setAttribute('data-selected',  val === 'posted'  ? 'true' : 'false');
+      cr.textContent = val === 'reserve' ? '\u2713' : '';
+      cp.textContent = val === 'posted'  ? '\u2713' : '';
+    };
+    window.d3Continue = function() {
+      startForm(d3Choice === 'reserve');
+    };
+
+    // Init
+    function initStartMode() {
+      showSlide(1);
+      var params = new URLSearchParams(window.location.search);
+      var updatesOnly = window.__SP_START_MODE === 'updates' || params.get('updates') === '1' || params.get('mode') === 'updates';
+      if (updatesOnly) {
+        startForm(false);
       }
-    });
+      document.body.classList.remove('preload-hide');
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initStartMode);
+    } else {
+      initStartMode();
+    }
+  })();
   </script>
+
+  <script src="privacy-consent.js"></script>
 </body>
 </html>

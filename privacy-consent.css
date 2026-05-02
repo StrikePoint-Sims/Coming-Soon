@@ -1,0 +1,104 @@
+/* ── Cookie consent banner ── */
+#sp-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 9999;
+  background: #141414;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding: 16px 40px;
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+}
+#sp-banner.sp-banner--in {
+  transform: translateY(0);
+}
+
+.sp-banner-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.sp-banner-copy {
+  flex: 1;
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.68);
+  line-height: 1.55;
+  min-width: 200px;
+}
+
+.sp-banner-policy {
+  color: rgba(255,255,255,0.45);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.sp-banner-policy:hover { color: rgba(255,255,255,0.8); }
+
+.sp-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sp-btn {
+  font-family: 'Lato', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 700;
+  border-radius: 40px;
+  cursor: pointer;
+  padding: 9px 22px;
+  white-space: nowrap;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+  line-height: 1;
+}
+
+.sp-btn--accept {
+  background: #4a6e34;
+  color: #fff;
+  border: 1px solid #4a6e34;
+}
+.sp-btn--accept:hover { background: #5a8040; border-color: #5a8040; }
+
+.sp-btn--decline {
+  background: transparent;
+  color: rgba(255,255,255,0.28);
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 9px 6px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  border-radius: 0;
+}
+.sp-btn--decline:hover {
+  color: rgba(255,255,255,0.5);
+}
+
+/* ── "Privacy Settings" trigger used in footers ── */
+.sp-privacy-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.5;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.sp-privacy-btn:hover { opacity: 0.85; }
+
+@media (max-width: 600px) {
+  #sp-banner { padding: 14px 20px; }
+  .sp-banner-inner { gap: 12px; }
+  .sp-banner-actions { width: 100%; }
+  .sp-btn { flex: 1; text-align: center; padding: 10px 16px; }
+}
