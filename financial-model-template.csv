@@ -1,0 +1,49 @@
+Key,Value,Notes
+--- OPERATING EXPENSES ---,,Edit column B only. Do not change column A keys.
+opex_rent,6237,Monthly rent Oct–Dec (3mo abated Jul–Sep)
+opex_elec_buildout,1600,Electricity Aug–Sep (buildout months)
+opex_elec_operating,2000,Electricity Oct–Dec (operating months)
+opex_inet_aug,50,Internet + water/sewer August
+opex_inet_sep,200,Internet + water/sewer September
+opex_inet_oct,200,Internet + water/sewer October–Dec
+opex_insurance,300,Monthly insurance Aug+
+opex_trackman_lic,275,Trackman licensing per month (3 bays) Sep+
+opex_other_tech,303,Other tech subscriptions per month Sep+
+opex_admin,700,Administrative / bookkeeping / misc per month Aug+
+opex_debt_service,1941,SBA monthly payment ($150K @ 9.5% / 120mo)
+opex_cc_rate,0.029,CC processing rate (decimal — 2.9% = 0.029)
+opex_mktg_aug,1200,Marketing spend August
+opex_mktg_sep,3000,Marketing spend September (pre-launch push)
+opex_mktg_oct,870,Marketing spend October
+opex_mktg_nov,870,Marketing spend November
+opex_mktg_dec,570,Marketing spend December
+--- REVENUE ---,,
+rev_oct_members,29,Ending members October
+rev_oct_walkins,110,Walk-in patrons October
+rev_oct_mem_rev,3828,Membership revenue October
+rev_oct_walk_rev,6600,Walk-in revenue October
+rev_nov_members,31,Ending members November
+rev_nov_walkins,119,Walk-in patrons November
+rev_nov_mem_rev,7920,Membership revenue November
+rev_nov_walk_rev,7100,Walk-in revenue November
+rev_dec_members,39,Ending members December
+rev_dec_walkins,137,Walk-in patrons December
+rev_dec_mem_rev,9240,Membership revenue December
+rev_dec_walk_rev,8250,Walk-in revenue December
+--- FUNDING ---,,
+fund_sba,160000,SBA proceeds arriving July (gross)
+fund_ti_aug,14000,TI allowance draw August
+fund_ti_sep,13000,TI allowance draw September
+--- CAPEX (pre-open) ---,,
+capex_professional_apr,2800,Professional fees April (architect retainer + attorney)
+capex_professional_may,3200,Professional fees May (schematics delivery + attorney)
+capex_professional_jun,7800,Professional fees June (stamped drawings + permits)
+capex_contracted_jul,13314,Contracted buildout July (40%)
+capex_contracted_aug,12266,Contracted buildout August (30%)
+capex_contracted_sep,13406,Contracted buildout September (30%)
+capex_diy_jul,18520,DIY materials July
+capex_diy_aug,24495,DIY materials August
+capex_diy_sep,15345,DIY materials September
+capex_sim_equip,29678,Non-Trackman sim equipment (cash) August
+capex_tech_infra,13267,Technology infrastructure September
+capex_rent_deposit,12474,Rent deposit June (first + last)

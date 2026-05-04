@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StrikePoint Sims — Accounting User Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;color:#111827;background:#fff;line-height:1.6;}
+.page{max-width:820px;margin:0 auto;padding:48px 32px 80px;}
+
+/* Header */
+.guide-header{text-align:center;padding:40px 0 32px;border-bottom:2px solid #e5e7eb;margin-bottom:40px;}
+.logo-mark{width:52px;height:52px;background:#1a2744;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.logo-mark svg{width:26px;height:26px;fill:#fff;}
+.guide-header h1{font-size:26px;font-weight:700;color:#111827;margin-bottom:6px;}
+.guide-header p{color:#6b7280;font-size:15px;}
+
+/* TOC */
+.toc{background:#f8f9fb;border-radius:12px;padding:24px 28px;margin-bottom:40px;}
+.toc h3{font-size:13px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;}
+.toc ol{padding-left:20px;}
+.toc li{margin-bottom:4px;}
+.toc a{color:#2563eb;text-decoration:none;font-size:14px;}
+.toc a:hover{text-decoration:underline;}
+
+/* Sections */
+h2{font-size:20px;font-weight:700;color:#1a2744;margin:40px 0 14px;padding-bottom:8px;border-bottom:1px solid #e5e7eb;}
+h3{font-size:16px;font-weight:600;color:#111827;margin:24px 0 10px;}
+p{margin-bottom:14px;font-size:15px;color:#374151;}
+ul,ol{padding-left:22px;margin-bottom:14px;}
+li{margin-bottom:6px;font-size:15px;color:#374151;}
+strong{color:#111827;}
+code{font-family:'JetBrains Mono',monospace;background:#f3f4f6;padding:2px 6px;border-radius:4px;font-size:13px;}
+
+/* Info boxes */
+.tip-box{background:#eff6ff;border-left:4px solid #2563eb;border-radius:4px;padding:14px 18px;margin:20px 0;}
+.tip-box p{margin:0;color:#1e40af;font-size:14px;}
+.warn-box{background:#fef3c7;border-left:4px solid #d97706;border-radius:4px;padding:14px 18px;margin:20px 0;}
+.warn-box p{margin:0;color:#92400e;font-size:14px;}
+
+/* How-to table */
+.howto-table{width:100%;border-collapse:collapse;margin:16px 0;}
+.howto-table th{text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e5e7eb;padding:8px 12px;}
+.howto-table td{border-bottom:1px solid #e5e7eb;padding:10px 12px;font-size:14px;vertical-align:top;}
+.howto-table tr:last-child td{border-bottom:none;}
+.howto-table td:first-child{font-weight:500;color:#111827;white-space:nowrap;width:220px;}
+.howto-table td:last-child{color:#374151;}
+
+/* CPA export table */
+.export-table{width:100%;border-collapse:collapse;margin:16px 0;}
+.export-table th{text-align:left;font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid #e5e7eb;padding:8px 12px;}
+.export-table td{border-bottom:1px solid #e5e7eb;padding:10px 12px;font-size:14px;vertical-align:top;}
+.export-table tr:last-child td{border-bottom:none;}
+.export-table td:first-child{font-weight:600;width:200px;color:#111827;}
+.export-table td:last-child{color:#6b7280;}
+
+/* Print */
+@media print{
+  .no-print{display:none!important;}
+  body{font-size:12px;}
+  .page{padding:20px;}
+  h2{page-break-before:auto;}
+  .guide-header{padding:20px 0;}
+}
+
+/* Footer */
+.guide-footer{margin-top:60px;padding-top:20px;border-top:1px solid #e5e7eb;text-align:center;font-size:13px;color:#9ca3af;}
+.guide-footer a{color:#6b7280;text-decoration:none;}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="guide-header">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <h1>StrikePoint Sims — Accounting Guide</h1>
+    <p>Everything you need to keep clean books and give your CPA exactly what they need.</p>
+    <p class="no-print" style="margin-top:12px">
+      <a href="app.html" style="color:#2563eb">← Back to App</a> &nbsp;·&nbsp;
+      <button onclick="window.print()" style="background:none;border:none;color:#2563eb;cursor:pointer;font-size:15px;font-family:inherit">Print Guide</button>
+    </p>
+  </div>
+
+  <!-- Table of Contents -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#signin">Signing In</a></li>
+      <li><a href="#dashboard">The Dashboard</a></li>
+      <li><a href="#transactions">Logging Transactions</a></li>
+      <li><a href="#receipts">Receipts</a></li>
+      <li><a href="#personal-card">Personal Card Reimbursements</a></li>
+      <li><a href="#customers">Customers</a></li>
+      <li><a href="#vendors">Vendors & 1099 Tracking</a></li>
+      <li><a href="#time">Time Tracking & Mileage</a></li>
+      <li><a href="#recurring">Recurring Transactions</a></li>
+      <li><a href="#import">Bank CSV Import</a></li>
+      <li><a href="#budgets">Budget Tracking</a></li>
+      <li><a href="#reports">Reports</a></li>
+      <li><a href="#settings">Settings</a></li>
+      <li><a href="#yearend">Year-End: What to Give Your CPA</a></li>
+      <li><a href="#howto">Quick How-To Reference</a></li>
+      <li><a href="#tips">Tips & Best Practices</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. Signing In -->
+  <h2 id="signin">1. Signing In</h2>
+  <p>Go to <strong>strikepointsims.com</strong> and click <strong>"Continue with Google."</strong> Use your business Gmail account. You'll stay signed in on that device — click Sign Out in the sidebar when you're done on a shared computer.</p>
+  <p>Both Mike and Jill can log in. To share the same set of books, use the same Gmail account. To keep separate records, use different Gmail accounts.</p>
+
+  <!-- 2. Dashboard -->
+  <h2 id="dashboard">2. The Dashboard</h2>
+  <p>Your financial home screen. It shows at a glance:</p>
+  <ul>
+    <li><strong>YTD Income</strong> — all money received this calendar year</li>
+    <li><strong>YTD Expenses</strong> — all money spent this year</li>
+    <li><strong>Net P/L</strong> — profit or loss so far (income minus expenses)</li>
+    <li><strong>Pending Reimbursements</strong> — what the business owes you for personal card charges</li>
+    <li><strong>Monthly Cash Flow chart</strong> — income vs. expenses by month</li>
+    <li><strong>Expenses by Category</strong> — where the money is going</li>
+    <li><strong>Tax Alerts</strong> — upcoming quarterly estimated tax due dates and 1099 warnings</li>
+    <li><strong>Budget Health</strong> — how spending tracks against your targets (if budgets are set)</li>
+    <li><strong>Quick-Log widget</strong> — add a simple expense in seconds without opening a full panel</li>
+  </ul>
+  <p>The Dashboard updates live — every transaction you add immediately changes the numbers.</p>
+
+  <!-- 3. Logging Transactions -->
+  <h2 id="transactions">3. Logging Transactions</h2>
+  <p>Tap <strong>+</strong> in the top bar (mobile) or <strong>+ Add Transaction</strong> (desktop). Fill in the core fields:</p>
+  <ul>
+    <li><strong>Expense or Income</strong> — toggle at the top of the panel</li>
+    <li><strong>Amount</strong> — always a positive number</li>
+    <li><strong>Description</strong> — brief note (e.g. "Comcast monthly bill", "Founding member John Smith")</li>
+    <li><strong>Category</strong> — pick the closest match. The app will suggest one based on the vendor name as you type</li>
+    <li><strong>Date</strong> — defaults to today; change it if entering something from earlier</li>
+    <li><strong>Payment Method</strong> — which account or card you used:
+      <ul>
+        <li><em>Business Account</em> — LLC checking or business credit card</li>
+        <li><em>Personal Card</em> — your personal credit or debit card (automatically flagged for reimbursement)</li>
+        <li><em>SBA Funds</em> — money from your SBA loan draw</li>
+        <li><em>Owner Capital</em> — money you personally invested into the business</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3>More Options</h3>
+  <p>Tap "▾ More options" to expand advanced fields:</p>
+  <ul>
+    <li><strong>Vendor</strong> — link to a vendor you've created (enables 1099 tracking)</li>
+    <li><strong>Customer</strong> — link income transactions to specific members</li>
+    <li><strong>CT Sales Tax</strong> — check if you collected CT sales tax on income</li>
+    <li><strong>Loan Payment Split</strong> — appears when category is "Interest — Loan". Split the total into interest (tax-deductible) and principal (not deductible). This is important for accurate tax reporting</li>
+    <li><strong>Link to Capital Asset</strong> — for equipment purchases, connect to the asset in your register</li>
+    <li><strong>Notes</strong> — any additional details</li>
+  </ul>
+
+  <div class="tip-box"><p><strong>Tip:</strong> The app remembers the category you chose for each vendor. Next time you type the same vendor name, it'll suggest the category automatically.</p></div>
+
+  <!-- 4. Receipts -->
+  <h2 id="receipts">4. Attaching Receipts</h2>
+  <p>Every expense over $75 should have a receipt attached. The IRS requires it, and your CPA will ask for it. You can attach a receipt in three ways:</p>
+  <ul>
+    <li><strong>Drag and drop</strong> — drag a file from your computer onto the receipt zone in the panel</li>
+    <li><strong>Browse</strong> — click the receipt zone to open a file picker (JPG, PNG, PDF supported)</li>
+    <li><strong>Take Photo (mobile)</strong> — on iPhone or Android, tap "📷 Take Photo" to use your camera directly</li>
+  </ul>
+  <p>Receipts are stored securely in the cloud — they're not stuck on one device. You can view them from any browser by clicking the 📎 icon next to a transaction.</p>
+  <p>If you don't have the receipt yet, save the transaction without it and come back later. The <strong>Missing Receipts</strong> report shows you every expense over $75 that still needs documentation.</p>
+
+  <!-- 5. Personal Card -->
+  <h2 id="personal-card">5. Personal Card Reimbursements</h2>
+  <p>When you use your personal card for a business expense, log it exactly like any other transaction — but select <strong>"Personal Card"</strong> as the payment method. The app automatically flags it as "Pending Reimbursement" so you don't lose track of what the business owes you.</p>
+  <p>When you transfer money from the business account to yourself to cover it:</p>
+  <ol>
+    <li>Go to <strong>Reports → Reimbursements</strong></li>
+    <li>Find the transaction and click <strong>"Mark Reimbursed"</strong></li>
+  </ol>
+  <p>This closes the loop and keeps both sets of books clean. The Dashboard always shows your current pending reimbursement total so you know exactly what you're owed.</p>
+
+  <!-- 6. Customers -->
+  <h2 id="customers">6. Customers</h2>
+  <p>Track your members, walk-ins, and corporate clients. Go to <strong>Customers → + Add Customer</strong>. Fields include name, email, phone, type (Member / Walk-in / Corporate), membership tier, start date, and status.</p>
+  <p>Once a customer exists, you can link income transactions to them (in the transaction panel under "More options"). Click any customer row to see their full transaction history and lifetime value.</p>
+  <p>This is useful for membership retention analysis and for understanding which revenue streams are strongest.</p>
+
+  <!-- 7. Vendors -->
+  <h2 id="vendors">7. Vendors & 1099 Tracking</h2>
+  <p>Track everyone you pay — your landlord, attorney, accountant, TrackMan, Comcast, etc. Go to <strong>Vendors → + Add Vendor</strong>.</p>
+
+  <h3>1099 Tracking (Important)</h3>
+  <p>If you pay an individual or unincorporated business more than <strong>$600 per year for services</strong>, you're legally required to file a <strong>1099-NEC</strong> by January 31. Here's how to track it correctly:</p>
+  <ol>
+    <li>Create the vendor in the Vendors section</li>
+    <li>In the vendor panel, tap "▾ More details" to expand the 1099 section</li>
+    <li>Enter their <strong>EIN or SSN</strong></li>
+    <li>Enable <strong>"1099 Eligible"</strong></li>
+    <li>Link your expense transactions to that vendor</li>
+  </ol>
+  <p>The app tracks their running total and alerts you on the Dashboard when they cross $600. The <strong>1099 Vendors</strong> report shows all eligible vendors, their YTD payments, and which ones are missing an EIN — everything your accountant needs to file the forms.</p>
+
+  <div class="warn-box"><p><strong>Note:</strong> Payments to corporations (Inc., LLC taxed as corp) don't require 1099s. Payments to individuals and partnerships do. When in doubt, ask for a W-9.</p></div>
+
+  <!-- 8. Time Tracking -->
+  <h2 id="time">8. Time Tracking & Mileage</h2>
+
+  <h3>Logging Hours</h3>
+  <p>Go to <strong>Time → + Log Time</strong>. Fill in:</p>
+  <ul>
+    <li><strong>Date</strong> — defaults to today</li>
+    <li><strong>Hours</strong> — use decimals (1.5 = 1 hour 30 minutes)</li>
+    <li><strong>Description</strong> — what you were doing ("Reviewed contractor bids", "Called SBA bank")</li>
+    <li><strong>Category</strong> — the area of the business (Operations, Marketing, Finance, etc.)</li>
+  </ul>
+
+  <h3>Why It Matters</h3>
+  <p>Time logs document that you're an active participant in the business — relevant for LLC and SBA compliance, and for supporting home office deductions. Your CPA will want the "Hours by Category" CSV at year end.</p>
+
+  <h3>Logging Mileage</h3>
+  <p>Go to <strong>Time → Mileage tab → + Log Mileage</strong>. Enter miles, purpose, and optional from/to locations. The app calculates your IRS deduction automatically at the current rate ($0.70/mile for 2026). Check the "Round trip" checkbox to double the miles automatically.</p>
+  <p>The Mileage Log report exports a CPA-ready CSV with total miles, per-trip details, and total deduction.</p>
+
+  <!-- 9. Recurring Transactions -->
+  <h2 id="recurring">9. Recurring Transactions</h2>
+  <p>For expenses that repeat every month (rent, SBA payment, subscriptions), set up a recurring template so you don't have to remember to log them manually.</p>
+
+  <h3>Setting Up</h3>
+  <ol>
+    <li>Go to <strong>Settings → Recurring → + Add Recurring</strong></li>
+    <li>Fill in the amount, category, payment method, and how often it repeats</li>
+    <li>Set the day of month it's due (e.g. day 1 = first of every month)</li>
+    <li>Toggle <strong>Active</strong> when the recurring charge actually starts</li>
+  </ol>
+  <p>Two templates come pre-loaded: the SBA loan payment and monthly rent. They're set to inactive — toggle them active when payments begin.</p>
+
+  <h3>Confirming Drafts</h3>
+  <p>When a recurring transaction is due, a banner appears on the Dashboard: <em>"3 recurring transactions are ready to confirm."</em> Tap it, review the list, and click Confirm. The transaction is saved and the next due date advances automatically. Click Skip to skip that month without saving.</p>
+
+  <!-- 10. CSV Import -->
+  <h2 id="import">10. Bank CSV Import</h2>
+  <p>Rather than typing every transaction by hand, download a CSV export from your bank's website and import it.</p>
+  <ol>
+    <li>Go to <strong>Transactions → Import CSV</strong></li>
+    <li>Upload the CSV file from your bank (Liberty Bank, M&T, etc.)</li>
+    <li>Match the columns: Date, Description, Amount (the app shows a preview)</li>
+    <li>Click <strong>Import</strong> — transactions appear in a "Needs Review" queue</li>
+    <li>In the queue, assign categories and confirm each transaction</li>
+  </ol>
+  <p>The app remembers your column mapping, so the second import from the same bank requires no re-mapping. It also suggests categories based on vendor names as you review.</p>
+  <p>Import once a month to catch anything you missed logging manually — your bank statement is the source of truth.</p>
+
+  <!-- 11. Budgets -->
+  <h2 id="budgets">11. Budget Tracking</h2>
+  <p>Set monthly spending targets per category in <strong>Settings → Budgets</strong>. The Dashboard Budget Health card turns green when you're on track, amber when you've used 75%+, and red when you're over budget.</p>
+  <p>The <strong>Budget vs. Actual</strong> report shows a detailed comparison for all categories with budgets set.</p>
+
+  <!-- 12. Reports -->
+  <h2 id="reports">12. Reports</h2>
+  <p>Go to <strong>Reports</strong> to see the full library of 20 report cards. Click any card to open it. Every report has Export CSV and/or Print options.</p>
+
+  <h3>Key Reports</h3>
+  <ul>
+    <li><strong>Profit & Loss</strong> — your income statement. The primary report for your CPA. Organized by IRS Schedule C categories</li>
+    <li><strong>Tax Deductibility</strong> — shows which expenses are 100% deductible, which are 50% (meals), and which are non-deductible (owner draws)</li>
+    <li><strong>1099 Vendors</strong> — who needs a 1099 form, their EIN status, and YTD payment totals</li>
+    <li><strong>Missing Receipts</strong> — expenses over $75 with no receipt attached. Clean this up before sending anything to your CPA</li>
+    <li><strong>Reimbursements</strong> — personal card charges and their status (pending vs. reimbursed)</li>
+    <li><strong>Loan Amortization</strong> — payment schedule for SBA and TrackMan loans, showing interest paid (deductible) vs. principal</li>
+    <li><strong>Runway & Burn Rate</strong> — how long your current cash position lasts at your current spending rate</li>
+    <li><strong>CT Sales Tax</strong> — taxable revenue and 6.35% tax collected, for CT DRS filing</li>
+    <li><strong>Period Comparison</strong> — compare any two time periods side-by-side (this month vs. last month, this year vs. last year)</li>
+    <li><strong>Mileage Log</strong> — all mileage entries with IRS deduction totals</li>
+  </ul>
+
+  <h3>Filtering Reports</h3>
+  <p>Most reports respect the Tax Year selector. For the full transaction-based reports, use the date range filters in the Transactions view before exporting.</p>
+
+  <!-- 13. Settings -->
+  <h2 id="settings">13. Settings</h2>
+  <p>Access via the gear icon (⚙) at the bottom of the sidebar. The Settings modal has six tabs:</p>
+  <ul>
+    <li><strong>Assets</strong> — add capital equipment (TrackMan unit, buildout improvements). The app calculates straight-line depreciation and Section 179 for your CPA</li>
+    <li><strong>Loans</strong> — your SBA and TrackMan loans come pre-loaded. Update amounts as needed. The Loan Amortization report uses this data</li>
+    <li><strong>Recurring</strong> — manage recurring transaction templates. Toggle active/inactive per template</li>
+    <li><strong>Budgets</strong> — set monthly spending targets per category</li>
+    <li><strong>Categories</strong> — add custom categories if none of the 23 defaults fit. Also set QuickBooks account names for IIF export</li>
+    <li><strong>Documents</strong> — business document vault. Store your LLC Certificate, EIN letter, SBA agreement, insurance certificates, and lease here. Accessible from any device</li>
+  </ul>
+
+  <!-- 14. Year-End -->
+  <h2 id="yearend">14. Year-End: What to Give Your CPA</h2>
+  <p>Every January, export these reports and send them to your CPA along with your bank statements.</p>
+
+  <table class="export-table">
+    <thead><tr><th>Report</th><th>How to Export</th></tr></thead>
+    <tbody>
+      <tr><td>Profit & Loss</td><td>Reports → Profit & Loss → set Tax Year → Print/Export PDF</td></tr>
+      <tr><td>Tax Deductibility</td><td>Reports → Tax Deductibility → Export CSV</td></tr>
+      <tr><td>1099 Vendors</td><td>Reports → 1099 Vendors → Export CSV (EIN + payment totals per vendor)</td></tr>
+      <tr><td>Owner Draws & Capital</td><td>Reports → Owner Draws & Capital → Export CSV</td></tr>
+      <tr><td>Loan Amortization</td><td>Reports → Loan Amortization → Print (interest paid = deductible)</td></tr>
+      <tr><td>Capital Assets</td><td>Reports → Capital Assets → Print (depreciation schedule)</td></tr>
+      <tr><td>Reimbursements</td><td>Reports → Reimbursements → Export CSV</td></tr>
+      <tr><td>Hours by Category</td><td>Time → export from report (owner participation records)</td></tr>
+      <tr><td>Mileage Log</td><td>Reports → Mileage Log → Export CSV</td></tr>
+      <tr><td>CT Sales Tax</td><td>Reports → CT Sales Tax → Export CSV (for CT DRS filing)</td></tr>
+      <tr><td>QuickBooks Import</td><td>Transactions → Export ▾ → Export for QuickBooks (IIF)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Before You Export</h3>
+  <ol>
+    <li>Run the <strong>Missing Receipts</strong> report — attach any receipts still missing</li>
+    <li>Run the <strong>1099 Vendors</strong> report — make sure all eligible vendors have EINs</li>
+    <li>Review <strong>Reimbursements</strong> — mark everything reimbursed that has been paid back</li>
+    <li>Check the <strong>Tax Year selector</strong> in Reports is set to the correct year</li>
+  </ol>
+
+  <!-- 15. How-To Reference -->
+  <h2 id="howto">15. Quick How-To Reference</h2>
+  <table class="howto-table">
+    <thead><tr><th>Task</th><th>Steps</th></tr></thead>
+    <tbody>
+      <tr><td>Log an expense</td><td>Transactions → + Add Transaction → fill Amount, Description, Category, Payment Method → Save</td></tr>
+      <tr><td>Log income</td><td>Same as above, toggle "Income" at top of panel</td></tr>
+      <tr><td>Personal card expense</td><td>Select "Personal Card" as payment — auto-flagged for reimbursement</td></tr>
+      <tr><td>Attach a receipt</td><td>In Add/Edit panel, drag-and-drop or click the receipt zone; take photo on mobile</td></tr>
+      <tr><td>View / open a receipt</td><td>Click the 📎 icon on any transaction row</td></tr>
+      <tr><td>Mark reimbursed</td><td>Reports → Reimbursements → "Mark Reimbursed"</td></tr>
+      <tr><td>Log loan payment</td><td>Add Transaction → Category: Interest — Loan → More Options → enter Interest and Principal split</td></tr>
+      <tr><td>Add a customer</td><td>Customers → + Add Customer → name, email, phone, type</td></tr>
+      <tr><td>Add a vendor</td><td>Vendors → + Add Vendor → name, category, contact info</td></tr>
+      <tr><td>Flag a 1099 vendor</td><td>Vendor panel → More Details → enter EIN → enable 1099 Eligible</td></tr>
+      <tr><td>Add a capital asset</td><td>Settings → Assets → + Add Asset → name, cost, depreciation method</td></tr>
+      <tr><td>Add a loan</td><td>Settings → Loans → + Add Loan (SBA and TrackMan are pre-loaded)</td></tr>
+      <tr><td>Log time worked</td><td>Time → Hours tab → + Log Time → hours, description, category</td></tr>
+      <tr><td>Log mileage</td><td>Time → Mileage tab → + Log Mileage → miles, purpose, from/to</td></tr>
+      <tr><td>Set up recurring expense</td><td>Settings → Recurring → + Add Recurring → amount, category, frequency, day of month</td></tr>
+      <tr><td>Confirm a recurring draft</td><td>Dashboard "Recurring Due" banner → Review → Confirm or Skip</td></tr>
+      <tr><td>Import bank CSV</td><td>Transactions → Import CSV → upload file → map columns → review queue</td></tr>
+      <tr><td>Set a spending budget</td><td>Settings → Budgets → enter monthly target for each category</td></tr>
+      <tr><td>Check burn rate / runway</td><td>Reports → Runway & Burn Rate</td></tr>
+      <tr><td>Upload a business document</td><td>Settings → Documents → + Upload Document</td></tr>
+      <tr><td>Export for QuickBooks</td><td>Transactions → Export ▾ → Export for QuickBooks (IIF)</td></tr>
+      <tr><td>View all reports</td><td>Reports → click any card in the grid</td></tr>
+      <tr><td>Print a report</td><td>Open any report → Print (hides the sidebar automatically)</td></tr>
+      <tr><td>Sign out</td><td>Sidebar → Sign Out button at the bottom</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 16. Tips -->
+  <h2 id="tips">16. Tips & Best Practices</h2>
+  <ul>
+    <li>Use the <strong>Quick-Log widget</strong> on the Dashboard for fast one-liner expenses — it takes about 5 seconds</li>
+    <li><strong>Photograph receipts immediately</strong> after a purchase — the app accepts iPhone photos directly from your camera roll</li>
+    <li><strong>Set up recurring transactions</strong> for rent and the SBA payment — you'll never forget to log them</li>
+    <li><strong>Import your bank CSV once a month</strong> to catch anything you missed logging manually</li>
+    <li>If unsure which category to use, type the vendor name and the app will suggest one</li>
+    <li>The business bank account is your source of truth — personal card charges should be reimbursed and logged so both sets of books reconcile</li>
+    <li>Log even small amounts — your CPA will reconcile against bank statements and unexplained gaps slow down the process</li>
+    <li><strong>Loan payments</strong>: always split interest vs. principal in More Options. Only interest is tax-deductible; your CPA needs to see this breakdown</li>
+    <li>For the SBA loan, set up a recurring template and activate it when the first payment is due in July 2026</li>
+    <li>The TrackMan financing starts February 2027 at $2,937/month — set that recurring template active when the time comes</li>
+    <li>Keep your document vault current — LLC Certificate, EIN letter, SBA agreement, lease, and insurance certificates should all be in there</li>
+    <li>Every quarter, check the <strong>Tax Alerts</strong> section on the Dashboard for estimated tax due dates</li>
+  </ul>
+
+  <div class="guide-footer">
+    <p>StrikePoint Sims LLC &copy; 2026 &nbsp;·&nbsp; <a href="app.html">Open App</a></p>
+    <p style="margin-top:6px;font-size:12px">This guide is for internal use only. All financial figures are estimates — consult your CPA for tax advice.</p>
+  </div>
+
+</div>
+
+</body>
+</html>

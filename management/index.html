@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StrikePoint Sims — Management Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0a;--bg-surface:#0f0f0f;--bg-elevated:#131d0a;
+  --border:rgba(74,110,52,0.25);--border-strong:rgba(74,110,52,0.45);
+  --accent:#4a6e34;--accent-hover:#5a8040;--accent-light:#8fa65e;
+  --gold:#c9a84c;
+  --text:#fff;--text-soft:rgba(255,255,255,0.88);
+  --text-muted:rgba(255,255,255,0.65);--text-faint:rgba(255,255,255,0.3);
+  --red:#c44;
+  --font-serif:'Playfair Display',Georgia,serif;
+  --font-sans:'Hanken Grotesk',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
+
+/* PASSWORD OVERLAY */
+#pw-overlay{position:fixed;inset:0;z-index:1000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s;}
+#pw-overlay.hidden{opacity:0;pointer-events:none;}
+.pw-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:12px;padding:40px 48px;width:340px;text-align:center;}
+.pw-logo{font-family:var(--font-serif);font-size:20px;color:var(--accent-light);margin-bottom:4px;letter-spacing:0.5px;}
+.pw-title{font-size:12px;color:var(--text-muted);margin-bottom:24px;letter-spacing:0.3px;}
+#pw-input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-sans);font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:12px;display:block;}
+#pw-input:focus{border-color:var(--accent);}
+#pw-btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
+#pw-btn:hover{background:var(--accent-hover);}
+#pw-error{color:var(--red);font-size:12px;margin-top:10px;min-height:16px;}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.pw-box.shaking{animation:shake .4s ease;}
+
+/* LAYOUT */
+.container{max-width:860px;margin:0 auto;padding:52px 24px 64px;flex:1;}
+
+/* HEADER */
+header{text-align:center;margin-bottom:52px;}
+.back-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-muted);text-decoration:none;margin-bottom:28px;transition:color .15s;letter-spacing:.2px;}
+.back-link:hover{color:var(--text);}
+.back-link svg{stroke:currentColor;}
+header h1{font-family:var(--font-serif);font-size:30px;font-weight:700;margin-bottom:6px;letter-spacing:-.3px;}
+header .sub{font-size:13px;color:var(--text-muted);}
+
+/* TOOL CARDS */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:52px;}
+@media(max-width:580px){.tools{grid-template-columns:1fr;}}
+.tool-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:30px;display:block;text-decoration:none;color:var(--text);transition:border-color .2s,background .2s,transform .15s;}
+.tool-card:hover{border-color:var(--accent);background:var(--bg-elevated);transform:translateY(-2px);}
+.tool-icon{width:42px;height:42px;border-radius:9px;background:rgba(74,110,52,0.12);border:1px solid rgba(74,110,52,0.28);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+.tool-icon svg{width:20px;height:20px;stroke:var(--accent-light);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tool-name{font-family:var(--font-serif);font-size:19px;font-weight:700;margin-bottom:6px;}
+.tool-desc{font-size:12px;color:var(--text-muted);line-height:1.65;margin-bottom:14px;}
+.tool-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(74,110,52,0.1);color:var(--accent-light);}
+.tag.gold{background:rgba(201,168,76,0.1);color:var(--gold);}
+
+/* FOOTER */
+footer{text-align:center;font-size:11px;color:var(--text-faint);padding-bottom:32px;}
+footer a{color:var(--text-faint);text-decoration:none;}
+footer a:hover{color:var(--text-muted);}
+</style>
+</head>
+<body>
+
+<!-- PASSWORD OVERLAY -->
+<div id="pw-overlay">
+  <div class="pw-box" id="pw-box">
+    <div class="pw-logo">StrikePoint Sims</div>
+    <div class="pw-title">Management Portal</div>
+    <input type="password" id="pw-input" placeholder="password" autocomplete="off">
+    <button id="pw-btn">Enter</button>
+    <div id="pw-error">&nbsp;</div>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <a href="../index.html" class="back-link">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Site
+    </a>
+    <h1>Management Portal</h1>
+    <div class="sub">Internal tools &nbsp;·&nbsp; StrikePoint Sims</div>
+  </header>
+
+  <div class="tools">
+
+    <a class="tool-card" href="../gantt.html">
+      <div class="tool-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="4" width="4" height="3" rx=".5"/>
+          <line x1="10" y1="5.5" x2="21" y2="5.5"/>
+          <rect x="3" y="10.5" width="7" height="3" rx=".5"/>
+          <line x1="13" y1="12" x2="21" y2="12"/>
+          <rect x="3" y="17" width="5" height="3" rx=".5"/>
+          <line x1="11" y1="18.5" x2="21" y2="18.5"/>
+        </svg>
+      </div>
+      <div class="tool-name">Planning Dashboard</div>
+      <div class="tool-desc">Build-out Gantt chart, unified cash flow model, task completion tracking, opening scenario slider, and projected vs. actual variance. Apr – Dec 2026.</div>
+      <div class="tool-tags">
+        <span class="tag">Gantt</span>
+        <span class="tag gold">Cash Flow</span>
+        <span class="tag">Tasks</span>
+        <span class="tag">Scenarios</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="../accounting/public/app.html">
+      <div class="tool-icon">
+        <svg viewBox="0 0 24 24">
+          <line x1="12" y1="1" x2="12" y2="23"/>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="tool-name">Accounting</div>
+      <div class="tool-desc">Log transactions, track P&amp;L, categorize by IRS Schedule C line, time &amp; mileage logging, reimbursements, vendor 1099 tracking, and reports.</div>
+      <div class="tool-tags">
+        <span class="tag">Transactions</span>
+        <span class="tag gold">P&amp;L</span>
+        <span class="tag">Reports</span>
+        <span class="tag">Time</span>
+      </div>
+    </a>
+
+  </div>
+
+  <footer>
+    StrikePoint Sims LLC &nbsp;·&nbsp; Internal use only &nbsp;·&nbsp;
+    <a href="../index.html">Public Site →</a>
+  </footer>
+</div>
+
+<script>
+(function() {
+  const overlay = document.getElementById('pw-overlay');
+  const pwBox   = document.getElementById('pw-box');
+  const pwInput = document.getElementById('pw-input');
+  const pwBtn   = document.getElementById('pw-btn');
+  const pwError = document.getElementById('pw-error');
+
+  if (sessionStorage.getItem('sp_auth') === '1') {
+    overlay.classList.add('hidden');
+    return;
+  }
+
+  function tryAuth() {
+    if (pwInput.value === 'ilovegolf') {
+      sessionStorage.setItem('sp_auth', '1');
+      overlay.classList.add('hidden');
+    } else {
+      pwError.textContent = 'Incorrect password.';
+      pwBox.classList.remove('shaking');
+      void pwBox.offsetWidth;
+      pwBox.classList.add('shaking');
+      pwInput.value = '';
+      pwInput.focus();
+    }
+  }
+  pwBtn.addEventListener('click', tryAuth);
+  pwInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryAuth(); });
+  pwInput.focus();
+})();
+</script>
+</body>
+</html>
