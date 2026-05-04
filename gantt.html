@@ -287,6 +287,14 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
 #paste-area:focus{border-color:var(--accent);}
 .pm-footer{display:flex;gap:8px;justify-content:flex-end;}
 
+/* SYNC BADGE */
+.sync-badge{font-size:10px;font-weight:600;letter-spacing:.3px;display:inline-flex;align-items:center;gap:4px;}
+.sync-off{color:var(--text-faint);}
+.sync-saving{color:var(--text-muted);}
+.sync-ok{color:var(--accent-light);}
+.sync-err{color:var(--gold);}
+#fs-signin-btn{font-size:11px;padding:5px 10px;}
+
 /* PRINT */
 @media print{
   #pw-overlay,#toast,#paste-modal,#this-week,#progress-wrap,
@@ -370,6 +378,9 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
     <div class="hdr-actions no-print">
       <button class="btn btn-ghost" onclick="openPasteModal()">📋 Update from Sheet</button>
       <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
+      <button class="btn btn-ghost" id="fs-signin-btn" onclick="_googleSignIn()" title="Sign in to sync across devices">
+        <span class="sync-badge sync-off" id="sync-badge">☁ Sign in to sync</span>
+      </button>
     </div>
   </header>
 
@@ -487,6 +498,27 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
 
 </div><!-- /container -->
 
+<!-- Firebase SDK — cross-device sync -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+(function() {
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDFUm2mDCqwQXqTaxGxwQ0E5Yayid9xqoI",
+      authDomain: "strikepoint-sims.firebaseapp.com",
+      projectId: "strikepoint-sims",
+      storageBucket: "strikepoint-sims.firebasestorage.app",
+      messagingSenderId: "511868473293",
+      appId: "1:511868473293:web:930c9c1ce41182c90ebe84"
+    });
+  }
+  window._fbAuth = firebase.auth();
+  window._fbDb   = firebase.firestore();
+})();
+</script>
+
 <script>
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 const SD = new Date(2026,3,6);   // Apr 6 2026
@@ -601,6 +633,103 @@ let MODEL_UPDATED = null;
 let EDIT_MODE = false;
 let CF_EDIT_MODE = false;
 
+// ─── FIREBASE SYNC ────────────────────────────────────────────────────────────
+let _fsUser = null;
+let _fsPushTimer = null;
+
+function _ganttDoc() {
+  if (!_fsUser) return null;
+  return _fbDb.collection('users').doc(_fsUser.uid).collection('gantt').doc('state');
+}
+function _setSyncBadge(state) {
+  const el = E('sync-badge');
+  const btn = E('fs-signin-btn');
+  if (!el) return;
+  const s = {
+    off:    {t:'☁ Sign in to sync', cls:'sync-off'},
+    saving: {t:'↑ Saving…',         cls:'sync-saving'},
+    synced: {t:'☁ Synced',          cls:'sync-ok'},
+    error:  {t:'⚠ Offline',         cls:'sync-err'},
+  }[state] || {t:'☁ Sign in to sync', cls:'sync-off'};
+  el.textContent = s.t;
+  el.className = 'sync-badge ' + s.cls;
+  if (btn) btn.onclick = state === 'off' ? _googleSignIn : null;
+  if (btn) btn.style.cursor = state === 'off' ? 'pointer' : 'default';
+}
+async function _loadFromFirestore() {
+  const ref = _ganttDoc();
+  if (!ref) return;
+  try {
+    const snap = await ref.get();
+    if (snap.exists) {
+      const d = snap.data();
+      if (d.model) MODEL = d.model;
+      if (d.tasks && d.tasks.length) TASKS = d.tasks;
+      if (d.done) DONE = d.done;
+      if (d.actual) ACTUAL = d.actual;
+      if (d.scMembers !== undefined) SC_MEMBERS = d.scMembers;
+      if (d.modelUpdated) MODEL_UPDATED = d.modelUpdated;
+      // Refresh localStorage cache from Firestore
+      localStorage.setItem('sp_model',  JSON.stringify(MODEL));
+      localStorage.setItem('sp_tasks',  JSON.stringify(TASKS));
+      localStorage.setItem('sp_done',   JSON.stringify(DONE));
+      localStorage.setItem('sp_actual', JSON.stringify(ACTUAL));
+      if (MODEL_UPDATED) localStorage.setItem('sp_updated', MODEL_UPDATED);
+      localStorage.setItem('sp_sc_members', SC_MEMBERS);
+    } else {
+      // First time — push localStorage state up to Firestore
+      await _pushToFirestore();
+    }
+    _setSyncBadge('synced');
+    renderAll();
+  } catch(e) {
+    console.warn('Firestore load error, using localStorage:', e);
+    _setSyncBadge('error');
+  }
+}
+async function _pushToFirestore() {
+  const ref = _ganttDoc();
+  if (!ref) return;
+  try {
+    await ref.set({
+      model: MODEL, tasks: TASKS, done: DONE, actual: ACTUAL,
+      scMembers: SC_MEMBERS, modelUpdated: MODEL_UPDATED || null,
+      savedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    _setSyncBadge('synced');
+  } catch(e) {
+    console.warn('Firestore save error:', e);
+    _setSyncBadge('error');
+  }
+}
+function _schedulePush() {
+  if (!_fsUser) return;
+  clearTimeout(_fsPushTimer);
+  _setSyncBadge('saving');
+  _fsPushTimer = setTimeout(_pushToFirestore, 1500);
+}
+function _googleSignIn() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  _fbAuth.signInWithPopup(provider).catch(e => console.warn('Sign-in error:', e));
+}
+function _initFirebaseAuth() {
+  _fbAuth.onAuthStateChanged(user => {
+    _fsUser = user;
+    if (user) {
+      const btn = E('fs-signin-btn');
+      if (btn) {
+        btn.title = 'Signed in as ' + (user.displayName || user.email);
+        btn.onclick = null;
+        btn.style.cursor = 'default';
+      }
+      _setSyncBadge('saving');
+      _loadFromFirestore();
+    } else {
+      _setSyncBadge('off');
+    }
+  });
+}
+
 function loadState() {
   try { const m = localStorage.getItem('sp_model'); if (m) MODEL = JSON.parse(m); } catch(e) {}
   try { const t = localStorage.getItem('sp_tasks'); if (t) TASKS = JSON.parse(t); } catch(e) {}
@@ -617,6 +746,7 @@ function saveState() {
   localStorage.setItem('sp_actual', JSON.stringify(ACTUAL));
   if (MODEL_UPDATED) localStorage.setItem('sp_updated', MODEL_UPDATED);
   localStorage.setItem('sp_sc_members', SC_MEMBERS);
+  _schedulePush();
 }
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
@@ -1799,6 +1929,7 @@ function initAuth() {
 loadState();
 initAuth();
 renderAll();
+_initFirebaseAuth();
 </script>
 </body>
 </html>

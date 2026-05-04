@@ -53,21 +53,28 @@ const State = {
 //   bootstrapApp(user);
 // });
 
-// TEST MODE: skip auth, use mock user
-const mockUser = {
-  uid: 'test-user-123',
-  displayName: 'Mike Rockland',
-  email: 'strikepointsims.com',
-};
-// Mock Firebase auth.currentUser for test mode
-if (!auth.currentUser) {
-  Object.defineProperty(auth, 'currentUser', {
-    configurable: true,
-    value: mockUser
+// Auth — Google Sign-In
+function showSignIn() {
+  const el = document.getElementById('sp-signin-overlay');
+  if (el) el.style.display = 'flex';
+}
+function hideSignIn() {
+  const el = document.getElementById('sp-signin-overlay');
+  if (el) el.style.display = 'none';
+}
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider).catch(err => {
+    console.error('Sign-in error:', err);
   });
 }
-State.user = mockUser;
-bootstrapApp(mockUser);
+
+auth.onAuthStateChanged(user => {
+  if (!user) { showSignIn(); return; }
+  State.user = user;
+  hideSignIn();
+  bootstrapApp(user);
+});
 
 async function bootstrapApp(user) {
   // Show user info in sidebar
@@ -75,27 +82,26 @@ async function bootstrapApp(user) {
   document.getElementById('userEmail') && (document.getElementById('userEmail').textContent = user.email);
   document.getElementById('userAvatar') && (document.getElementById('userAvatar').textContent = (user.displayName || user.email || '?')[0].toUpperCase());
 
-  // Load from localStorage if available, otherwise seed with sample data
-  _loadOrSeedData();
+  if (_isTestMode()) {
+    // Offline/test mode: load from localStorage, seed if empty
+    _loadOrSeedData();
+  } else {
+    // Firebase mode: seed Firestore on first login, then start real-time listeners
+    try { await seedDefaultData(); } catch(e) { console.warn('Seed error:', e); }
+  }
 
-  // Load settings (skip in test mode if it fails)
+  // Load settings
   try {
     State.settings = await getSettings();
     if (State.settings.taxYear) State.currentTaxYear = State.settings.taxYear;
     if (State.settings.hourlyRates) State.hourlyRates = State.settings.hourlyRates;
-  } catch (e) {
-    console.warn('Test mode: skipping Firebase settings load');
-  }
+  } catch(e) { console.warn('Settings load error:', e); }
 
-  // Initialize Chart.js defaults
   initChartDefaults();
 
-  // Set up Firestore listeners (skipped in test mode — test data already seeded)
-  if (auth.currentUser && auth.currentUser.uid !== 'test-user-123') {
-    _setupListeners();
+  if (!_isTestMode()) {
+    _setupListeners(); // Firestore real-time listeners
   }
-
-  // Navigate to dashboard
   navigate('dashboard');
 }
 
@@ -1008,9 +1014,13 @@ function renderReports() {
    Settings modal
    ──────────────────────────────────────────────────────────────────────────── */
 // openSettings() and renderSettingsTab() live in features.js
-// Sign-out / back to hub
+// Sign-out
 function signOut() {
-  window.location.href = '../../management/index.html';
+  auth.signOut().then(() => {
+    window.location.href = '../../management/index.html';
+  }).catch(() => {
+    window.location.href = '../../management/index.html';
+  });
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
