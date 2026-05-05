@@ -21,12 +21,6 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;}
 
-/* PASSWORD OVERLAY */
-#pw-overlay{position:fixed;inset:0;z-index:1000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s;}
-#pw-overlay.hidden{opacity:0;pointer-events:none;}
-.pw-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:12px;padding:40px 48px;width:340px;text-align:center;}
-.pw-logo{font-family:var(--font-serif);font-size:20px;color:var(--accent-light);margin-bottom:4px;letter-spacing:0.5px;}
-.pw-title{font-size:12px;color:var(--text-muted);margin-bottom:24px;letter-spacing:0.3px;}
 #pw-input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-sans);font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:12px;}
 #pw-input:focus{border-color:var(--accent);}
 #pw-btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
@@ -297,7 +291,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
 
 /* PRINT */
 @media print{
-  #pw-overlay,#toast,#paste-modal,#this-week,#progress-wrap,
+  #toast,#paste-modal,#this-week,#progress-wrap,
   .hdr-actions,.cf-controls,#scenario{display:none!important;}
   body{background:#fff;color:#000;}
   header{border-color:#ccc;}
@@ -332,17 +326,6 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
 </style>
 </head>
 <body>
-
-<!-- PASSWORD OVERLAY -->
-<div id="pw-overlay">
-  <div class="pw-box" id="pw-box">
-    <div class="pw-logo">StrikePoint Sims</div>
-    <div class="pw-title">Internal Planning Dashboard</div>
-    <input type="password" id="pw-input" placeholder="password" autocomplete="off">
-    <button id="pw-btn">Enter</button>
-    <div id="pw-error">&nbsp;</div>
-  </div>
-</div>
 
 <!-- TOAST -->
 <div id="toast"></div>
@@ -1891,33 +1874,10 @@ function renderAll() {
   updateScenario(SC_MEMBERS);
 }
 
-// ─── PASSWORD ─────────────────────────────────────────────────────────────────
+// ─── INIT LABELS ──────────────────────────────────────────────────────────────
 function initAuth() {
   E('today-lbl').textContent = TODAY.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   document.getElementById('members-slider').value = SC_MEMBERS;
-
-  if (sessionStorage.getItem('sp_auth') === '1') {
-    E('pw-overlay').classList.add('hidden');
-    return;
-  }
-
-  function tryAuth() {
-    if (E('pw-input').value === 'ilovegolf') {
-      sessionStorage.setItem('sp_auth','1');
-      E('pw-overlay').classList.add('hidden');
-    } else {
-      E('pw-error').textContent = 'Incorrect password.';
-      const box = E('pw-box');
-      box.classList.remove('shaking');
-      void box.offsetWidth;
-      box.classList.add('shaking');
-      E('pw-input').value = '';
-      E('pw-input').focus();
-    }
-  }
-  E('pw-btn').addEventListener('click', tryAuth);
-  E('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') tryAuth(); });
-  E('pw-input').focus();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
