@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>StrikePoint Sims — Tasks</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0a0a; --bg-s:#0f0f0f; --bg-r:#161616; --bg-card:#1b1b1b;
+  --border:rgba(74,110,52,.2); --border-s:rgba(74,110,52,.4);
+  --accent:#4a6e34; --accent-h:#5a8040; --accent-l:#8fa65e;
+  --gold:#c9a84c;
+  --text:#fff; --text-s:rgba(255,255,255,.88); --text-m:rgba(255,255,255,.6); --text-f:rgba(255,255,255,.28);
+  --red:#e05555; --red-bg:rgba(224,85,85,.1);
+  --amber:#e09a30; --amber-bg:rgba(224,154,48,.1);
+  --blue:#4a8fe0; --blue-bg:rgba(74,143,224,.1);
+  --fs:'Playfair Display',Georgia,serif;
+  --fn:'Hanken Grotesk',system-ui,sans-serif;
+  --fm:'JetBrains Mono',monospace;
+  --r:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--text);font-family:var(--fn);-webkit-font-smoothing:antialiased;height:100dvh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ── AUTH SCREEN ── */
+#auth-screen{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;z-index:9999;}
+#auth-screen .logo{font-family:var(--fs);font-size:20px;color:var(--accent-l);}
+#auth-screen .sub{font-size:12px;color:var(--text-f);}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;background:var(--bg-s);border-bottom:1px solid var(--border);flex-shrink:0;min-width:0;}
+.back-btn{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-m);text-decoration:none;white-space:nowrap;transition:color .15s;flex-shrink:0;}
+.back-btn:hover{color:var(--text);}
+.sep{color:var(--text-f);flex-shrink:0;}
+.app-label{font-family:var(--fs);font-size:15px;color:var(--accent-l);flex-shrink:0;}
+#board-tabs{display:flex;gap:3px;overflow-x:auto;flex:1;scrollbar-width:none;min-width:0;}
+#board-tabs::-webkit-scrollbar{display:none;}
+.b-tab{padding:5px 11px;border-radius:6px;font-size:13px;font-weight:500;background:none;border:none;color:var(--text-m);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.b-tab:hover{background:var(--bg-r);color:var(--text);}
+.b-tab.active{background:rgba(74,110,52,.15);color:var(--accent-l);}
+.b-add-btn{background:none;border:none;color:var(--text-f);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:5px;transition:color .15s;flex-shrink:0;line-height:1;}
+.b-add-btn:hover{color:var(--accent-l);}
+
+/* ── FILTER BAR ── */
+#filter-bar{display:flex;align-items:center;gap:7px;padding:7px 14px;background:var(--bg-s);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
+#filter-bar::-webkit-scrollbar{display:none;}
+.f-search{flex:0 0 140px;padding:5px 9px;background:var(--bg-r);border:1px solid var(--border);border-radius:6px;font-size:12px;color:var(--text);font-family:var(--fn);outline:none;}
+.f-search:focus{border-color:var(--accent);}
+.f-search::placeholder{color:var(--text-f);}
+.f-chip{padding:4px 10px;border-radius:5px;font-size:11px;font-weight:600;letter-spacing:.3px;border:1px solid var(--border);background:none;color:var(--text-m);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.f-chip:hover{border-color:var(--accent);color:var(--accent-l);}
+.f-chip.on{background:rgba(74,110,52,.15);border-color:var(--accent);color:var(--accent-l);}
+.f-clear{font-size:11px;color:var(--text-f);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:5px;transition:color .15s;white-space:nowrap;}
+.f-clear:hover{color:var(--red);}
+
+/* ── BOARD AREA ── */
+#board-area{display:flex;align-items:flex-start;gap:10px;padding:12px 14px 20px;overflow-x:auto;overflow-y:hidden;flex:1;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+#board-area::-webkit-scrollbar{height:5px;}
+#board-area::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.empty-board{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:14px;color:var(--text-m);}
+.empty-board p{font-size:14px;}
+
+/* ── COLUMN ── */
+.col-wrap{min-width:268px;max-width:268px;background:var(--bg-s);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;max-height:100%;transition:border-color .15s;flex-shrink:0;}
+.col-wrap.drag-over{border-color:var(--accent);background:rgba(74,110,52,.06);}
+.col-header{display:flex;align-items:center;gap:6px;padding:9px 10px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.col-name-inp{flex:1;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text-m);background:none;border:none;outline:none;font-family:var(--fn);cursor:text;min-width:0;}
+.col-name-inp:focus{color:var(--text);}
+.col-count{font-size:11px;color:var(--text-f);font-family:var(--fm);}
+.col-del{background:none;border:none;cursor:pointer;color:var(--text-f);font-size:15px;padding:1px 4px;border-radius:4px;opacity:0;transition:all .15s;line-height:1;flex-shrink:0;}
+.col-header:hover .col-del,.col-del:focus{opacity:1;}
+.col-del:hover{color:var(--red);background:var(--red-bg);}
+.col-cards{overflow-y:auto;flex:1;padding:6px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;min-height:44px;}
+.col-cards::-webkit-scrollbar{width:3px;}
+.col-cards::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.col-add-btn{margin:0 6px 6px;padding:6px 10px;border-radius:6px;background:none;border:1px dashed transparent;color:var(--text-f);font-family:var(--fn);font-size:12px;cursor:pointer;text-align:left;transition:all .15s;flex-shrink:0;}
+.col-add-btn:hover{border-color:var(--border);color:var(--text-m);background:var(--bg-r);}
+.add-col-wrap{min-width:200px;max-width:200px;align-self:flex-start;flex-shrink:0;}
+.add-col-btn{width:100%;padding:11px;background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:10px;color:var(--text-f);font-family:var(--fn);font-size:13px;cursor:pointer;transition:all .15s;}
+.add-col-btn:hover{border-color:var(--accent);color:var(--accent-l);background:rgba(74,110,52,.05);}
+
+/* ── CARD ── */
+.card{background:var(--bg-card);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:10px 11px;margin-bottom:5px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none;}
+.card:hover{border-color:var(--border-s);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.card.dragging{opacity:.35;}
+.card-title{font-size:13px;font-weight:500;color:var(--text-s);line-height:1.4;margin-bottom:5px;word-break:break-word;}
+.card-meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
+.c-priority{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:1px 6px;border-radius:3px;}
+.p-high{background:var(--red-bg);color:var(--red);}
+.p-medium{background:var(--amber-bg);color:var(--amber);}
+.p-low{background:var(--blue-bg);color:var(--blue);}
+.c-due{font-size:10px;font-family:var(--fm);color:var(--text-f);}
+.c-due.overdue{color:var(--red);}
+.c-label{font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:rgba(74,110,52,.15);color:var(--accent-l);}
+.c-check{font-size:10px;font-family:var(--fm);color:var(--text-f);}
+.c-assign{font-size:10px;color:var(--text-f);}
+
+/* ── INLINE ADD-CARD FORM ── */
+.add-form{margin-bottom:5px;}
+.add-form-ta{width:100%;padding:8px 10px;background:var(--bg-r);border:1px solid var(--accent);border-radius:6px;color:var(--text);font-family:var(--fn);font-size:13px;outline:none;resize:none;}
+.add-form-actions{display:flex;gap:6px;margin-top:5px;}
+.btn-confirm{padding:5px 12px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s;}
+.btn-confirm:hover{background:var(--accent-h);}
+.btn-cancel{padding:5px 10px;background:none;border:none;color:var(--text-m);font-size:12px;cursor:pointer;border-radius:5px;transition:background .15s;}
+.btn-cancel:hover{background:var(--bg-r);}
+
+/* ── MODAL ── */
+#modal-bg{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center;}
+@media(min-width:640px){#modal-bg{align-items:center;}}
+#modal-box{background:var(--bg-s);border:1px solid var(--border-s);border-radius:14px 14px 0 0;width:100%;max-height:92dvh;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+@media(min-width:640px){#modal-box{border-radius:14px;width:560px;max-height:84vh;}}
+.mhdr{display:flex;align-items:flex-start;gap:10px;padding:16px 18px 12px;position:sticky;top:0;background:var(--bg-s);border-bottom:1px solid var(--border);z-index:1;}
+#m-title{flex:1;font-size:16px;font-weight:600;color:var(--text);background:none;border:none;outline:none;font-family:var(--fn);resize:none;line-height:1.4;}
+.m-close{background:none;border:none;cursor:pointer;color:var(--text-m);font-size:22px;line-height:1;padding:0 4px;border-radius:5px;transition:all .15s;flex-shrink:0;margin-top:-2px;}
+.m-close:hover{color:var(--text);background:var(--bg-r);}
+.mbody{padding:14px 18px;display:flex;flex-direction:column;gap:14px;}
+.mf label{display:block;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-m);margin-bottom:6px;}
+.mf input,.mf select,.mf textarea{width:100%;padding:8px 10px;background:var(--bg-r);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--fn);font-size:13px;outline:none;transition:border-color .15s;}
+.mf input:focus,.mf select:focus,.mf textarea:focus{border-color:var(--accent);}
+.mf textarea{resize:vertical;min-height:68px;}
+.mf select option{background:#1a1a1a;}
+.m2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:480px){.m2col{grid-template-columns:1fr;}}
+
+/* labels */
+.lbl-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:4px;}
+.lbl-tag{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:4px;background:rgba(74,110,52,.15);color:var(--accent-l);font-size:11px;font-weight:600;}
+.lbl-del{cursor:pointer;background:none;border:none;color:inherit;font-size:13px;line-height:1;opacity:.6;transition:opacity .15s;}
+.lbl-del:hover{opacity:1;}
+.row-add{display:flex;gap:6px;}
+.row-add input{flex:1;width:auto;}
+.btn-row-add{padding:6px 12px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+
+/* checklist */
+.chk-items{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
+.chk-row{display:flex;align-items:flex-start;gap:8px;}
+.chk-row input[type=checkbox]{margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.chk-txt{flex:1;font-size:13px;color:var(--text-s);background:none;border:none;outline:none;font-family:var(--fn);padding:0;}
+.chk-txt.done{text-decoration:line-through;color:var(--text-f);}
+.chk-row-del{background:none;border:none;cursor:pointer;color:var(--text-f);font-size:13px;opacity:0;transition:opacity .15s;line-height:1;}
+.chk-row:hover .chk-row-del{opacity:1;}
+.chk-row-del:hover{color:var(--red);}
+.chk-prog{font-size:11px;color:var(--text-m);margin-bottom:6px;font-family:var(--fm);}
+
+/* comments */
+.cmt-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.cmt{background:var(--bg-r);border-radius:6px;padding:8px 10px;}
+.cmt-ts{font-size:10px;color:var(--text-f);margin-bottom:4px;font-family:var(--fm);}
+.cmt-body{font-size:13px;color:var(--text-s);line-height:1.45;word-break:break-word;}
+.cmt-add-row{display:flex;gap:6px;}
+.cmt-add-row textarea{flex:1;width:auto;min-height:36px;}
+.btn-post{padding:7px 14px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;align-self:flex-end;}
+.btn-post:hover{background:var(--accent-h);}
+
+/* modal footer */
+.m-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.m-footer select{font-size:12px;padding:5px 8px;max-width:180px;}
+.btn-del-card{padding:6px 12px;background:none;border:1px solid rgba(224,85,85,.3);border-radius:6px;color:var(--red);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;}
+.btn-del-card:hover{background:var(--red-bg);border-color:var(--red);}
+
+/* ── CUSTOM DIALOG ── */
+.dlg-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;}
+.dlg-box{background:var(--bg-s);border:1px solid var(--border-s);border-radius:12px;padding:26px;width:320px;max-width:100%;}
+.dlg-msg{font-size:14px;color:var(--text-s);margin-bottom:14px;line-height:1.5;}
+.dlg-inp{width:100%;padding:9px 11px;background:var(--bg-r);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:14px;font-family:var(--fn);outline:none;margin-bottom:14px;}
+.dlg-inp:focus{border-color:var(--accent);}
+.dlg-btns{display:flex;gap:8px;justify-content:flex-end;}
+.dlg-cancel{padding:7px 14px;background:none;border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text-m);font-size:13px;cursor:pointer;}
+.dlg-ok{padding:7px 16px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;}
+.dlg-ok:hover{background:var(--accent-h);}
+.dlg-ok.red{background:var(--red);}
+
+/* primary btn */
+.btn-primary{padding:9px 20px;background:var(--accent);border:none;border-radius:7px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;}
+.btn-primary:hover{background:var(--accent-h);}
+
+/* touch drag ghost */
+.touch-ghost{position:fixed;pointer-events:none;z-index:9998;opacity:.85;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:rotate(1.5deg);}
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+  <div class="logo">StrikePoint Sims</div>
+  <div class="sub">Loading tasks…</div>
+</div>
+
+<div id="app" style="display:none;flex-direction:column;height:100dvh;overflow:hidden;">
+  <header>
+    <a href="../index.html" class="back-btn">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Hub
+    </a>
+    <span class="sep">/</span>
+    <span class="app-label">Tasks</span>
+    <div id="board-tabs"></div>
+    <button class="b-add-btn" title="New board" onclick="promptAddBoard()">+</button>
+  </header>
+
+  <div id="filter-bar">
+    <input type="search" class="f-search" id="fq" placeholder="Search…" oninput="applyFilter()">
+    <button class="f-chip" data-f="priority" data-v="high"    onclick="toggleFilter(this)">High</button>
+    <button class="f-chip" data-f="priority" data-v="medium"  onclick="toggleFilter(this)">Medium</button>
+    <button class="f-chip" data-f="priority" data-v="low"     onclick="toggleFilter(this)">Low</button>
+    <button class="f-chip" data-f="due"      data-v="overdue" onclick="toggleFilter(this)">Overdue</button>
+    <button class="f-chip" data-f="due"      data-v="week"    onclick="toggleFilter(this)">This week</button>
+    <button class="f-clear" id="f-clear" onclick="clearFilter()" style="display:none">✕ Clear</button>
+  </div>
+
+  <div id="board-area"></div>
+</div>
+
+<!-- Card detail modal -->
+<div id="modal-bg" style="display:none" onclick="bgClick(event)">
+  <div id="modal-box">
+    <div class="mhdr">
+      <textarea id="m-title" rows="1" placeholder="Card title" oninput="autoH(this);patchCard('title',this.value)"></textarea>
+      <button class="m-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="mbody">
+      <div class="m2col">
+        <div class="mf">
+          <label>Priority</label>
+          <select id="m-priority" onchange="patchCard('priority',this.value)">
+            <option value="">None</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="mf">
+          <label>Due Date</label>
+          <input type="date" id="m-due" onchange="patchCard('dueDate',this.value)">
+        </div>
+      </div>
+      <div class="mf">
+        <label>Assignee</label>
+        <input type="text" id="m-assignee" placeholder="Name" oninput="patchCard('assignee',this.value)">
+      </div>
+      <div class="mf">
+        <label>Description</label>
+        <textarea id="m-desc" rows="3" placeholder="Notes, details…" oninput="patchCard('desc',this.value)"></textarea>
+      </div>
+      <div class="mf">
+        <label>Labels</label>
+        <div class="lbl-list" id="m-labels"></div>
+        <div class="row-add">
+          <input type="text" id="lbl-in" placeholder="Add label…" onkeydown="if(event.key==='Enter')addLabel()">
+          <button class="btn-row-add" onclick="addLabel()">Add</button>
+        </div>
+      </div>
+      <div class="mf">
+        <label>Checklist</label>
+        <div class="chk-prog" id="chk-prog"></div>
+        <div class="chk-items" id="m-checklist"></div>
+        <div class="row-add">
+          <input type="text" id="chk-in" placeholder="Add item…" onkeydown="if(event.key==='Enter')addChkItem()">
+          <button class="btn-row-add" onclick="addChkItem()">Add</button>
+        </div>
+      </div>
+      <div class="mf">
+        <label>Comments</label>
+        <div class="cmt-list" id="m-comments"></div>
+        <div class="cmt-add-row">
+          <textarea id="cmt-in" rows="2" placeholder="Add a comment…"></textarea>
+          <button class="btn-post" onclick="addComment()">Post</button>
+        </div>
+      </div>
+      <div class="m-footer">
+        <div class="mf" style="margin:0">
+          <select id="m-move" onchange="moveToCol(this.value)" style="font-size:12px;padding:5px 8px;max-width:180px;">
+            <option value="">Move to column…</option>
+          </select>
+        </div>
+        <button class="btn-del-card" onclick="deleteCurrentCard()">Delete card</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+// ── Firebase ──────────────────────────────────────────────────────────────────
+if (!firebase.apps.length) {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDFUm2mDCqwQXqTaxGxwQ0E5Yayid9xqoI",
+    authDomain:"strikepoint-sims.firebaseapp.com",
+    projectId:"strikepoint-sims",
+    storageBucket:"strikepoint-sims.firebasestorage.app",
+    messagingSenderId:"511868473293",
+    appId:"1:511868473293:web:930c9c1ce41182c90ebe84"
+  });
+}
+const _auth = firebase.auth();
+const _db   = firebase.firestore();
+
+// ── State ─────────────────────────────────────────────────────────────────────
+const S = {
+  user:null, boards:[], cards:{}, active:null, editCard:null,
+  filter:{q:'',priority:'',due:''}
+};
+const boardsCol = () => _db.collection('users').doc(S.user.uid).collection('taskBoards');
+const cardsCol  = () => _db.collection('users').doc(S.user.uid).collection('taskCards');
+const genId     = () => 'id_' + Math.random().toString(36).slice(2,9);
+const ts        = () => Date.now();
+const AB        = () => S.boards.find(b => b.id === S.active) || null;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+_auth.onAuthStateChanged(user => {
+  if (!user) {
+    if (!localStorage.getItem('sp_authed')) window.location.href = '../index.html';
+    return;
+  }
+  localStorage.setItem('sp_authed','1');
+  S.user = user;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  initApp();
+});
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+async function initApp() {
+  await loadBoards();
+  if (!S.boards.length) { await createDefaultBoard(); await loadBoards(); }
+  S.active = S.boards[0].id;
+  await loadCards(S.active);
+  render();
+}
+
+async function loadBoards() {
+  const snap = await boardsCol().orderBy('createdAt').get();
+  S.boards = snap.docs.map(d => ({id:d.id,...d.data()}));
+}
+
+async function loadCards(boardId) {
+  const snap = await cardsCol().where('boardId','==',boardId).get();
+  S.cards = {};
+  snap.docs.forEach(d => { S.cards[d.id] = {id:d.id,...d.data()}; });
+}
+
+async function createDefaultBoard() {
+  const id = genId(), cols = {}, order = [];
+  ['Backlog','In Progress','Review','Done'].forEach(n => {
+    const cid = genId(); cols[cid]={name:n,cardOrder:[]}; order.push(cid);
+  });
+  await boardsCol().doc(id).set({name:'Pre-Opening',colOrder:order,cols,createdAt:ts(),updatedAt:ts()});
+}
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+let _bTimer = null;
+function scheduleBoard() {
+  clearTimeout(_bTimer);
+  _bTimer = setTimeout(async () => {
+    const b = AB(); if (!b) return;
+    await boardsCol().doc(b.id).set({name:b.name,colOrder:b.colOrder,cols:b.cols,updatedAt:ts()},{merge:true});
+  }, 500);
+}
+
+const _cTimers = {};
+function scheduleCard(id) {
+  clearTimeout(_cTimers[id]);
+  _cTimers[id] = setTimeout(async () => {
+    const c = S.cards[id]; if (!c) return;
+    await cardsCol().doc(id).set({...c,updatedAt:ts()},{merge:true});
+  }, 400);
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() { renderTabs(); renderBoard(); }
+
+function renderTabs() {
+  const el = document.getElementById('board-tabs');
+  el.innerHTML = '';
+  S.boards.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'b-tab' + (b.id===S.active?' active':'');
+    btn.textContent = b.name;
+    btn.onclick = async () => {
+      if (btn.isContentEditable) return;
+      if (S.active === b.id) return;
+      S.active = b.id;
+      await loadCards(b.id);
+      render();
+    };
+    btn.ondblclick = () => startRenameBoard(b.id, btn);
+    el.appendChild(btn);
+  });
+}
+
+function renderBoard() {
+  const area = document.getElementById('board-area');
+  area.innerHTML = '';
+  const b = AB();
+  if (!b) {
+    area.innerHTML = '<div class="empty-board"><p>No boards yet.</p><button class="btn-primary" onclick="promptAddBoard()">Create board</button></div>';
+    return;
+  }
+  (b.colOrder||[]).forEach(cid => { const col = b.cols[cid]; if (col) area.appendChild(makeCol(cid,col)); });
+  const wrap = document.createElement('div');
+  wrap.className = 'add-col-wrap';
+  const btn = document.createElement('button');
+  btn.className = 'add-col-btn';
+  btn.textContent = '+ Add column';
+  btn.onclick = promptAddCol;
+  wrap.appendChild(btn);
+  area.appendChild(wrap);
+}
+
+function makeCol(cid, col) {
+  const wrap = document.createElement('div');
+  wrap.className = 'col-wrap';
+  wrap.dataset.colId = cid;
+
+  // Header
+  const hdr = document.createElement('div');
+  hdr.className = 'col-header';
+  const nameEl = document.createElement('input');
+  nameEl.type = 'text'; nameEl.className = 'col-name-inp'; nameEl.value = col.name;
+  nameEl.onchange = () => { col.name = nameEl.value.trim()||col.name; scheduleBoard(); };
+  const cnt = document.createElement('span');
+  cnt.className = 'col-count';
+  cnt.textContent = (col.cardOrder||[]).length;
+  const delBtn = document.createElement('button');
+  delBtn.className = 'col-del'; delBtn.title='Delete column'; delBtn.textContent = '×';
+  delBtn.onclick = () => confirmDeleteCol(cid);
+  hdr.append(nameEl, cnt, delBtn);
+
+  // Cards
+  const cardsEl = document.createElement('div');
+  cardsEl.className = 'col-cards'; cardsEl.dataset.colId = cid;
+
+  // Mouse D&D
+  cardsEl.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('drag-over'); });
+  cardsEl.addEventListener('dragleave', e => { if (!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
+  cardsEl.addEventListener('drop', e => {
+    e.preventDefault(); wrap.classList.remove('drag-over');
+    const id = e.dataTransfer.getData('cardId');
+    if (id) dropCard(id, cid, e.clientY, cardsEl);
+  });
+
+  filteredCards(col.cardOrder||[]).forEach(c => cardsEl.appendChild(makeCardEl(c)));
+
+  // Add-card button
+  const addBtn = document.createElement('button');
+  addBtn.className = 'col-add-btn'; addBtn.textContent = '+ Add card';
+  addBtn.onclick = () => showAddForm(cid, addBtn, cardsEl);
+
+  wrap.append(hdr, cardsEl, addBtn);
+  return wrap;
+}
+
+function filteredCards(order) {
+  const {q,priority,due} = S.filter;
+  const today = midnight();
+  const week  = new Date(today); week.setDate(week.getDate()+7);
+  return order.map(id => S.cards[id]).filter(c => {
+    if (!c) return false;
+    if (q && !c.title.toLowerCase().includes(q) && !(c.desc||'').toLowerCase().includes(q)) return false;
+    if (priority && c.priority !== priority) return false;
+    if (due === 'overdue') { if (!c.dueDate||new Date(c.dueDate+'T00:00:00')>=today) return false; }
+    if (due === 'week')    { if (!c.dueDate) return false; const d=new Date(c.dueDate+'T00:00:00'); if(d<today||d>week) return false; }
+    return true;
+  });
+}
+function midnight() { const d=new Date(); d.setHours(0,0,0,0); return d; }
+
+function makeCardEl(card) {
+  const el = document.createElement('div');
+  el.className = 'card'; el.dataset.id = card.id;
+  el.draggable = true;
+
+  // Mouse drag
+  el.addEventListener('dragstart', e => { e.dataTransfer.setData('cardId',card.id); setTimeout(()=>el.classList.add('dragging'),0); });
+  el.addEventListener('dragend',   () => { el.classList.remove('dragging'); document.querySelectorAll('.drag-over').forEach(x=>x.classList.remove('drag-over')); });
+
+  // Touch drag
+  el.addEventListener('touchstart', onTouchStart, {passive:true});
+
+  // Click (tap) — guarded by drag flag
+  el.addEventListener('click', () => { if (_wasDrag) return; openModal(card.id); });
+
+  const title = document.createElement('div');
+  title.className = 'card-title';
+  title.textContent = card.title || '(untitled)';
+  el.appendChild(title);
+
+  const meta = document.createElement('div');
+  meta.className = 'card-meta';
+  if (card.priority) { const s=document.createElement('span'); s.className='c-priority p-'+card.priority; s.textContent=card.priority; meta.appendChild(s); }
+  if (card.dueDate)  { const s=document.createElement('span'); s.className='c-due'+(new Date(card.dueDate+'T00:00:00')<midnight()?' overdue':''); s.textContent=card.dueDate; meta.appendChild(s); }
+  (card.labels||[]).forEach(l => { const s=document.createElement('span'); s.className='c-label'; s.textContent=l; meta.appendChild(s); });
+  const chk=card.checklist||[]; if(chk.length){ const s=document.createElement('span'); s.className='c-check'; s.textContent='☑ '+chk.filter(x=>x.done).length+'/'+chk.length; meta.appendChild(s); }
+  if (card.assignee) { const s=document.createElement('span'); s.className='c-assign'; s.textContent='@ '+card.assignee; meta.appendChild(s); }
+  if (meta.children.length) el.appendChild(meta);
+  return el;
+}
+
+// ── Inline add form ───────────────────────────────────────────────────────────
+function showAddForm(colId, addBtn, cardsEl) {
+  document.querySelectorAll('.add-form').forEach(f=>f.remove());
+  document.querySelectorAll('.col-add-btn').forEach(b=>b.style.display='');
+  const form = document.createElement('div'); form.className='add-form';
+  const ta = document.createElement('textarea'); ta.className='add-form-ta'; ta.placeholder='Card title…'; ta.rows=2;
+  ta.addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();confirm();} if(e.key==='Escape') cancel(); });
+  const acts = document.createElement('div'); acts.className='add-form-actions';
+  const ok=document.createElement('button'); ok.className='btn-confirm'; ok.textContent='Add card'; ok.onclick=confirm;
+  const no=document.createElement('button'); no.className='btn-cancel';  no.textContent='Cancel';   no.onclick=cancel;
+  acts.append(ok,no); form.append(ta,acts);
+  addBtn.style.display='none'; cardsEl.appendChild(form); ta.focus();
+  async function confirm() {
+    const t=ta.value.trim(); if(!t){cancel();return;}
+    await addCard(colId,t); form.remove(); addBtn.style.display=''; renderBoard();
+  }
+  function cancel() { form.remove(); addBtn.style.display=''; }
+}
+
+// ── CRUD ──────────────────────────────────────────────────────────────────────
+async function addCard(colId, title) {
+  const b=AB(); if(!b) return;
+  const id=genId();
+  const card={id,boardId:b.id,colId,title,desc:'',dueDate:'',priority:'',labels:[],checklist:[],assignee:'',comments:[],createdAt:ts(),updatedAt:ts()};
+  S.cards[id]=card;
+  if(!b.cols[colId].cardOrder) b.cols[colId].cardOrder=[];
+  b.cols[colId].cardOrder.push(id);
+  await cardsCol().doc(id).set(card);
+  scheduleBoard();
+}
+
+function patchCard(field, value) {
+  if (!S.editCard||!S.cards[S.editCard]) return;
+  S.cards[S.editCard][field]=value;
+  scheduleCard(S.editCard);
+}
+
+async function deleteCard(id) {
+  const c=S.cards[id]; if(!c) return;
+  const b=AB(); if(!b) return;
+  const col=b.cols[c.colId];
+  if(col) col.cardOrder=(col.cardOrder||[]).filter(x=>x!==id);
+  delete S.cards[id];
+  await cardsCol().doc(id).delete();
+  scheduleBoard();
+}
+
+function dropCard(cardId, toColId, clientY, cardsEl) {
+  const c=S.cards[cardId]; const b=AB(); if(!c||!b) return;
+  const fromCol=b.cols[c.colId]; const toCol=b.cols[toColId];
+  if(!fromCol||!toCol) return;
+  fromCol.cardOrder=(fromCol.cardOrder||[]).filter(id=>id!==cardId);
+  const els=[...cardsEl.querySelectorAll('.card:not(.dragging)')];
+  let idx=toCol.cardOrder?toCol.cardOrder.length:0;
+  for(let i=0;i<els.length;i++){const r=els[i].getBoundingClientRect();if(clientY<r.top+r.height/2){idx=i;break;}}
+  if(!toCol.cardOrder) toCol.cardOrder=[];
+  toCol.cardOrder.splice(idx,0,cardId);
+  c.colId=toColId;
+  scheduleBoard(); scheduleCard(cardId); renderBoard();
+}
+
+async function confirmDeleteCol(colId) {
+  showConfirm('Delete this column and all its cards?', async () => {
+    const b=AB(); if(!b) return;
+    const col=b.cols[colId];
+    if(col) await Promise.all((col.cardOrder||[]).map(async id=>{ delete S.cards[id]; await cardsCol().doc(id).delete(); }));
+    delete b.cols[colId];
+    b.colOrder=(b.colOrder||[]).filter(id=>id!==colId);
+    await boardsCol().doc(b.id).set({colOrder:b.colOrder,cols:b.cols,updatedAt:ts()},{merge:true});
+    renderBoard();
+  });
+}
+
+function promptAddBoard() {
+  showPrompt('Board name:', '', async name => {
+    const id=genId(), cols={}, order=[];
+    ['Backlog','In Progress','Done'].forEach(n=>{ const cid=genId(); cols[cid]={name:n,cardOrder:[]}; order.push(cid); });
+    await boardsCol().doc(id).set({name,colOrder:order,cols,createdAt:ts(),updatedAt:ts()});
+    await loadBoards(); S.active=id; S.cards={}; render();
+  });
+}
+
+function promptAddCol() {
+  showPrompt('Column name:', '', async name => {
+    const b=AB(); if(!b) return;
+    const cid=genId(); b.cols[cid]={name,cardOrder:[]}; b.colOrder.push(cid);
+    await boardsCol().doc(b.id).set({colOrder:b.colOrder,cols:b.cols,updatedAt:ts()},{merge:true});
+    renderBoard();
+  });
+}
+
+function startRenameBoard(boardId, btn) {
+  btn.contentEditable='true'; btn.focus();
+  const sel=window.getSelection(), r=document.createRange(); r.selectNodeContents(btn); sel.removeAllRanges(); sel.addRange(r);
+  async function done() {
+    btn.contentEditable='false';
+    const n=btn.textContent.trim();
+    if(n){ const b=S.boards.find(x=>x.id===boardId); if(b){b.name=n;await boardsCol().doc(boardId).set({name:n},{merge:true});} }
+    renderTabs();
+  }
+  btn.onblur=done; btn.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();done();}};
+}
+
+// ── Filter ────────────────────────────────────────────────────────────────────
+function applyFilter() { S.filter.q=document.getElementById('fq').value.toLowerCase().trim(); updateFClear(); renderBoard(); }
+function toggleFilter(btn) {
+  const f=btn.dataset.f, v=btn.dataset.v;
+  if(S.filter[f]===v){ S.filter[f]=''; btn.classList.remove('on'); }
+  else { document.querySelectorAll(`[data-f="${f}"]`).forEach(b=>b.classList.remove('on')); S.filter[f]=v; btn.classList.add('on'); }
+  updateFClear(); renderBoard();
+}
+function clearFilter() {
+  S.filter={q:'',priority:'',due:''};
+  document.getElementById('fq').value='';
+  document.querySelectorAll('.f-chip').forEach(b=>b.classList.remove('on'));
+  updateFClear(); renderBoard();
+}
+function updateFClear() {
+  document.getElementById('f-clear').style.display = (S.filter.q||S.filter.priority||S.filter.due)?'':'none';
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  const c=S.cards[id]; if(!c) return;
+  S.editCard=id; fillModal(c);
+  document.getElementById('modal-bg').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+function closeModal() {
+  document.getElementById('modal-bg').style.display='none';
+  document.body.style.overflow='';
+  S.editCard=null; renderBoard();
+}
+function bgClick(e) { if(e.target===document.getElementById('modal-bg')) closeModal(); }
+
+function fillModal(c) {
+  const t=document.getElementById('m-title'); t.value=c.title||''; autoH(t);
+  document.getElementById('m-priority').value=c.priority||'';
+  document.getElementById('m-due').value=c.dueDate||'';
+  document.getElementById('m-assignee').value=c.assignee||'';
+  document.getElementById('m-desc').value=c.desc||'';
+  renderLabels(c); renderChecklist(c); renderComments(c); renderMoveCol(c);
+}
+
+function renderLabels(c) {
+  const el=document.getElementById('m-labels'); el.innerHTML='';
+  (c.labels||[]).forEach((l,i)=>{
+    const tag=document.createElement('span'); tag.className='lbl-tag'; tag.textContent=l;
+    const del=document.createElement('button'); del.className='lbl-del'; del.textContent='×';
+    del.onclick=()=>{ c.labels.splice(i,1); patchCard('labels',c.labels); renderLabels(c); };
+    tag.appendChild(del); el.appendChild(tag);
+  });
+}
+function addLabel() {
+  const inp=document.getElementById('lbl-in'), v=inp.value.trim(); if(!v||!S.editCard) return;
+  const c=S.cards[S.editCard]; if(!c) return;
+  if(!c.labels) c.labels=[];
+  c.labels.push(v); patchCard('labels',c.labels); renderLabels(c); inp.value='';
+}
+
+function renderChecklist(c) {
+  const el=document.getElementById('m-checklist'); el.innerHTML='';
+  const items=c.checklist||[];
+  const done=items.filter(x=>x.done).length;
+  document.getElementById('chk-prog').textContent=items.length?`${done} / ${items.length} done`:'';
+  items.forEach((item,i)=>{
+    const row=document.createElement('div'); row.className='chk-row';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=item.done;
+    cb.onchange=()=>{ items[i].done=cb.checked; patchCard('checklist',items); txt.classList.toggle('done',cb.checked); document.getElementById('chk-prog').textContent=`${items.filter(x=>x.done).length} / ${items.length} done`; };
+    const txt=document.createElement('input'); txt.type='text'; txt.className='chk-txt'+(item.done?' done':''); txt.value=item.text;
+    txt.onchange=()=>{ items[i].text=txt.value; patchCard('checklist',items); };
+    const del=document.createElement('button'); del.className='chk-row-del'; del.textContent='×';
+    del.onclick=()=>{ items.splice(i,1); patchCard('checklist',items); renderChecklist(c); };
+    row.append(cb,txt,del); el.appendChild(row);
+  });
+}
+function addChkItem() {
+  const inp=document.getElementById('chk-in'), v=inp.value.trim(); if(!v||!S.editCard) return;
+  const c=S.cards[S.editCard]; if(!c) return;
+  if(!c.checklist) c.checklist=[];
+  c.checklist.push({id:genId(),text:v,done:false}); patchCard('checklist',c.checklist); renderChecklist(c); inp.value='';
+}
+
+function renderComments(c) {
+  const el=document.getElementById('m-comments'); el.innerHTML='';
+  [...(c.comments||[])].reverse().forEach(cm=>{
+    const div=document.createElement('div'); div.className='cmt';
+    const ts_el=document.createElement('div'); ts_el.className='cmt-ts'; ts_el.textContent=new Date(cm.ts).toLocaleString();
+    const body=document.createElement('div'); body.className='cmt-body'; body.textContent=cm.text;
+    div.append(ts_el,body); el.appendChild(div);
+  });
+}
+function addComment() {
+  const inp=document.getElementById('cmt-in'), v=inp.value.trim(); if(!v||!S.editCard) return;
+  const c=S.cards[S.editCard]; if(!c) return;
+  if(!c.comments) c.comments=[];
+  c.comments.push({id:genId(),text:v,ts:ts()}); patchCard('comments',c.comments); renderComments(c); inp.value='';
+}
+
+function renderMoveCol(c) {
+  const sel=document.getElementById('m-move'); sel.innerHTML='<option value="">Move to column…</option>';
+  const b=AB(); if(!b) return;
+  (b.colOrder||[]).forEach(cid=>{
+    const col=b.cols[cid]; if(!col) return;
+    const o=document.createElement('option'); o.value=cid; o.textContent=col.name;
+    if(cid===c.colId) o.selected=true; sel.appendChild(o);
+  });
+}
+function moveToCol(toColId) {
+  if(!toColId||!S.editCard) return;
+  const c=S.cards[S.editCard]; if(!c||c.colId===toColId) return;
+  const b=AB(); if(!b) return;
+  const from=b.cols[c.colId], to=b.cols[toColId]; if(!from||!to) return;
+  from.cardOrder=(from.cardOrder||[]).filter(id=>id!==c.id);
+  if(!to.cardOrder) to.cardOrder=[];
+  to.cardOrder.push(c.id); c.colId=toColId;
+  patchCard('colId',toColId); scheduleBoard(); renderMoveCol(c);
+}
+async function deleteCurrentCard() {
+  if(!S.editCard) return;
+  showConfirm('Delete this card?', async () => {
+    const id=S.editCard; closeModal(); await deleteCard(id); renderBoard();
+  });
+}
+
+// ── Touch drag-and-drop ───────────────────────────────────────────────────────
+let _touch=null, _wasDrag=false;
+
+function onTouchStart(e) {
+  const el=e.currentTarget; const t=e.touches[0]; const r=el.getBoundingClientRect();
+  _wasDrag=false;
+  _touch={cardId:el.dataset.id,el,ghost:null,moved:false,targetColId:null,
+    ox:t.clientX-r.left, oy:t.clientY-r.top};
+  _touch.timer=setTimeout(()=>{
+    if(!_touch) return;
+    const g=el.cloneNode(true); g.className='card touch-ghost';
+    g.style.width=r.width+'px'; g.style.left=(t.clientX-_touch.ox)+'px'; g.style.top=(t.clientY-_touch.oy)+'px';
+    document.body.appendChild(g); _touch.ghost=g; el.style.opacity='.25';
+  },200);
+}
+
+document.addEventListener('touchmove', e=>{
+  if(!_touch||!_touch.ghost) return;
+  e.preventDefault();
+  const t=e.touches[0]; _touch.moved=true;
+  _touch.ghost.style.left=(t.clientX-_touch.ox)+'px';
+  _touch.ghost.style.top =(t.clientY-_touch.oy)+'px';
+  _touch.ghost.style.visibility='hidden';
+  const under=document.elementFromPoint(t.clientX,t.clientY);
+  _touch.ghost.style.visibility='';
+  const colEl=under&&under.closest('[data-col-id]');
+  document.querySelectorAll('.col-wrap').forEach(c=>c.classList.remove('drag-over'));
+  if(colEl){ _touch.targetColId=colEl.dataset.colId; colEl.closest('.col-wrap').classList.add('drag-over'); }
+  else { _touch.targetColId=null; }
+},{passive:false});
+
+document.addEventListener('touchend', e=>{
+  if(!_touch){ _wasDrag=false; return; }
+  clearTimeout(_touch.timer);
+  if(_touch.ghost){
+    _touch.ghost.remove(); _touch.el.style.opacity='';
+    document.querySelectorAll('.col-wrap').forEach(c=>c.classList.remove('drag-over'));
+    if(_touch.moved&&_touch.targetColId){
+      _wasDrag=true;
+      const t=e.changedTouches[0];
+      const ce=document.querySelector(`.col-cards[data-col-id="${_touch.targetColId}"]`);
+      dropCard(_touch.cardId,_touch.targetColId,t.clientY,ce||document.createElement('div'));
+    }
+  }
+  _touch=null;
+  setTimeout(()=>{ _wasDrag=false; },100);
+});
+
+// ── Custom dialogs ────────────────────────────────────────────────────────────
+function showPrompt(msg, placeholder, onOk) {
+  const bg=document.createElement('div'); bg.className='dlg-bg';
+  const box=document.createElement('div'); box.className='dlg-box';
+  const p=document.createElement('p'); p.className='dlg-msg'; p.textContent=msg;
+  const inp=document.createElement('input'); inp.type='text'; inp.className='dlg-inp'; inp.placeholder=placeholder;
+  const btns=document.createElement('div'); btns.className='dlg-btns';
+  const no=document.createElement('button'); no.className='dlg-cancel'; no.textContent='Cancel';
+  const ok=document.createElement('button'); ok.className='dlg-ok'; ok.textContent='OK';
+  const close=()=>document.body.removeChild(bg);
+  no.onclick=close;
+  ok.onclick=()=>{ const v=inp.value.trim(); close(); if(v) onOk(v); };
+  inp.onkeydown=e=>{if(e.key==='Enter') ok.onclick(); if(e.key==='Escape') close();};
+  btns.append(no,ok); box.append(p,inp,btns); bg.appendChild(box); document.body.appendChild(bg);
+  setTimeout(()=>inp.focus(),50);
+}
+
+function showConfirm(msg, onOk) {
+  const bg=document.createElement('div'); bg.className='dlg-bg';
+  const box=document.createElement('div'); box.className='dlg-box';
+  const p=document.createElement('p'); p.className='dlg-msg'; p.textContent=msg;
+  const btns=document.createElement('div'); btns.className='dlg-btns';
+  const no=document.createElement('button'); no.className='dlg-cancel'; no.textContent='Cancel';
+  const ok=document.createElement('button'); ok.className='dlg-ok red'; ok.textContent='Delete';
+  const close=()=>document.body.removeChild(bg);
+  no.onclick=close; ok.onclick=()=>{ close(); onOk(); };
+  btns.append(no,ok); box.append(p,btns); bg.appendChild(box); document.body.appendChild(bg);
+  setTimeout(()=>ok.focus(),50);
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function autoH(el) { el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+</script>
+</body>
+</html>

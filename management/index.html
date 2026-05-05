@@ -49,8 +49,7 @@ header h1{font-family:var(--font-serif);font-size:30px;font-weight:700;margin-bo
 header .sub{font-size:13px;color:var(--text-muted);}
 
 /* TOOL CARDS */
-.tools{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:52px;}
-@media(max-width:580px){.tools{grid-template-columns:1fr;}}
+.tools{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:52px;}
 .tool-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:12px;padding:30px;display:block;text-decoration:none;color:var(--text);transition:border-color .2s,background .2s,transform .15s;}
 .tool-card:hover{border-color:var(--accent);background:var(--bg-elevated);transform:translateY(-2px);}
 .tool-icon{width:42px;height:42px;border-radius:9px;background:rgba(74,110,52,0.12);border:1px solid rgba(74,110,52,0.28);display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
@@ -123,6 +122,24 @@ footer a:hover{color:var(--text-muted);}
         <span class="tag gold">Cash Flow</span>
         <span class="tag">Tasks</span>
         <span class="tag">Scenarios</span>
+      </div>
+    </a>
+
+    <a class="tool-card" href="tasks/index.html">
+      <div class="tool-icon">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="4" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </div>
+      <div class="tool-name">Task Board</div>
+      <div class="tool-desc">Kanban-style task management with drag-and-drop cards, priority levels, due dates, checklists, labels, and comments. Synced across all devices.</div>
+      <div class="tool-tags">
+        <span class="tag">Kanban</span>
+        <span class="tag gold">Drag &amp; Drop</span>
+        <span class="tag">Checklists</span>
       </div>
     </a>
 
