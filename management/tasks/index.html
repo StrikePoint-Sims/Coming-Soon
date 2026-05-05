@@ -134,11 +134,13 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 
 /* checklist */
 .chk-items{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;}
-.chk-row{display:flex;align-items:flex-start;gap:8px;}
-.chk-row input[type=checkbox]{margin-top:2px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
-.chk-txt{flex:1;font-size:13px;color:var(--text-s);background:none;border:none;outline:none;font-family:var(--fn);padding:0;}
-.chk-txt.done{text-decoration:line-through;color:var(--text-f);}
-.chk-row-del{background:none;border:none;cursor:pointer;color:var(--text-f);font-size:13px;opacity:0;transition:opacity .15s;line-height:1;}
+.chk-row{display:flex;align-items:center;gap:8px;}
+/* override .mf input for checklist inputs */
+.chk-row input[type=checkbox]{width:auto;padding:0;background:none;border:none;border-radius:0;margin-top:0;accent-color:var(--accent);cursor:pointer;flex-shrink:0;}
+.chk-row input[type=text]{flex:1;width:auto;padding:3px 0;background:none;border:none;border-radius:0;font-size:13px;color:var(--text-s);font-family:var(--fn);outline:none;}
+.chk-row input[type=text]:focus{border-color:transparent;}
+.chk-row input[type=text].done{text-decoration:line-through;color:var(--text-f);}
+.chk-row-del{background:none;border:none;cursor:pointer;color:var(--text-f);font-size:13px;opacity:0;transition:opacity .15s;line-height:1;flex-shrink:0;}
 .chk-row:hover .chk-row-del{opacity:1;}
 .chk-row-del:hover{color:var(--red);}
 .chk-prog{font-size:11px;color:var(--text-m);margin-bottom:6px;font-family:var(--fm);}
