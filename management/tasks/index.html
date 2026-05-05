@@ -36,9 +36,14 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 .app-label{font-family:var(--fs);font-size:15px;color:var(--accent-l);flex-shrink:0;}
 #board-tabs{display:flex;gap:3px;overflow-x:auto;flex:1;scrollbar-width:none;min-width:0;}
 #board-tabs::-webkit-scrollbar{display:none;}
-.b-tab{padding:5px 11px;border-radius:6px;font-size:13px;font-weight:500;background:none;border:none;color:var(--text-m);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;}
+.b-tab-group{display:inline-flex;align-items:center;flex-shrink:0;}
+.b-tab{padding:5px 11px;border-radius:6px 0 0 6px;font-size:13px;font-weight:500;background:none;border:none;color:var(--text-m);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.b-tab-group:only-child .b-tab,.b-tab-alone{border-radius:6px;}
 .b-tab:hover{background:var(--bg-r);color:var(--text);}
 .b-tab.active{background:rgba(74,110,52,.15);color:var(--accent-l);}
+.b-tab-del{padding:4px 6px;border-radius:0 6px 6px 0;font-size:12px;background:none;border:none;color:var(--text-f);cursor:pointer;transition:all .15s;opacity:0;line-height:1;}
+.b-tab-group:hover .b-tab-del{opacity:1;}
+.b-tab-del:hover{color:var(--red);background:var(--red-bg);}
 .b-add-btn{background:none;border:none;color:var(--text-f);font-size:20px;cursor:pointer;padding:2px 8px;border-radius:5px;transition:color .15s;flex-shrink:0;line-height:1;}
 .b-add-btn:hover{color:var(--accent-l);}
 
@@ -64,7 +69,13 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 /* ── COLUMN ── */
 .col-wrap{min-width:268px;max-width:268px;background:var(--bg-s);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;max-height:100%;transition:border-color .15s;flex-shrink:0;}
 .col-wrap.drag-over{border-color:var(--accent);background:rgba(74,110,52,.06);}
-.col-header{display:flex;align-items:center;gap:6px;padding:9px 10px 7px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.col-header{display:flex;align-items:center;gap:6px;padding:9px 10px 7px;border-bottom:1px solid var(--border);flex-shrink:0;cursor:default;}
+.col-drag-handle{cursor:grab;color:var(--text-f);font-size:15px;opacity:0;transition:opacity .15s;user-select:none;padding:0 2px;flex-shrink:0;line-height:1;}
+.col-header:hover .col-drag-handle{opacity:0.5;}
+.col-drag-handle:hover{opacity:1!important;}
+.col-drag-handle:active{cursor:grabbing;}
+.col-wrap.col-dragging{opacity:.3;}
+.col-wrap.col-drag-over{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent);}
 .col-name-inp{flex:1;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text-m);background:none;border:none;outline:none;font-family:var(--fn);cursor:text;min-width:0;}
 .col-name-inp:focus{color:var(--text);}
 .col-count{font-size:11px;color:var(--text-f);font-family:var(--fm);}
@@ -380,6 +391,9 @@ function renderTabs() {
   const el = document.getElementById('board-tabs');
   el.innerHTML = '';
   S.boards.forEach(b => {
+    const group = document.createElement('div');
+    group.className = 'b-tab-group';
+
     const btn = document.createElement('button');
     btn.className = 'b-tab' + (b.id===S.active?' active':'');
     btn.textContent = b.name;
@@ -391,7 +405,15 @@ function renderTabs() {
       render();
     };
     btn.ondblclick = () => startRenameBoard(b.id, btn);
-    el.appendChild(btn);
+
+    const del = document.createElement('button');
+    del.className = 'b-tab-del';
+    del.title = 'Delete board';
+    del.textContent = '×';
+    del.onclick = (e) => { e.stopPropagation(); deleteBoard(b.id); };
+
+    group.append(btn, del);
+    el.appendChild(group);
   });
 }
 
@@ -422,6 +444,26 @@ function makeCol(cid, col) {
   // Header
   const hdr = document.createElement('div');
   hdr.className = 'col-header';
+
+  // Drag handle — mouse
+  const handle = document.createElement('span');
+  handle.className = 'col-drag-handle';
+  handle.textContent = '⠿';
+  handle.draggable = true;
+  handle.addEventListener('dragstart', e => {
+    _colDragId = cid;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('col_id', cid);
+    setTimeout(() => wrap.classList.add('col-dragging'), 0);
+  });
+  handle.addEventListener('dragend', () => {
+    _colDragId = null;
+    wrap.classList.remove('col-dragging');
+    document.querySelectorAll('.col-drag-over').forEach(el => el.classList.remove('col-drag-over'));
+  });
+  // Drag handle — touch
+  handle.addEventListener('touchstart', onColTouchStart, {passive:true});
+
   const nameEl = document.createElement('input');
   nameEl.type = 'text'; nameEl.className = 'col-name-inp'; nameEl.value = col.name;
   nameEl.onchange = () => { col.name = nameEl.value.trim()||col.name; scheduleBoard(); };
@@ -431,16 +473,37 @@ function makeCol(cid, col) {
   const delBtn = document.createElement('button');
   delBtn.className = 'col-del'; delBtn.title='Delete column'; delBtn.textContent = '×';
   delBtn.onclick = () => confirmDeleteCol(cid);
-  hdr.append(nameEl, cnt, delBtn);
+  hdr.append(handle, nameEl, cnt, delBtn);
+
+  // Column-level drag-over/drop (for reordering columns)
+  wrap.addEventListener('dragover', e => {
+    if (!_colDragId || _colDragId === cid) return;
+    e.preventDefault();
+    document.querySelectorAll('.col-drag-over').forEach(el => el.classList.remove('col-drag-over'));
+    wrap.classList.add('col-drag-over');
+  });
+  wrap.addEventListener('dragleave', e => {
+    if (!wrap.contains(e.relatedTarget)) wrap.classList.remove('col-drag-over');
+  });
+  wrap.addEventListener('drop', e => {
+    if (!_colDragId || _colDragId === cid) return;
+    e.preventDefault();
+    wrap.classList.remove('col-drag-over');
+    reorderCol(_colDragId, cid);
+  });
 
   // Cards
   const cardsEl = document.createElement('div');
   cardsEl.className = 'col-cards'; cardsEl.dataset.colId = cid;
 
-  // Mouse D&D
-  cardsEl.addEventListener('dragover', e => { e.preventDefault(); wrap.classList.add('drag-over'); });
+  // Card mouse D&D — skip if column drag is active
+  cardsEl.addEventListener('dragover', e => {
+    if (_colDragId) return;
+    e.preventDefault(); wrap.classList.add('drag-over');
+  });
   cardsEl.addEventListener('dragleave', e => { if (!wrap.contains(e.relatedTarget)) wrap.classList.remove('drag-over'); });
   cardsEl.addEventListener('drop', e => {
+    if (_colDragId) return;
     e.preventDefault(); wrap.classList.remove('drag-over');
     const id = e.dataTransfer.getData('cardId');
     if (id) dropCard(id, cid, e.clientY, cardsEl);
@@ -585,6 +648,35 @@ async function confirmDeleteCol(colId) {
     await boardsCol().doc(b.id).set({colOrder:b.colOrder,cols:b.cols,updatedAt:ts()},{merge:true});
     renderBoard();
   });
+}
+
+async function deleteBoard(boardId) {
+  const b = S.boards.find(x => x.id === boardId);
+  if (!b) return;
+  showConfirm(`Delete board "${b.name}" and all its cards?`, async () => {
+    // Delete all cards in this board
+    const snap = await cardsCol().where('boardId','==',boardId).get();
+    await Promise.all(snap.docs.map(d => d.ref.delete()));
+    await boardsCol().doc(boardId).delete();
+    await loadBoards();
+    // Switch to another board if we deleted the active one
+    if (S.active === boardId) {
+      S.active = S.boards.length ? S.boards[0].id : null;
+      S.cards = {};
+      if (S.active) await loadCards(S.active);
+    }
+    render();
+  });
+}
+
+function reorderCol(fromId, toId) {
+  const b = AB(); if (!b) return;
+  const order = b.colOrder;
+  const fi = order.indexOf(fromId), ti = order.indexOf(toId);
+  if (fi === -1 || ti === -1) return;
+  order.splice(fi, 1);
+  order.splice(ti, 0, fromId);
+  scheduleBoard(); renderBoard();
 }
 
 function promptAddBoard() {
@@ -739,8 +831,11 @@ async function deleteCurrentCard() {
   });
 }
 
+// ── Column drag state ─────────────────────────────────────────────────────────
+let _colDragId = null;
+
 // ── Touch drag-and-drop ───────────────────────────────────────────────────────
-let _touch=null, _wasDrag=false;
+let _touch=null, _wasDrag=false, _colTouch=null;
 
 function onTouchStart(e) {
   const el=e.currentTarget; const t=e.touches[0]; const r=el.getBoundingClientRect();
@@ -785,6 +880,52 @@ document.addEventListener('touchend', e=>{
   }
   _touch=null;
   setTimeout(()=>{ _wasDrag=false; },100);
+});
+
+// ── Column touch drag ─────────────────────────────────────────────────────────
+function onColTouchStart(e) {
+  const handle = e.currentTarget;
+  const wrap   = handle.closest('.col-wrap');
+  const colId  = wrap && wrap.dataset.colId;
+  if (!colId) return;
+  const t = e.touches[0], r = wrap.getBoundingClientRect();
+  _colTouch = { colId, wrap, ghost:null, moved:false, targetColId:null,
+    ox: t.clientX - r.left, oy: t.clientY - r.top };
+  _colTouch.timer = setTimeout(() => {
+    if (!_colTouch) return;
+    const g = wrap.cloneNode(true); g.style.cssText = `position:fixed;pointer-events:none;z-index:9998;opacity:.8;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:rotate(1deg);width:${r.width}px;left:${t.clientX-_colTouch.ox}px;top:${t.clientY-_colTouch.oy}px;`;
+    document.body.appendChild(g); _colTouch.ghost = g; wrap.style.opacity = '.2';
+  }, 250);
+}
+
+document.addEventListener('touchmove', e => {
+  if (!_colTouch || !_colTouch.ghost) return;
+  if (_touch) return; // card drag takes priority
+  e.preventDefault();
+  const t = e.touches[0];
+  _colTouch.moved = true;
+  _colTouch.ghost.style.left = (t.clientX - _colTouch.ox) + 'px';
+  _colTouch.ghost.style.top  = (t.clientY - _colTouch.oy) + 'px';
+  _colTouch.ghost.style.visibility = 'hidden';
+  const under = document.elementFromPoint(t.clientX, t.clientY);
+  _colTouch.ghost.style.visibility = '';
+  const targetWrap = under && under.closest('.col-wrap');
+  document.querySelectorAll('.col-drag-over').forEach(el => el.classList.remove('col-drag-over'));
+  if (targetWrap && targetWrap !== _colTouch.wrap) {
+    _colTouch.targetColId = targetWrap.dataset.colId;
+    targetWrap.classList.add('col-drag-over');
+  } else { _colTouch.targetColId = null; }
+}, {passive:false});
+
+document.addEventListener('touchend', () => {
+  if (!_colTouch) return;
+  clearTimeout(_colTouch.timer);
+  if (_colTouch.ghost) {
+    _colTouch.ghost.remove(); _colTouch.wrap.style.opacity = '';
+    document.querySelectorAll('.col-drag-over').forEach(el => el.classList.remove('col-drag-over'));
+    if (_colTouch.moved && _colTouch.targetColId) reorderCol(_colTouch.colId, _colTouch.targetColId);
+  }
+  _colTouch = null;
 });
 
 // ── Custom dialogs ────────────────────────────────────────────────────────────
