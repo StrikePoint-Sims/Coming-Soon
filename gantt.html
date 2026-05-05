@@ -378,9 +378,7 @@ header{display:flex;align-items:flex-start;justify-content:space-between;margin-
     <div class="hdr-actions no-print">
       <button class="btn btn-ghost" onclick="openPasteModal()">📋 Update from Sheet</button>
       <button class="btn btn-ghost" onclick="window.print()">🖨 Print</button>
-      <button class="btn btn-ghost" id="fs-signin-btn" onclick="_googleSignIn()" title="Sign in to sync across devices">
-        <span class="sync-badge sync-off" id="sync-badge">☁ Sign in to sync</span>
-      </button>
+      <span class="sync-badge sync-off" id="sync-badge" title="">☁ Syncing…</span>
     </div>
   </header>
 
@@ -708,25 +706,17 @@ function _schedulePush() {
   _setSyncBadge('saving');
   _fsPushTimer = setTimeout(_pushToFirestore, 1500);
 }
-function _googleSignIn() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  _fbAuth.signInWithPopup(provider).catch(e => console.warn('Sign-in error:', e));
-}
 function _initFirebaseAuth() {
   _fbAuth.onAuthStateChanged(user => {
-    _fsUser = user;
-    if (user) {
-      const btn = E('fs-signin-btn');
-      if (btn) {
-        btn.title = 'Signed in as ' + (user.displayName || user.email);
-        btn.onclick = null;
-        btn.style.cursor = 'default';
-      }
-      _setSyncBadge('saving');
-      _loadFromFirestore();
-    } else {
-      _setSyncBadge('off');
+    if (!user) {
+      window.location.href = 'management/index.html';
+      return;
     }
+    _fsUser = user;
+    const badge = E('sync-badge');
+    if (badge) badge.title = 'Signed in as ' + (user.email || '');
+    _setSyncBadge('saving');
+    _loadFromFirestore();
   });
 }
 

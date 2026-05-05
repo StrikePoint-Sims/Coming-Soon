@@ -41,38 +41,15 @@ const State = {
   hourlyRates: {},
 };
 
-/* ────────────────────────────────────────────────────────────────────────────
-   Auth (disabled for testing — uncomment for production)
-   ──────────────────────────────────────────────────────────────────────────── */
-// auth.onAuthStateChanged(user => {
-//   if (!user) {
-//     window.location.href = 'index.html';
-//     return;
-//   }
-//   State.user = user;
-//   bootstrapApp(user);
-// });
-
-// Auth — Google Sign-In
-function showSignIn() {
-  const el = document.getElementById('sp-signin-overlay');
-  if (el) el.style.display = 'flex';
-}
-function hideSignIn() {
-  const el = document.getElementById('sp-signin-overlay');
-  if (el) el.style.display = 'none';
-}
-function signInWithGoogle() {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider).catch(err => {
-    console.error('Sign-in error:', err);
-  });
-}
-
+/* ─── Auth — redirect to management hub if not signed in ─── */
 auth.onAuthStateChanged(user => {
-  if (!user) { showSignIn(); return; }
+  if (!user) {
+    window.location.href = '../../management/index.html';
+    return;
+  }
+  const overlay = document.getElementById('sp-signin-overlay');
+  if (overlay) overlay.style.display = 'none';
   State.user = user;
-  hideSignIn();
   bootstrapApp(user);
 });
 

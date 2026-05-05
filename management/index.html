@@ -21,22 +21,24 @@
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;}
 
-/* PASSWORD OVERLAY */
-#pw-overlay{position:fixed;inset:0;z-index:1000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.4s;}
-#pw-overlay.hidden{opacity:0;pointer-events:none;}
-.pw-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:12px;padding:40px 48px;width:340px;text-align:center;}
-.pw-logo{font-family:var(--font-serif);font-size:20px;color:var(--accent-light);margin-bottom:4px;letter-spacing:0.5px;}
-.pw-title{font-size:12px;color:var(--text-muted);margin-bottom:24px;letter-spacing:0.3px;}
-#pw-input{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-sans);font-size:15px;text-align:center;letter-spacing:4px;outline:none;margin-bottom:12px;display:block;}
-#pw-input:focus{border-color:var(--accent);}
-#pw-btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;}
-#pw-btn:hover{background:var(--accent-hover);}
-#pw-error{color:var(--red);font-size:12px;margin-top:10px;min-height:16px;}
+/* LOGIN OVERLAY */
+#login-overlay{position:fixed;inset:0;z-index:1000;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity 0.3s;}
+#login-overlay.hidden{opacity:0;pointer-events:none;}
+.login-box{background:var(--bg-surface);border:1px solid var(--border-strong);border-radius:12px;padding:40px 48px;width:340px;text-align:center;}
+.login-logo{font-family:var(--font-serif);font-size:20px;color:var(--accent-light);margin-bottom:4px;letter-spacing:0.5px;}
+.login-title{font-size:12px;color:var(--text-muted);margin-bottom:24px;letter-spacing:0.3px;}
+.login-field{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--font-sans);font-size:14px;outline:none;margin-bottom:10px;display:block;transition:border-color .15s;}
+.login-field:focus{border-color:var(--accent);}
+#login-btn{width:100%;padding:10px;background:var(--accent);border:none;border-radius:6px;color:#fff;font-family:var(--font-sans);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s;margin-top:2px;}
+#login-btn:hover{background:var(--accent-hover);}
+#login-btn:disabled{opacity:.5;cursor:default;}
+#login-error{color:var(--red);font-size:12px;margin-top:10px;min-height:16px;}
 @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
-.pw-box.shaking{animation:shake .4s ease;}
+.login-box.shaking{animation:shake .4s ease;}
 
 /* LAYOUT */
-.container{max-width:860px;margin:0 auto;padding:52px 24px 64px;flex:1;}
+.container{max-width:860px;margin:0 auto;padding:52px 24px 64px;flex:1;display:none;}
+.container.visible{display:block;}
 
 /* HEADER */
 header{text-align:center;margin-bottom:52px;}
@@ -59,6 +61,12 @@ header .sub{font-size:13px;color:var(--text-muted);}
 .tag{font-size:10px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(74,110,52,0.1);color:var(--accent-light);}
 .tag.gold{background:rgba(201,168,76,0.1);color:var(--gold);}
 
+/* SIGN OUT */
+.signout-row{text-align:center;margin-bottom:24px;}
+#signout-btn{background:none;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--font-sans);font-size:12px;padding:5px 14px;cursor:pointer;transition:all .15s;}
+#signout-btn:hover{border-color:var(--red);color:var(--red);}
+#signed-in-as{font-size:11px;color:var(--text-faint);margin-top:6px;}
+
 /* FOOTER */
 footer{text-align:center;font-size:11px;color:var(--text-faint);padding-bottom:32px;}
 footer a{color:var(--text-faint);text-decoration:none;}
@@ -67,18 +75,20 @@ footer a:hover{color:var(--text-muted);}
 </head>
 <body>
 
-<!-- PASSWORD OVERLAY -->
-<div id="pw-overlay">
-  <div class="pw-box" id="pw-box">
-    <div class="pw-logo">StrikePoint Sims</div>
-    <div class="pw-title">Management Portal</div>
-    <input type="password" id="pw-input" placeholder="password" autocomplete="off">
-    <button id="pw-btn">Enter</button>
-    <div id="pw-error">&nbsp;</div>
+<!-- LOGIN OVERLAY -->
+<div id="login-overlay">
+  <div class="login-box" id="login-box">
+    <div class="login-logo">StrikePoint Sims</div>
+    <div class="login-title">Management Portal</div>
+    <input type="email" id="login-email" class="login-field" placeholder="Email" autocomplete="username">
+    <input type="password" id="login-pw" class="login-field" placeholder="Password" autocomplete="current-password">
+    <button id="login-btn">Sign In</button>
+    <div id="login-error">&nbsp;</div>
   </div>
 </div>
 
-<div class="container">
+<!-- HUB CONTENT (hidden until authenticated) -->
+<div class="container" id="hub">
   <header>
     <a href="../index.html" class="back-link">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
@@ -87,6 +97,11 @@ footer a:hover{color:var(--text-muted);}
     <h1>Management Portal</h1>
     <div class="sub">Internal tools &nbsp;·&nbsp; StrikePoint Sims</div>
   </header>
+
+  <div class="signout-row">
+    <button id="signout-btn" onclick="doSignOut()">Sign Out</button>
+    <div id="signed-in-as"></div>
+  </div>
 
   <div class="tools">
 
@@ -136,35 +151,76 @@ footer a:hover{color:var(--text-muted);}
   </footer>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script>
 (function() {
-  const overlay = document.getElementById('pw-overlay');
-  const pwBox   = document.getElementById('pw-box');
-  const pwInput = document.getElementById('pw-input');
-  const pwBtn   = document.getElementById('pw-btn');
-  const pwError = document.getElementById('pw-error');
+  if (!firebase.apps.length) {
+    firebase.initializeApp({
+      apiKey: "AIzaSyDFUm2mDCqwQXqTaxGxwQ0E5Yayid9xqoI",
+      authDomain: "strikepoint-sims.firebaseapp.com",
+      projectId: "strikepoint-sims",
+      storageBucket: "strikepoint-sims.firebasestorage.app",
+      messagingSenderId: "511868473293",
+      appId: "1:511868473293:web:930c9c1ce41182c90ebe84"
+    });
+  }
 
-  if (sessionStorage.getItem('sp_auth') === '1') {
+  const _auth      = firebase.auth();
+  const overlay    = document.getElementById('login-overlay');
+  const loginBox   = document.getElementById('login-box');
+  const hub        = document.getElementById('hub');
+  const emailEl    = document.getElementById('login-email');
+  const pwEl       = document.getElementById('login-pw');
+  const loginBtn   = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+  const signedInAs = document.getElementById('signed-in-as');
+
+  function showHub(user) {
     overlay.classList.add('hidden');
-    return;
+    hub.classList.add('visible');
+    if (signedInAs) signedInAs.textContent = 'Signed in as ' + (user.email || '');
   }
 
-  function tryAuth() {
-    if (pwInput.value === 'ilovegolf') {
-      sessionStorage.setItem('sp_auth', '1');
-      overlay.classList.add('hidden');
-    } else {
-      pwError.textContent = 'Incorrect password.';
-      pwBox.classList.remove('shaking');
-      void pwBox.offsetWidth;
-      pwBox.classList.add('shaking');
-      pwInput.value = '';
-      pwInput.focus();
-    }
+  function showLogin() {
+    overlay.classList.remove('hidden');
+    hub.classList.remove('visible');
+    setTimeout(() => emailEl.focus(), 50);
   }
-  pwBtn.addEventListener('click', tryAuth);
-  pwInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryAuth(); });
-  pwInput.focus();
+
+  _auth.onAuthStateChanged(user => {
+    if (user) { showHub(user); } else { showLogin(); }
+  });
+
+  function trySignIn() {
+    const email = emailEl.value.trim();
+    const pw    = pwEl.value;
+    if (!email || !pw) {
+      loginError.textContent = 'Enter your email and password.';
+      return;
+    }
+    loginBtn.disabled = true;
+    loginError.textContent = ' ';
+    _auth.signInWithEmailAndPassword(email, pw)
+      .catch(err => {
+        loginError.textContent = 'Incorrect email or password.';
+        loginBox.classList.remove('shaking');
+        void loginBox.offsetWidth;
+        loginBox.classList.add('shaking');
+        pwEl.value = '';
+        pwEl.focus();
+        loginBtn.disabled = false;
+      });
+  }
+
+  loginBtn.addEventListener('click', trySignIn);
+  pwEl.addEventListener('keydown', e => { if (e.key === 'Enter') trySignIn(); });
+  emailEl.addEventListener('keydown', e => { if (e.key === 'Enter') pwEl.focus(); });
+
+  window.doSignOut = function() {
+    _auth.signOut();
+  };
 })();
 </script>
 </body>
