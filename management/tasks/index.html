@@ -93,8 +93,11 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 .c-due{font-size:10px;font-family:var(--fm);color:var(--text-f);}
 .c-due.overdue{color:var(--red);}
 .c-label{font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;padding:1px 6px;border-radius:3px;background:rgba(74,110,52,.15);color:var(--accent-l);}
-.c-check{font-size:10px;font-family:var(--fm);color:var(--text-f);}
 .c-assign{font-size:10px;color:var(--text-f);}
+.card-checklist-preview{margin-top:7px;display:flex;flex-direction:column;gap:3px;}
+.c-chk-item{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--text-m);line-height:1.35;}
+.c-chk-item.done{color:var(--text-f);text-decoration:line-through;}
+.c-chk-icon{font-size:11px;flex-shrink:0;}
 
 /* ── INLINE ADD-CARD FORM ── */
 .add-form{margin-bottom:5px;}
@@ -494,9 +497,20 @@ function makeCardEl(card) {
   if (card.priority) { const s=document.createElement('span'); s.className='c-priority p-'+card.priority; s.textContent=card.priority; meta.appendChild(s); }
   if (card.dueDate)  { const s=document.createElement('span'); s.className='c-due'+(new Date(card.dueDate+'T00:00:00')<midnight()?' overdue':''); s.textContent=card.dueDate; meta.appendChild(s); }
   (card.labels||[]).forEach(l => { const s=document.createElement('span'); s.className='c-label'; s.textContent=l; meta.appendChild(s); });
-  const chk=card.checklist||[]; if(chk.length){ const s=document.createElement('span'); s.className='c-check'; s.textContent='☑ '+chk.filter(x=>x.done).length+'/'+chk.length; meta.appendChild(s); }
   if (card.assignee) { const s=document.createElement('span'); s.className='c-assign'; s.textContent='@ '+card.assignee; meta.appendChild(s); }
   if (meta.children.length) el.appendChild(meta);
+
+  const chk=card.checklist||[];
+  if (chk.length) {
+    const list=document.createElement('div'); list.className='card-checklist-preview';
+    chk.forEach(item => {
+      const row=document.createElement('div'); row.className='c-chk-item'+(item.done?' done':'');
+      const icon=document.createElement('span'); icon.className='c-chk-icon'; icon.textContent=item.done?'☑':'☐';
+      const txt=document.createElement('span'); txt.textContent=item.text;
+      row.append(icon,txt); list.appendChild(row);
+    });
+    el.appendChild(list);
+  }
   return el;
 }
 
