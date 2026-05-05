@@ -44,9 +44,14 @@ const State = {
 /* ─── Auth — redirect to management hub if not signed in ─── */
 auth.onAuthStateChanged(user => {
   if (!user) {
-    window.location.href = '../../management/index.html';
+    // Only redirect if the localStorage auth flag is absent —
+    // this prevents a race where Firebase is still restoring its session
+    if (!localStorage.getItem('sp_authed')) {
+      window.location.href = '../../management/index.html';
+    }
     return;
   }
+  localStorage.setItem('sp_authed', '1');
   const overlay = document.getElementById('sp-signin-overlay');
   if (overlay) overlay.style.display = 'none';
   State.user = user;

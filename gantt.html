@@ -709,9 +709,14 @@ function _schedulePush() {
 function _initFirebaseAuth() {
   _fbAuth.onAuthStateChanged(user => {
     if (!user) {
-      window.location.href = 'management/index.html';
+      // Only redirect if there's no localStorage auth flag —
+      // the flag is set on login and gives Firebase time to restore its session
+      if (!localStorage.getItem('sp_authed')) {
+        window.location.href = 'management/index.html';
+      }
       return;
     }
+    localStorage.setItem('sp_authed', '1');
     _fsUser = user;
     const badge = E('sync-badge');
     if (badge) badge.title = 'Signed in as ' + (user.email || '');

@@ -190,7 +190,13 @@ footer a:hover{color:var(--text-muted);}
   }
 
   _auth.onAuthStateChanged(user => {
-    if (user) { showHub(user); } else { showLogin(); }
+    if (user) {
+      localStorage.setItem('sp_authed', '1');
+      showHub(user);
+    } else {
+      localStorage.removeItem('sp_authed');
+      showLogin();
+    }
   });
 
   function trySignIn() {
