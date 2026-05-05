@@ -95,7 +95,10 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 .card{background:var(--bg-card);border:1px solid rgba(255,255,255,.05);border-radius:7px;padding:10px 11px;margin-bottom:5px;cursor:pointer;transition:border-color .15s,box-shadow .15s;user-select:none;}
 .card:hover{border-color:var(--border-s);box-shadow:0 2px 8px rgba(0,0,0,.3);}
 .card.dragging{opacity:.35;}
-.card-title{font-size:13px;font-weight:500;color:var(--text-s);line-height:1.4;margin-bottom:5px;word-break:break-word;}
+.card-title{font-size:13px;font-weight:500;color:var(--text-s);line-height:1.4;margin-bottom:4px;word-break:break-word;}
+.card-update{display:flex;align-items:baseline;gap:6px;margin-bottom:6px;}
+.card-update-text{font-size:11px;color:var(--text-m);line-height:1.4;flex:1;word-break:break-word;font-style:italic;}
+.card-update-ago{font-size:10px;color:var(--text-f);font-family:var(--fm);white-space:nowrap;flex-shrink:0;}
 .card-meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
 .c-priority{font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:1px 6px;border-radius:3px;}
 .p-high{background:var(--red-bg);color:var(--red);}
@@ -158,6 +161,12 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
 .chk-row:hover .chk-row-del{opacity:1;}
 .chk-row-del:hover{color:var(--red);}
 .chk-prog{font-size:11px;color:var(--text-m);margin-bottom:6px;font-family:var(--fm);}
+
+/* updates */
+.upd-list{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:160px;overflow-y:auto;scrollbar-width:thin;}
+.upd-item{display:flex;gap:8px;align-items:flex-start;}
+.upd-text{font-size:13px;color:var(--text-s);line-height:1.45;flex:1;word-break:break-word;}
+.upd-ago{font-size:10px;color:var(--text-f);font-family:var(--fm);white-space:nowrap;padding-top:2px;flex-shrink:0;}
 
 /* comments */
 .cmt-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
@@ -257,6 +266,14 @@ header{display:flex;align-items:center;gap:10px;padding:0 14px;height:48px;backg
       <div class="mf">
         <label>Description</label>
         <textarea id="m-desc" rows="3" placeholder="Notes, details…" oninput="patchCard('desc',this.value)"></textarea>
+      </div>
+      <div class="mf">
+        <label>Latest Update</label>
+        <div class="upd-list" id="m-updates"></div>
+        <div class="cmt-add-row">
+          <textarea id="upd-in" rows="2" placeholder="Post an update…"></textarea>
+          <button class="btn-post" onclick="addUpdate()">Post</button>
+        </div>
       </div>
       <div class="mf">
         <label>Labels</label>
@@ -555,6 +572,15 @@ function makeCardEl(card) {
   title.textContent = card.title || '(untitled)';
   el.appendChild(title);
 
+  const updates = card.updates || [];
+  if (updates.length) {
+    const latest = updates[updates.length - 1];
+    const upd = document.createElement('div'); upd.className = 'card-update';
+    const txt = document.createElement('span'); txt.className = 'card-update-text'; txt.textContent = latest.text;
+    const ago = document.createElement('span'); ago.className = 'card-update-ago'; ago.textContent = timeAgo(latest.ts);
+    upd.append(txt, ago); el.appendChild(upd);
+  }
+
   const meta = document.createElement('div');
   meta.className = 'card-meta';
   if (card.priority) { const s=document.createElement('span'); s.className='c-priority p-'+card.priority; s.textContent=card.priority; meta.appendChild(s); }
@@ -747,7 +773,7 @@ function fillModal(c) {
   document.getElementById('m-due').value=c.dueDate||'';
   document.getElementById('m-assignee').value=c.assignee||'';
   document.getElementById('m-desc').value=c.desc||'';
-  renderLabels(c); renderChecklist(c); renderComments(c); renderMoveCol(c);
+  renderUpdates(c); renderLabels(c); renderChecklist(c); renderComments(c); renderMoveCol(c);
 }
 
 function renderLabels(c) {
@@ -803,6 +829,30 @@ function addComment() {
   const c=S.cards[S.editCard]; if(!c) return;
   if(!c.comments) c.comments=[];
   c.comments.push({id:genId(),text:v,ts:ts()}); patchCard('comments',c.comments); renderComments(c); inp.value='';
+}
+
+function renderUpdates(c) {
+  const el=document.getElementById('m-updates'); el.innerHTML='';
+  [...(c.updates||[])].reverse().forEach(u => {
+    const row=document.createElement('div'); row.className='upd-item';
+    const txt=document.createElement('div'); txt.className='upd-text'; txt.textContent=u.text;
+    const ago=document.createElement('div'); ago.className='upd-ago'; ago.textContent=timeAgo(u.ts);
+    row.append(txt, ago); el.appendChild(row);
+  });
+}
+function addUpdate() {
+  const inp=document.getElementById('upd-in'), v=inp.value.trim(); if(!v||!S.editCard) return;
+  const c=S.cards[S.editCard]; if(!c) return;
+  if(!c.updates) c.updates=[];
+  c.updates.push({id:genId(),text:v,ts:ts()}); patchCard('updates',c.updates); renderUpdates(c); inp.value='';
+}
+function timeAgo(ts) {
+  const d=Date.now()-ts, m=Math.floor(d/60000), h=Math.floor(d/3600000), dy=Math.floor(d/86400000);
+  if(m<1)    return 'just now';
+  if(m<60)   return m+'m ago';
+  if(h<24)   return h+'h ago';
+  if(dy<7)   return dy+'d ago';
+  return new Date(ts).toLocaleDateString();
 }
 
 function renderMoveCol(c) {
