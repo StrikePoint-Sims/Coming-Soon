@@ -128,64 +128,69 @@ body {
 
 .nav-cta-btn {
   font-family: var(--font-sans);
-  font-size: 0.78rem; font-weight: 600;
-  letter-spacing: 0.05em; text-transform: uppercase;
-  color: #fff; text-decoration: none;
-  padding: 10px 20px;
-  background: var(--accent);
-  border-radius: 4px;
-  transition: background 0.25s;
-  white-space: nowrap;
-  display: none; /* hidden on mobile */
-}
-.nav-cta-btn:hover { background: var(--accent-hover); }
-
-/* Hamburger — visible on mobile */
-.nav-hamburger {
-  display: flex; flex-direction: column; justify-content: center; gap: 5px;
-  width: 36px; height: 36px; padding: 6px;
-  background: none; border: none; cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-.nav-hamburger span {
-  display: block; width: 100%; height: 1.5px;
-  background: rgba(255,255,255,0.85);
-  transition: transform 0.3s, opacity 0.3s;
-  transform-origin: center;
-}
-.nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-.nav-hamburger.open span:nth-child(2) { opacity: 0; }
-.nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
-
-/* Mobile menu drawer */
-.nav-mobile-menu {
-  display: none;
-  position: fixed; inset: 0; z-index: 15;
-  background: rgba(10,10,10,0.97);
-  padding: 100px 32px 40px;
-  flex-direction: column;
-  gap: 8px;
-}
-.nav-mobile-menu.open { display: flex; }
-.nav-mobile-menu a {
-  font-family: var(--font-sans);
-  font-size: 1.2rem; font-weight: 400;
-  color: rgba(255,255,255,0.85);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
   text-decoration: none;
-  padding: 14px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  transition: color 0.2s;
-}
-.nav-mobile-menu a:hover { color: #fff; }
-.nav-mobile-menu .nav-mobile-cta {
-  margin-top: 24px;
+  padding: 10px 16px;
+  background: rgba(74,110,52,0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 3px;
+  transition: background 0.25s, border-color 0.25s;
+  white-space: nowrap;
   display: inline-block;
-  font-size: 0.88rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em;
-  color: #fff; text-align: center;
-  padding: 16px 32px;
-  background: var(--accent);
-  border-radius: 4px;
-  border-bottom: none;
+}
+.nav-cta-btn:hover {
+  background: var(--accent-hover);
+  border-color: rgba(255,255,255,0.14);
+}
+
+
+/* Mobile side CTA: independent of the nav so it can sit near the bottom while scrolling. */
+.mobile-side-updates {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .mobile-side-updates {
+    position: fixed;
+    right: 0;
+    bottom: max(96px, calc(76px + env(safe-area-inset-bottom)));
+    z-index: 999;
+    transform: translateX(110%);
+    opacity: 0;
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 14px 12px 16px;
+    background: rgba(74,110,52,0.96);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-right: 0;
+    border-radius: 999px 0 0 999px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.42);
+    font-family: var(--font-sans);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 0.28s ease, opacity 0.28s ease, background 0.25s ease;
+  }
+
+  .mobile-side-updates.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-side-updates:hover {
+    background: var(--accent-hover);
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -394,9 +399,8 @@ body {
     /* Left: quick darken then bg */
     linear-gradient(to right,
       var(--bg-alt)       0%,
-      rgba(0,0,0,0.9)     3%,
-      rgba(0,0,0,0.6)     10%,
-      transparent         22%,
+      rgba(0,0,0,0.5)     5%,
+      transparent         20%,
       rgba(0,0,0,0.1)     100%),
     /* Top + bottom: fade into section bg */
     linear-gradient(to bottom,
@@ -486,10 +490,13 @@ body {
 }
 
 .owner-sig {
-  font-family: var(--font-serif);
-  font-size: 1.5rem; font-style: italic;
-  font-weight: 400; color: var(--text-soft);
-  margin-top: 24px; margin-bottom: 36px;
+  font-family: 'Nothing You Could Do', cursive;
+  font-size: 1.65rem;
+  font-style: normal;
+  font-weight: 400;
+  color: var(--text-soft);
+  margin-top: 24px;
+  margin-bottom: 36px;
 }
 
 /* Owner photo placeholder */
@@ -755,8 +762,7 @@ body {
 @media (min-width: 640px) {
   .nav { padding: 24px 40px; }
   .nav-logo { height: 52px; }
-  .nav-cta-btn { display: inline-block; }
-  .nav-hamburger { display: none; }
+  .nav-cta-btn { padding: 10px 20px; font-size: 0.78rem; letter-spacing: 0.05em; }
   .nav-links { display: flex; }
 
   .hero-body { padding: 48px 40px 72px; }
@@ -965,19 +971,12 @@ body {
   </script>
 
   <link rel="stylesheet" href="privacy-consent.css">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-  <!-- Mobile nav drawer -->
-  <nav class="nav-mobile-menu" id="mobileMenu" aria-label="Mobile navigation" role="dialog" aria-modal="true">
-    <a href="#home" onclick="closeMobileMenu()">Home</a>
-    <a href="#experience" onclick="closeMobileMenu()">The Experience</a>
-    <a href="#founder-20" onclick="closeMobileMenu()">Membership</a>
-    <a href="#founder-20" onclick="closeMobileMenu()">Founding 20</a>
-    <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
-    <a href="join.html?updates=1" class="nav-mobile-cta">Get updates</a>
-  </nav>
+  <a href="join.html?updates=1" class="mobile-side-updates" id="mobileSideUpdates" aria-label="Get updates from StrikePoint Sims">Get updates</a>
 
   <!-- ══════════════════════════════════════
        HERO
@@ -999,10 +998,8 @@ body {
         <li><a href="#faq">FAQ</a></li>
       </ul>
       <div class="nav-right">
-        <a href="join.html?updates=1" class="nav-cta-btn">Get updates</a>
-        <button class="nav-hamburger" id="hamburgerBtn" aria-label="Open navigation menu" aria-expanded="false" aria-controls="mobileMenu">
-          <span></span><span></span><span></span>
-        </button>
+        <a href="join.html?updates=1" class="nav-cta-btn nav-cta-btn--mobile">Get updates</a>
+
       </div>
     </header>
 
@@ -1198,10 +1195,6 @@ body {
           <svg class="footer-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
           info@strikepointsims.com
         </a>
-        <a class="footer-contact-row" href="tel:+18603415693">
-          <svg class="footer-contact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.16 6.16l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          860-341-5693
-        </a>
       </div>
       <div class="footer-social">
         <a href="#" class="footer-social-link" aria-label="StrikePoint Sims on Instagram">
@@ -1239,6 +1232,38 @@ body {
       document.querySelectorAll('[data-anim]').forEach(function(el){ el.classList.add('in-view'); });
     }
 
+
+    // Mobile side tab CTA: hide while scrolling, then reappear after 3 seconds.
+    var mobileSideUpdates=document.getElementById('mobileSideUpdates');
+    var mobileSideTimer=null;
+
+    function shouldShowMobileSideCta(){
+      return mobileSideUpdates && window.matchMedia('(max-width: 639px)').matches && window.scrollY > 220;
+    }
+
+    function hideMobileSideCta(){
+      if(!mobileSideUpdates) return;
+      mobileSideUpdates.classList.remove('is-visible');
+    }
+
+    function showMobileSideCta(){
+      if(!mobileSideUpdates) return;
+      mobileSideUpdates.classList.toggle('is-visible', shouldShowMobileSideCta());
+    }
+
+    function scheduleMobileSideCta(){
+      if(!mobileSideUpdates) return;
+      window.clearTimeout(mobileSideTimer);
+      hideMobileSideCta();
+      if(shouldShowMobileSideCta()){
+        mobileSideTimer=window.setTimeout(showMobileSideCta, 3000);
+      }
+    }
+
+    showMobileSideCta();
+    window.addEventListener('scroll', scheduleMobileSideCta, {passive:true});
+    window.addEventListener('resize', scheduleMobileSideCta);
+
     // Nav active link on scroll
     var sections=['home','experience','founder-20','faq'];
     var navLinks=document.querySelectorAll('.nav-links a');
@@ -1257,17 +1282,6 @@ body {
       sectionEls.forEach(function(el){ if(el) navObs.observe(el); });
     }
 
-    // Hamburger menu
-    var btn=document.getElementById('hamburgerBtn');
-    var menu=document.getElementById('mobileMenu');
-    if(btn&&menu){
-      btn.addEventListener('click',function(){
-        var open=menu.classList.toggle('open');
-        btn.classList.toggle('open',open);
-        btn.setAttribute('aria-expanded',open);
-        document.body.style.overflow=open?'hidden':'';
-      });
-    }
 
     // GA4 events (no-ops until ID is set)
     var heroCta=document.getElementById('hero-cta');
@@ -1285,14 +1299,6 @@ body {
       });
     });
   })();
-
-  function closeMobileMenu(){
-    var btn=document.getElementById('hamburgerBtn');
-    var menu=document.getElementById('mobileMenu');
-    if(menu) menu.classList.remove('open');
-    if(btn){ btn.classList.remove('open'); btn.setAttribute('aria-expanded','false'); }
-    document.body.style.overflow='';
-  }
   </script>
   <script src="privacy-consent.js"></script>
 </body>
