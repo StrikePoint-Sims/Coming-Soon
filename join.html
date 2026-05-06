@@ -1568,15 +1568,6 @@
         document.getElementById('err-first-name').textContent = '';
       }
 
-      if (!last || last.length < 2) {
-        lastInp.classList.add('has-error');
-        document.getElementById('err-last-name').textContent = last ? 'Please enter your full last name' : 'Please enter your last name';
-        ok = false;
-      } else {
-        lastInp.classList.remove('has-error');
-        document.getElementById('err-last-name').textContent = '';
-      }
-
       if (!em || !re.test(em)) {
         emailInp.classList.add('has-error');
         document.getElementById('err-email').textContent = em ? "That doesn't look right" : 'Please enter your email';
