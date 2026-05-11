@@ -745,7 +745,7 @@ td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       Help Guide
     </div>
-    <div class="more-menu-item" onclick="signOut()">
+    <div class="more-menu-item" onclick="window.location.href='https://www.strikepointsims.com/management/'">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/><line x1="9" y1="12" x2="21" y2="12"/></svg>
       Management Hub
     </div>
@@ -756,8 +756,8 @@ td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- Hidden file inputs -->
-<input type="file" id="receiptInput" accept="image/*,application/pdf" style="display:none">
-<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
+<input type="file" id="receiptInput" accept="image/*,application/pdf" style="display:none" onchange="handleReceiptFileInput(this)">
+<input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleCameraFileInput(this)">
 <input type="file" id="docInput" accept="image/*,application/pdf,.doc,.docx" style="display:none">
 <input type="file" id="csvInput" accept=".csv,text/csv" style="display:none">
 

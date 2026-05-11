@@ -1017,6 +1017,8 @@ tbody td.mono{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:
   .topbar{padding:0 16px;}
   .topbar-title{font-size:14px;}
 
+  .panel-close{font-size:24px;padding:10px 14px;min-width:44px;min-height:44px;}
+
   .mobile-topbar-brand{
     display:flex;align-items:center;gap:8px;flex:1;
   }
