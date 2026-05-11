@@ -18,6 +18,6 @@ jobs:
 
       - name: Deploy to Firebase
         working-directory: accounting
-        run: firebase deploy --only hosting,firestore,storage
+        run: firebase deploy --only hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
