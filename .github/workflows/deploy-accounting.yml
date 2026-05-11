@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'accounting/**'
+  workflow_dispatch:
 
 jobs:
   deploy:
