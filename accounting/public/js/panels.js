@@ -5,7 +5,7 @@
 /* ── Panel state ── */
 let currentPanelType = null;
 let currentPanelId   = null;
-let currentReceipt   = null; // { file, url, filename } for pending uploads
+let currentReceipt   = null; // { file, processedData } for pending uploads
 
 /* ────────────────────────────────────────────────────────────────────────────
    Panel router
@@ -72,7 +72,8 @@ function openTxnPanel(id, defaultTxnType = null) {
   const principalAmt = txn?.principalAmount != null ? txn.principalAmount : '';
   const loanId      = txn?.loanId      || '';
   const assetId     = txn?.assetId     || '';
-  const receiptUrl  = txn?.receiptUrl  || '';
+  const receiptData     = txn?.receiptData     || '';
+  const receiptMime     = txn?.receiptMime     || 'image/jpeg';
   const receiptFilename = txn?.receiptFilename || '';
 
   const isMobile = window.innerWidth < 768;
@@ -139,10 +140,10 @@ function openTxnPanel(id, defaultTxnType = null) {
       <!-- Receipt zone -->
       <div class="form-row">
         <label>Receipt / Invoice</label>
-        ${receiptUrl
+        ${receiptData
           ? `<div class="receipt-attached">
-               <span class="receipt-name">📎 ${receiptFilename || 'Receipt'}</span>
-               <button type="button" class="btn-link" onclick="previewReceipt('${receiptUrl}','')">View</button>
+               <span class="receipt-name">${receiptMime === 'application/pdf' ? '📄' : '📎'} ${receiptFilename || 'Receipt'}</span>
+               <button type="button" class="btn-link" onclick="previewCurrentReceipt()">View</button>
                <button type="button" class="btn-link red" onclick="removeReceipt()">Remove</button>
              </div>`
           : `<div class="receipt-zone" id="receiptZone"
@@ -152,7 +153,7 @@ function openTxnPanel(id, defaultTxnType = null) {
                <div class="receipt-zone-inner">
                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                  <span>Drop file here or click to browse</span>
-                 <span class="receipt-hint">JPG, PNG, PDF supported</span>
+                 <span class="receipt-hint">JPG, PNG or PDF &mdash; images auto-converted to B&amp;W</span>
                </div>
              </div>
              ${isMobile && hasCamera ? `
@@ -352,16 +353,26 @@ function openCameraCapture() {
   if (inp) { inp.value = ''; inp.click(); }
 }
 
-function setPendingReceipt(file) {
-  currentReceipt = { file };
+let _receiptToken = 0;
+async function setPendingReceipt(file) {
+  const token = ++_receiptToken;
   const pend = document.getElementById('receiptPending');
-  const name = document.getElementById('receiptPendingName');
-  if (pend && name) {
-    name.textContent = '📎 ' + file.name;
-    pend.style.display = '';
+  const nameEl = document.getElementById('receiptPendingName');
+  if (pend && nameEl) { nameEl.textContent = '⏳ Processing…'; pend.style.display = ''; }
+  try {
+    const result = await processReceiptFile(file);
+    if (token !== _receiptToken) return; // a newer file was selected, discard this result
+    currentReceipt = { file, processedData: result.data, processedMime: result.mime };
+    const icon = result.mime === 'application/pdf' ? '📄' : '📎';
+    if (nameEl) nameEl.textContent = icon + ' ' + file.name;
+    const zone = document.getElementById('receiptZone');
+    if (zone) zone.classList.add('has-file');
+  } catch (e) {
+    if (token !== _receiptToken) return;
+    currentReceipt = null;
+    if (pend) pend.style.display = 'none';
+    toast(e.message, 'error');
   }
-  const zone = document.getElementById('receiptZone');
-  if (zone) zone.classList.add('has-file');
 }
 
 function clearPendingReceipt() {
@@ -375,22 +386,41 @@ function clearPendingReceipt() {
 function removeReceipt() {
   if (!currentPanelId) return;
   const txn = State.txns.find(t => t.id === currentPanelId);
-  if (!txn?.receiptUrl) return;
+  if (!txn?.receiptData) return;
   if (!confirm('Remove this receipt? This cannot be undone.')) return;
-  deleteReceipt(currentPanelId, txn.receiptFilename)
-    .then(() => dbSet('transactions', currentPanelId, { receiptUrl: '', receiptFilename: '' }))
+  deleteReceipt(currentPanelId)
     .then(() => { toast('Receipt removed'); openPanel('txn', currentPanelId); })
     .catch(e => toast('Error: ' + e.message, 'error'));
+}
+
+function previewCurrentReceipt() {
+  const txn = State.txns.find(t => t.id === currentPanelId);
+  if (!txn?.receiptData) return;
+  if (txn.receiptMime === 'application/pdf') {
+    _openPDFPreview(txn.receiptData);
+  } else {
+    previewReceipt(txn.receiptData);
+  }
+}
+
+function _openPDFPreview(base64DataURI) {
+  const byteStr = atob(base64DataURI.split(',')[1]);
+  const bytes = new Uint8Array(byteStr.length);
+  for (let i = 0; i < byteStr.length; i++) bytes[i] = byteStr.charCodeAt(i);
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const blobUrl = URL.createObjectURL(blob);
+  window.open(blobUrl, '_blank');
 }
 
 function previewReceipt(url, mime) {
   const overlay = document.getElementById('previewOverlay');
   const content = document.getElementById('previewContent');
   if (!overlay || !content) return;
-  const isPDF = mime === 'application/pdf' || url.toLowerCase().includes('.pdf') || url.toLowerCase().includes('pdf');
-  content.innerHTML = isPDF
-    ? `<iframe src="${url}" style="width:100%;height:80vh;border:0;border-radius:8px"></iframe>`
-    : `<img src="${url}" style="max-width:100%;max-height:80vh;border-radius:8px;display:block;margin:auto">`;
+  content.textContent = '';
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.cssText = 'max-width:100%;max-height:80vh;border-radius:8px;display:block;margin:auto';
+  content.appendChild(img);
   overlay.classList.add('open');
 }
 
@@ -440,9 +470,8 @@ async function saveTxnPanel() {
 
     const txnId = await saveTxn(data, currentPanelId || null);
 
-    if (currentReceipt?.file) {
-      const { receiptUrl, receiptFilename } = await uploadReceipt(txnId, currentReceipt.file);
-      await dbSet('transactions', txnId, { receiptUrl, receiptFilename });
+    if (currentReceipt?.processedData) {
+      await uploadReceipt(txnId, currentReceipt.processedData, currentReceipt.processedMime, currentReceipt.file.name);
     }
 
     closePanel('txnOverlay');

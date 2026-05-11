@@ -47,7 +47,7 @@ auth.onAuthStateChanged(user => {
     // Only redirect if the localStorage auth flag is absent —
     // this prevents a race where Firebase is still restoring its session
     if (!localStorage.getItem('sp_authed')) {
-      window.location.href = '../../management/index.html';
+      window.location.href = 'https://www.strikepointsims.com/management/';
     }
     return;
   }

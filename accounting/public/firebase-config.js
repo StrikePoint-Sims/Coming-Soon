@@ -37,12 +37,12 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDFUm2mDCqwQXqTaxGxwQ0E5Yayid9xqoI",
+  authDomain: "strikepoint-sims.firebaseapp.com",
+  projectId: "strikepoint-sims",
+  storageBucket: "strikepoint-sims.firebasestorage.app",
+  messagingSenderId: "511868473293",
+  appId: "1:511868473293:web:930c9c1ce41182c90ebe84"
 };
 
 // Initialize Firebase

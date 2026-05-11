@@ -387,21 +387,8 @@ function openDocumentUpload() {
 }
 
 async function handleDocumentFile(input) {
-  const file = input.files[0];
-  if (!file) return;
   input.value = '';
-
-  const name = prompt('Document name:', file.name) || file.name;
-  const category = _promptDocCategory();
-  if (!category) return;
-
-  try {
-    toast('Uploading…');
-    await uploadDocument(file, name, category);
-    toast('Document uploaded');
-  } catch (e) {
-    toast('Upload failed: ' + e.message, 'error');
-  }
+  toast('Document vault uploads require Firebase Storage (paid plan). Receipts on transactions are stored automatically.', 'error');
 }
 
 function _promptDocCategory() {

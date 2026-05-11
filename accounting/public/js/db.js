@@ -35,7 +35,7 @@ const DEFAULT_CATEGORIES = [
 const DEFAULT_LOANS = [
   {
     name:'SBA 7(a) Loan',
-    lender:'TBD — Liberty / M&T / Dime / CT Community Bank',
+    lender:'M&T Bank',
     originalAmount:150000,
     interestRate:0.095,
     termMonths:120,
@@ -268,30 +268,152 @@ async function saveTxn(data, id = null) {
 }
 
 async function deleteTxn(id) {
-  const txn = (State.txns || []).find(t => t.id === id);
-  if (txn && txn.receiptUrl && txn.receiptFilename && !_isTestMode()) {
-    await deleteReceipt(id, txn.receiptFilename).catch(() => {});
-  }
   await dbDelete('transactions', id);
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
-   Receipt storage helpers
+   Receipt storage — images processed client-side and stored in Firestore
    ──────────────────────────────────────────────────────────────────────────── */
 
-async function uploadReceipt(txnId, file) {
-  const uid = State.user?.uid || auth.currentUser?.uid;
-  const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-  const ref = storage.ref(`receipts/${uid}/${txnId}/${filename}`);
-  const snap = await ref.put(file);
-  const url = await snap.ref.getDownloadURL();
-  return { receiptUrl: url, receiptFilename: filename };
+const MAX_RECEIPT_BYTES = 700000; // ~700 KB base64 leaves headroom for other transaction fields under 1 MB Firestore limit
+
+// Returns { data: base64DataURI, mime: string }
+function processReceiptFile(file) {
+  if (file.type === 'application/pdf') {
+    return _processPDF(file);
+  } else if (file.type.startsWith('image/')) {
+    return _processImage(file);
+  }
+  return Promise.reject(new Error('Only JPG, PNG, or PDF files are supported.'));
 }
 
-async function deleteReceipt(txnId, filename) {
-  const uid = State.user?.uid || auth.currentUser?.uid;
-  const ref = storage.ref(`receipts/${uid}/${txnId}/${filename}`);
-  await ref.delete();
+async function _processPDF(file) {
+  // Small PDFs (≤ 524 KB raw → ≤ ~700 KB base64): store as native PDF for full fidelity
+  if (file.size <= 524000) {
+    const data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = () => reject(new Error('Failed to read PDF'));
+      reader.readAsDataURL(file);
+    });
+    if (data.length <= MAX_RECEIPT_BYTES) return { data, mime: 'application/pdf' };
+  }
+  // Oversized: render pages to a compressed grayscale image automatically
+  return _renderPDFToImage(file);
+}
+
+async function _loadPDFJS() {
+  if (window.pdfjsLib) return;
+  await new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = resolve;
+    s.onerror = () => reject(new Error('Could not load PDF renderer. Check your connection and try again.'));
+    document.head.appendChild(s);
+  });
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+async function _renderPDFToImage(file) {
+  await _loadPDFJS();
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+  // Render each page at 1.5× scale (~150 DPI for letter size, readable text)
+  const pageCanvases = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const vp = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement('canvas');
+    canvas.width = vp.width; canvas.height = vp.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    pageCanvases.push(canvas);
+  }
+
+  // Stitch pages vertically with an 8 px white gap
+  const GAP = 8;
+  const rawW = Math.max(...pageCanvases.map(c => c.width));
+  const rawH = pageCanvases.reduce((s, c) => s + c.height, 0) + GAP * (pageCanvases.length - 1);
+
+  // Scale down so longest side ≤ 1200 px
+  const scale = Math.min(1, 1200 / Math.max(rawW, rawH));
+  const finalW = Math.round(rawW * scale);
+  const finalH = Math.round(rawH * scale);
+
+  const combined = document.createElement('canvas');
+  combined.width = finalW; combined.height = finalH;
+  const ctx = combined.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, finalW, finalH);
+
+  let y = 0;
+  for (const pc of pageCanvases) {
+    const h = Math.round(pc.height * scale);
+    ctx.drawImage(pc, 0, y, Math.round(pc.width * scale), h);
+    y += h + Math.round(GAP * scale);
+  }
+
+  // Grayscale pass
+  const id = ctx.getImageData(0, 0, finalW, finalH);
+  for (let i = 0; i < id.data.length; i += 4) {
+    const g = id.data[i] * 0.299 + id.data[i + 1] * 0.587 + id.data[i + 2] * 0.114;
+    id.data[i] = id.data[i + 1] = id.data[i + 2] = g;
+  }
+  ctx.putImageData(id, 0, 0);
+
+  // Progressive quality reduction until it fits
+  for (const q of [0.72, 0.55, 0.40, 0.25]) {
+    const data = combined.toDataURL('image/jpeg', q);
+    if (data.length <= MAX_RECEIPT_BYTES) return { data, mime: 'image/jpeg' };
+  }
+  throw new Error(`PDF rendered to ${pdf.numPages} page(s) but is still too large. Try fewer pages or a smaller source file.`);
+}
+
+function _processImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 1200;
+      let w = img.naturalWidth, h = img.naturalHeight;
+      if (w > maxDim || h > maxDim) {
+        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+        else       { w = Math.round(w * maxDim / h); h = maxDim; }
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const d = ctx.getImageData(0, 0, w, h);
+      for (let i = 0; i < d.data.length; i += 4) {
+        const g = d.data[i] * 0.299 + d.data[i + 1] * 0.587 + d.data[i + 2] * 0.114;
+        d.data[i] = d.data[i + 1] = d.data[i + 2] = g;
+      }
+      ctx.putImageData(d, 0, 0);
+      // Try progressively lower quality until under the size limit
+      for (const q of [0.72, 0.55, 0.40, 0.25]) {
+        const data = canvas.toDataURL('image/jpeg', q);
+        if (data.length <= MAX_RECEIPT_BYTES) { resolve({ data, mime: 'image/jpeg' }); return; }
+      }
+      reject(new Error('Receipt image is too large to store even after compression. Try a lower-resolution photo.'));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Failed to load image')); };
+    img.src = url;
+  });
+}
+
+async function uploadReceipt(txnId, receiptData, receiptMime, filename) {
+  if (receiptData.length > MAX_RECEIPT_BYTES) {
+    throw new Error('File is too large to store. Try a compressed version or a photo.');
+  }
+  await dbSet('transactions', txnId, { receiptData, receiptMime, receiptFilename: filename, receiptUrl: '' });
+  return { receiptData, receiptMime, receiptFilename: filename };
+}
+
+async function deleteReceipt(txnId) {
+  await dbSet('transactions', txnId, { receiptData: '', receiptFilename: '', receiptUrl: '' });
 }
 
 /* ────────────────────────────────────────────────────────────────────────────
@@ -299,27 +421,10 @@ async function deleteReceipt(txnId, filename) {
    ──────────────────────────────────────────────────────────────────────────── */
 
 async function uploadDocument(file, name, category) {
-  const uid = State.user?.uid || auth.currentUser?.uid;
-  const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
-  const ref = storage.ref(`documents/${uid}/${filename}`);
-  const snap = await ref.put(file);
-  const url = await snap.ref.getDownloadURL();
-  const id = await dbAdd('documents', {
-    name: name || file.name,
-    category: category || 'Other',
-    fileUrl: url,
-    filename,
-    mimeType: file.type,
-    size: file.size,
-    uploadedAt: Date.now(),
-  });
-  return id;
+  throw new Error('Document vault uploads are not available without Firebase Storage.');
 }
 
 async function deleteDocument(docId, filename) {
-  const uid = State.user?.uid || auth.currentUser?.uid;
-  const ref = storage.ref(`documents/${uid}/${filename}`);
-  await ref.delete().catch(() => {});
   await dbDelete('documents', docId);
 }
 
