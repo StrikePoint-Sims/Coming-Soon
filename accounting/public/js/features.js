@@ -47,10 +47,16 @@ async function checkRecurring() {
 
 function _advanceNextDueDate(tmpl) {
   const base = new Date(tmpl.nextDueDate + 'T12:00:00');
-  if (tmpl.frequency === 'monthly') {
-    base.setMonth(base.getMonth() + 1);
-  } else if (tmpl.frequency === 'weekly') {
+  if (tmpl.frequency === 'weekly') {
     base.setDate(base.getDate() + 7);
+  } else if (tmpl.frequency === 'bi-weekly') {
+    base.setDate(base.getDate() + 14);
+  } else if (tmpl.frequency === 'monthly') {
+    base.setMonth(base.getMonth() + 1);
+  } else if (tmpl.frequency === 'quarterly') {
+    base.setMonth(base.getMonth() + 3);
+  } else if (tmpl.frequency === 'semi-annual') {
+    base.setMonth(base.getMonth() + 6);
   } else if (tmpl.frequency === 'annually') {
     base.setFullYear(base.getFullYear() + 1);
   }
@@ -722,9 +728,12 @@ function openRecurringEdit(id) {
         <div>
           <label>Frequency</label>
           <select id="recFreq">
-            <option value="monthly"  ${t?.frequency==='monthly' ?'selected':''}>Monthly</option>
-            <option value="weekly"   ${t?.frequency==='weekly'  ?'selected':''}>Weekly</option>
-            <option value="annually" ${t?.frequency==='annually'?'selected':''}>Annually</option>
+            <option value="weekly"      ${t?.frequency==='weekly'     ?'selected':''}>Weekly</option>
+            <option value="bi-weekly"   ${t?.frequency==='bi-weekly'  ?'selected':''}>Bi-Weekly (every 2 weeks)</option>
+            <option value="monthly"     ${t?.frequency==='monthly'    ?'selected':''}>Monthly</option>
+            <option value="quarterly"   ${t?.frequency==='quarterly'  ?'selected':''}>Quarterly (every 3 months)</option>
+            <option value="semi-annual" ${t?.frequency==='semi-annual'?'selected':''}>Semi-Annual (every 6 months)</option>
+            <option value="annually"    ${t?.frequency==='annually'   ?'selected':''}>Annually</option>
           </select>
         </div>
         <div><label>Day of Month (1–28)</label><input type="number" id="recDay" value="${t?.dayOfMonth||1}" min="1" max="28"></div>

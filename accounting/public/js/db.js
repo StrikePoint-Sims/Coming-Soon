@@ -158,13 +158,17 @@ async function seedDefaultData() {
 }
 
 function nextDueDate(dayOfMonth, frequency) {
+  const now = new Date();
   const d = new Date();
-  if (frequency === 'monthly') {
+  if (frequency === 'weekly' || frequency === 'bi-weekly') {
+    // day-of-month not meaningful for week-based; first occurrence is today or next occurrence
+    return d.toISOString().slice(0, 10);
+  } else if (frequency === 'monthly' || frequency === 'quarterly' || frequency === 'semi-annual') {
     d.setDate(dayOfMonth);
-    if (d <= new Date()) d.setMonth(d.getMonth() + 1);
+    if (d <= now) d.setMonth(d.getMonth() + 1);
   } else if (frequency === 'annually') {
     d.setMonth(0); d.setDate(dayOfMonth);
-    if (d <= new Date()) d.setFullYear(d.getFullYear() + 1);
+    if (d <= now) d.setFullYear(d.getFullYear() + 1);
   }
   return d.toISOString().slice(0, 10);
 }
