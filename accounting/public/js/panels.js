@@ -336,9 +336,9 @@ function checkDuplicate() {
 function toggleMoreOptions() {
   const body  = document.getElementById('moreOptionsBody');
   const label = document.getElementById('moreLabel');
-  const open  = body.style.display === 'none' || body.style.display === '';
-  body.style.display  = open ? '' : 'none';
-  label.textContent   = open ? '▴ Fewer options' : '▾ More options';
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : '';
+  label.textContent  = isOpen ? '▾ More options' : '▴ Fewer options';
 }
 
 /* Receipt handlers */
@@ -391,6 +391,18 @@ function removeReceipt() {
   deleteReceipt(currentPanelId)
     .then(() => { toast('Receipt removed'); openPanel('txn', currentPanelId); })
     .catch(e => toast('Error: ' + e.message, 'error'));
+}
+
+function previewTxnReceipt(id) {
+  const txn = (State.txns || []).find(t => t.id === id);
+  if (!txn) return;
+  const data = txn.receiptData || txn.receiptUrl;
+  if (!data) return;
+  if (txn.receiptMime === 'application/pdf') {
+    _openPDFPreview(data);
+  } else {
+    previewReceipt(data);
+  }
 }
 
 function previewCurrentReceipt() {
@@ -446,9 +458,11 @@ async function saveTxnPanel() {
     type, amount, description: desc, category, date,
     paymentMethod: pm,
     deductibility: ded,
-    reimbursementStatus: pm === 'personal' ? (currentPanelId
-      ? (State.txns.find(t=>t.id===currentPanelId)?.reimbursementStatus || 'pending')
-      : 'pending') : 'na',
+    reimbursementStatus: pm === 'personal' ? (() => {
+      if (!currentPanelId) return 'pending';
+      const prev = State.txns.find(t => t.id === currentPanelId)?.reimbursementStatus;
+      return (prev && prev !== 'na') ? prev : 'pending';
+    })() : 'na',
     isTaxable: document.getElementById('txnTaxable')?.checked || false,
     vendorId: document.getElementById('txnVendor')?.value || '',
     customerId: document.getElementById('txnCustomer')?.value || '',

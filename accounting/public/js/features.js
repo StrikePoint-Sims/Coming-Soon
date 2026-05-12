@@ -1018,7 +1018,7 @@ function renderGettingStarted() {
     { key: 'loans',     label: 'Go to <strong>Settings → Loans</strong> and confirm your SBA and TrackMan loans', done: (State.loans||[]).length > 0 },
     { key: 'vendor',    label: 'Go to <strong>Vendors</strong> and add your key vendors', done: (State.vendors||[]).length > 0 },
     { key: 'txn',       label: 'Log your first expense in <strong>Transactions</strong>', done: (State.txns||[]).some(t=>t.status==='normal') },
-    { key: 'receipt',   label: 'Attach a receipt to a transaction', done: (State.txns||[]).some(t=>t.receiptUrl) },
+    { key: 'receipt',   label: 'Attach a receipt to a transaction', done: (State.txns||[]).some(t=>t.receiptData||t.receiptUrl) },
     { key: 'dashboard', label: 'Check the <strong>Dashboard</strong> to see your financial snapshot', done: false },
     { key: 'time',      label: 'Go to <strong>Time</strong> and log your first hours worked', done: (State.timeEntries||[]).length > 0 },
     { key: 'recurring', label: 'Go to <strong>Settings → Recurring</strong> and activate your SBA and rent templates', done: (State.recurringTemplates||[]).some(t=>t.active) },

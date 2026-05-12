@@ -435,7 +435,7 @@ function renderDashboard() {
             <tbody>
               ${recent.map(t => `<tr onclick="openPanel('txn','${t.id}')" class="clickable">
                 <td>${fmtDate(t.date)}</td>
-                <td>${t.description || '—'} ${t.receiptUrl ? '📎' : ''}</td>
+                <td>${t.description || '—'} ${(t.receiptData || t.receiptUrl) ? '📎' : ''}</td>
                 <td><span class="cat-badge">${t.category}</span></td>
                 <td>${_pmLabel(t.paymentMethod)}</td>
                 <td class="num ${t.type==='income'?'amount-income':'amount-expense'}">${t.type==='income'?'+':'-'}${fmt$(t.amount)}</td>
@@ -671,8 +671,8 @@ function renderTransactions() {
                   <td>${_pmLabel(t.paymentMethod)}</td>
                   <td class="num ${t.type==='income'?'green':'red'}">${t.type==='income'?'+':'-'}${fmt$(t.amount)}</td>
                   <td class="receipt-cell">
-                    ${t.receiptUrl
-                      ? `<button class="btn-link" onclick="event.stopPropagation();previewReceipt('${t.receiptUrl}','')">📎</button>`
+                    ${(t.receiptData || t.receiptUrl)
+                      ? `<button class="btn-link" onclick="event.stopPropagation();previewTxnReceipt('${t.id}')">📎</button>`
                       : (t.amount >= 75 && t.type === 'expense' ? '<span class="missing-receipt" title="Missing receipt">!</span>' : '')}
                   </td>
                 </tr>`).join('')}

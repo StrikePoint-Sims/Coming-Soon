@@ -512,7 +512,7 @@ function computeSalesTax(txns, rate = 0.0635) {
 /* ── Missing receipts ── */
 function computeMissingReceipts(txns, threshold = 75) {
   return txns
-    .filter(t => t.type === 'expense' && (t.amount||0) >= threshold && !t.receiptUrl)
+    .filter(t => t.type === 'expense' && (t.amount||0) >= threshold && !t.receiptData && !t.receiptUrl)
     .sort((a,b) => b.amount - a.amount);
 }
 
@@ -664,7 +664,7 @@ function exportTransactionsCSV(txns) {
     custMap[t.customerId] || '',
     t.interestAmount || '', t.principalAmount || '',
     t.notes || '',
-    t.receiptUrl ? 'Yes' : 'No',
+    (t.receiptData || t.receiptUrl) ? 'Yes' : 'No',
   ]);
   exportCSV(headers, rows, `sp-transactions-${todayStr()}.csv`);
 }
