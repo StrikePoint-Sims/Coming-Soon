@@ -509,6 +509,10 @@ td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
         <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4"/></svg></div>
         <span class="nav-label">Transactions</span>
       </div>
+      <div class="nav-item" onclick="openSettings('recurring')">
+        <div class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div>
+        <span class="nav-label">Recurring</span>
+      </div>
       <div class="nav-item" data-view="customers" onclick="navigate('customers')">
         <div class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         <span class="nav-label">Customers</span>
@@ -729,6 +733,10 @@ td.num,th.num{text-align:right;font-family:'JetBrains Mono',monospace}
 <div class="more-overlay" id="moreOverlay" onclick="closeMobileMore()">
   <div class="more-menu" onclick="event.stopPropagation()">
     <div class="more-menu-title">More</div>
+    <div class="more-menu-item" onclick="openSettings('recurring');closeMobileMore()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+      Recurring Expenses
+    </div>
     <div class="more-menu-item" onclick="navigate('customers');closeMobileMore()">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Customers
