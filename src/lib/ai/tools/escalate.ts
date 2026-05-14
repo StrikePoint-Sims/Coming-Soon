@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { brevo } from '@/lib/brevo/client'
 import { env } from '@/env'
 import { db } from '@/db'
@@ -14,33 +15,19 @@ registerTool({
       'the customer is frustrated, or you are not confident in the answer. ' +
       'Always escalate for: lockouts, payment disputes over $50, safety concerns, ' +
       'complaints about staff, and requests you cannot fulfill.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {
-        thread_id: {
-          type: 'string',
-          description: 'The support thread ID for this conversation',
-        },
-        summary: {
-          type: 'string',
-          description:
-            'A concise 1–3 sentence summary of the issue and what you have already tried',
-        },
-        urgency: {
-          type: 'string',
-          enum: ['normal', 'urgent'],
-          description:
-            'urgent = customer is locked out, safety issue, or actively angry. normal = everything else.',
-        },
-      },
-      required: ['thread_id', 'summary', 'urgency'],
-    },
+    parameters: z.object({
+      thread_id: z.string().describe('The support thread ID for this conversation'),
+      summary: z.string().describe(
+        'A concise 1–3 sentence summary of the issue and what you have already tried',
+      ),
+      urgency: z.enum(['normal', 'urgent']).describe(
+        'urgent = customer is locked out, safety issue, or actively angry. normal = everything else.',
+      ),
+    }),
   },
 
   async execute(input) {
-    const threadId = input['thread_id'] as string
-    const summary = input['summary'] as string
-    const urgency = input['urgency'] as 'normal' | 'urgent'
+    const { thread_id: threadId, summary, urgency } = input
 
     const appUrl = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://strikepointsims.com'
     const threadLink = `${appUrl}/admin/support/${threadId}`

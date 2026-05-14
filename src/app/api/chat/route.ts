@@ -5,7 +5,7 @@ import { supportThreads, supportMessages } from '@/db/schema'
 import { nanoid } from '@/lib/utils'
 
 export const runtime = 'nodejs'
-export const maxDuration = 30
+export const maxDuration = 10
 
 interface ChatRequestBody {
   messages: ChatMessage[]
@@ -29,8 +29,9 @@ export async function POST(req: NextRequest) {
   // Create or reuse a support thread (non-fatal — chat works even if DB is unavailable)
   const threadId = existingThreadId ?? nanoid()
 
+  // Ensure thread exists before inserting messages (FK dependency)
   if (!existingThreadId) {
-    db.insert(supportThreads).values({
+    await db.insert(supportThreads).values({
       id: threadId,
       userId: null,
       channel: 'chat',
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest) {
   // Store the latest user message (non-fatal)
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')
   if (lastUserMessage) {
-    db.insert(supportMessages).values({
+    await db.insert(supportMessages).values({
       id: nanoid(),
       threadId,
       direction: 'inbound',

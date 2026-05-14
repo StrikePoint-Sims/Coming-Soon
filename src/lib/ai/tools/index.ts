@@ -1,25 +1,27 @@
-import { tool, jsonSchema } from 'ai'
+import { tool } from 'ai'
 import type { ToolSet } from 'ai'
+import type { z } from 'zod'
 
 // ── Tool definition type ──────────────────────────────────────────────────────
 
-export interface AgentTool {
+export interface AgentTool<TSchema extends z.ZodTypeAny = z.ZodTypeAny> {
   definition: {
     name: string
     description: string
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    input_schema: Record<string, any>
+    parameters: TSchema
   }
-  execute: (input: Record<string, unknown>) => Promise<string>
+  execute: (input: z.infer<TSchema> & { thread_id: string }) => Promise<string>
 }
 
 // ── Tool registry ─────────────────────────────────────────────────────────────
 // Tools are added here as backend capabilities come online (week by week).
 // Financial/access tools must not be registered until their backing systems are tested.
 
-const registry = new Map<string, AgentTool>()
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const registry = new Map<string, AgentTool<any>>()
 
-export function registerTool(t: AgentTool): void {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function registerTool(t: AgentTool<any>): void {
   registry.set(t.definition.name, t)
 }
 
@@ -29,15 +31,12 @@ export function getRegisteredTools(threadId: string): ToolSet {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result: Record<string, any> = {}
   for (const [name, agentTool] of registry.entries()) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result[name] = tool({
       description: agentTool.definition.description,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      parameters: jsonSchema<Record<string, unknown>>(agentTool.definition.input_schema as any),
+      parameters: agentTool.definition.parameters,
       execute: (input: Record<string, unknown>) =>
         agentTool.execute({ thread_id: threadId, ...input }),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
+    })
   }
   return result as ToolSet
 }

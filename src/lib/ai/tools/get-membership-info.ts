@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { registerTool } from './index'
 
 // Pre-launch tier info. When admin tier management ships in Week 7, this tool
@@ -33,21 +34,15 @@ registerTool({
     description:
       'Returns current StrikePoint Sims membership tiers, pricing, and features. ' +
       'Use this when a customer asks about memberships, pricing, tiers, or what is included.',
-    input_schema: {
-      type: 'object' as const,
-      properties: {
-        tier: {
-          type: 'string',
-          enum: ['Range', 'Standard', 'Elite', 'all'],
-          description: 'Specific tier to look up, or "all" for all tiers.',
-        },
-      },
-      required: ['tier'],
-    },
+    parameters: z.object({
+      tier: z
+        .enum(['Range', 'Standard', 'Elite', 'all'])
+        .describe('Specific tier to look up, or "all" for all tiers.'),
+    }),
   },
 
   async execute(input) {
-    const tierName = input['tier'] as string
+    const { tier: tierName } = input
     const tiers = tierName === 'all' ? TIERS : TIERS.filter((t) => t.name === tierName)
 
     if (tiers.length === 0) {
