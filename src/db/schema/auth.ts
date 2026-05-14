@@ -70,5 +70,12 @@ export const waitlistSignups = pgTable('waitlist_signups', {
   utmMedium: text('utm_medium'),
   utmCampaign: text('utm_campaign'),
   brevoContactSynced: boolean('brevo_contact_synced').notNull().default(false),
+  // Survey data captured incrementally per slide
+  golfLevel: text('golf_level'),
+  community: text('community'),
+  priority: text('priority'),
+  // Funnel tracking
+  status: text('status').notNull().default('started'), // started | completed
+  founderPath: boolean('founder_path').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })

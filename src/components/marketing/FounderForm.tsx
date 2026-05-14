@@ -12,6 +12,7 @@ import {
 import {
   createFoundingPaymentIntent,
   submitFounderData,
+  saveLeadProgress,
 } from '@/app/(marketing)/join/actions'
 
 // ── Tier config ───────────────────────────────────────────────────────────────
@@ -403,13 +404,34 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
 
   // ─ Next / Prev ─
   function nextSlide() {
-    if (currentSlide === 1 && !validateSlide1()) return
+    if (currentSlide === 1) {
+      if (!validateSlide1()) return
+      // Save contact info after slide 1 validates
+      void saveLeadProgress({
+        email: email.trim(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim() || undefined,
+        interestedTier: selectedTier?.name,
+        founderPath: isFounder,
+        status: 'started',
+      }).catch(() => {})
+    }
     if (currentSlide === 3) {
       if (community === 'other' && !communityOther.trim()) return
       if (isFounder) { goToSlide(4); return }
       handleFinalSubmit(); return
     }
-    if (currentSlide === 4) { goToSlide(6); return }
+    if (currentSlide === 4) {
+      // Save priority selections before going to payment
+      void saveLeadProgress({
+        email: email.trim(),
+        firstName: firstName.trim(),
+        priority: priority.join(', '),
+        status: 'started',
+      }).catch(() => {})
+      goToSlide(6)
+      return
+    }
     if (currentSlide < 4) goToSlide((currentSlide + 1) as 1 | 2 | 3 | 4 | 6 | 7)
   }
 
@@ -421,12 +443,26 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
   // ─ Choice handlers ─
   function selectGolfLevel(level: string) {
     setGolfLevel(level)
+    // Save after golf level selected
+    void saveLeadProgress({
+      email: email.trim(),
+      firstName: firstName.trim(),
+      golfLevel: level,
+      status: 'started',
+    }).catch(() => {})
     setTimeout(() => goToSlide(3), 280)
   }
 
   function selectCommunity(val: string) {
     setCommunity(val)
     if (val !== 'other') {
+      // Save after community selected (non-"other" towns advance immediately)
+      void saveLeadProgress({
+        email: email.trim(),
+        firstName: firstName.trim(),
+        community: val,
+        status: 'started',
+      }).catch(() => {})
       setTimeout(() => {
         if (isFounder) goToSlide(4)
         else handleFinalSubmit()
@@ -464,6 +500,12 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
       if (active?.id === 'other-town-input') {
         if (community === 'other' && communityOther.trim()) {
           e.preventDefault()
+          void saveLeadProgress({
+            email: email.trim(),
+            firstName: firstName.trim(),
+            community: communityOther.trim(),
+            status: 'started',
+          }).catch(() => {})
           if (isFounder) goToSlide(4)
           else handleFinalSubmit()
         }
@@ -817,6 +859,12 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
                     type="button"
                     onClick={() => {
                       if (!communityOther.trim()) return
+                      void saveLeadProgress({
+                        email: email.trim(),
+                        firstName: firstName.trim(),
+                        community: communityOther.trim(),
+                        status: 'started',
+                      }).catch(() => {})
                       if (isFounder) goToSlide(4)
                       else handleFinalSubmit()
                     }}

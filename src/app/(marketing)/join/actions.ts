@@ -44,6 +44,95 @@ export async function createFoundingPaymentIntent(
   }
 }
 
+// ── Save lead progress incrementally (called fire-and-forget after each slide) ─
+
+const leadProgressSchema = z.object({
+  email: z.string().email(),
+  firstName: z.string().min(1).max(80),
+  lastName: z.string().max(80).optional().default(''),
+  interestedTier: z.string().max(40).optional().default(''),
+  golfLevel: z.string().max(120).optional().default(''),
+  community: z.string().max(80).optional().default(''),
+  priority: z.string().max(300).optional().default(''),
+  status: z.enum(['started', 'completed']).optional().default('started'),
+  founderPath: z.boolean().optional().default(false),
+})
+
+export async function saveLeadProgress(input: {
+  email: string
+  firstName: string
+  lastName?: string
+  interestedTier?: string
+  golfLevel?: string
+  community?: string
+  priority?: string
+  status?: 'started' | 'completed'
+  founderPath?: boolean
+}) {
+  const parsed = leadProgressSchema.safeParse(input)
+  if (!parsed.success) return // silent — never block the UI
+
+  const d = parsed.data
+
+  // Build only the columns we have data for (avoid overwriting later data with blanks)
+  const updateSet: Record<string, unknown> = { firstName: d.firstName }
+  if (d.lastName) updateSet.lastName = d.lastName
+  if (d.interestedTier) updateSet.interestedTier = d.interestedTier
+  if (d.golfLevel) updateSet.golfLevel = d.golfLevel
+  if (d.community) updateSet.community = d.community
+  if (d.priority) updateSet.priority = d.priority
+  if (d.status) updateSet.status = d.status
+  if (d.founderPath !== undefined) updateSet.founderPath = d.founderPath
+
+  await db
+    .insert(waitlistSignups)
+    .values({
+      id: nanoid(),
+      email: d.email,
+      firstName: d.firstName,
+      lastName: d.lastName || null,
+      phone: null,
+      interestedTier: d.interestedTier || null,
+      marketingConsent: false,
+      smsConsent: false,
+      stripeSetupIntentId: null,
+      stripeCustomerId: null,
+      utmSource: null,
+      utmMedium: null,
+      utmCampaign: null,
+      golfLevel: d.golfLevel || null,
+      community: d.community || null,
+      priority: d.priority || null,
+      status: d.status,
+      founderPath: d.founderPath,
+    })
+    .onConflictDoUpdate({
+      target: waitlistSignups.email,
+      set: updateSet,
+    })
+    .catch(() => {}) // non-fatal
+
+  // Lightweight Brevo sync (non-fatal)
+  await brevo
+    .upsertContact({
+      email: d.email,
+      attributes: {
+        FIRSTNAME: d.firstName,
+        LASTNAME: d.lastName ?? '',
+        INTERESTED_TIER: d.interestedTier ?? '',
+      },
+      listIds: [BREVO_FOUNDERS_LIST_ID],
+      updateEnabled: true,
+    })
+    .then(() =>
+      db
+        .update(waitlistSignups)
+        .set({ brevoContactSynced: true })
+        .where(eq(waitlistSignups.email, d.email)),
+    )
+    .catch(() => {}) // non-fatal
+}
+
 // ── Submit founder data after Stripe confirmation ─────────────────────────────
 
 const founderSchema = z.object({
@@ -90,12 +179,22 @@ export async function submitFounderData(input: {
         utmSource: null,
         utmMedium: null,
         utmCampaign: null,
+        golfLevel: d.golfLevel || null,
+        community: d.community || null,
+        priority: d.priority || null,
+        status: 'completed',
+        founderPath: d.isFounder,
       })
       .onConflictDoUpdate({
         target: waitlistSignups.email,
         set: {
           firstName: d.firstName,
           interestedTier: d.interestedTier || undefined,
+          golfLevel: d.golfLevel || undefined,
+          community: d.community || undefined,
+          priority: d.priority || undefined,
+          status: 'completed',
+          founderPath: d.isFounder,
         },
       })
   } catch (err) {
