@@ -7,6 +7,7 @@ import { getRegisteredTools } from './tools'
 // Side-effect imports register tools into the registry.
 // Add new imports here as tools come online each week.
 import './tools/escalate'
+import './tools/get-membership-info'
 import './tools/find-open-slot'
 import './tools/lookup-booking'
 
