@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
   const sig = req.headers.get('stripe-signature')
 
   if (!sig) return NextResponse.json({ error: 'Missing signature' }, { status: 400 })
+  if (!env.STRIPE_WEBHOOK_SECRET) return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 })
 
   let event
   try {
