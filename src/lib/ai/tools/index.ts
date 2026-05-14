@@ -31,12 +31,14 @@ export function getRegisteredTools(threadId: string): ToolSet {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const result: Record<string, any> = {}
   for (const [name, agentTool] of registry.entries()) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     result[name] = tool({
       description: agentTool.definition.description,
       parameters: agentTool.definition.parameters,
-      execute: (input: Record<string, unknown>) =>
-        agentTool.execute({ thread_id: threadId, ...input }),
-    })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      execute: (input: any) => agentTool.execute({ thread_id: threadId, ...input }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
   }
   return result as ToolSet
 }
