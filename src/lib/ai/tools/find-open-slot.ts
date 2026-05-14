@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { registerTool } from './index'
 import { getAvailableSlots } from '@/lib/booking/availability'
 import { env } from '@/env'
@@ -13,22 +12,27 @@ registerTool({
     description:
       'Find available bay time slots for a given date and session duration. ' +
       'Use when a customer asks about availability or wants to know when they can book.',
-    parameters: z.object({
-      date: z
-        .string()
-        .optional()
-        .describe('Date in YYYY-MM-DD format (ET). Defaults to tomorrow if not specified.'),
-      duration_minutes: z
-        .enum(['60', '90', '120'])
-        .optional()
-        .describe('Session length in minutes. Default 60.'),
-    }),
+    input_schema: {
+      type: 'object',
+      properties: {
+        date: {
+          type: 'string',
+          description: 'Date in YYYY-MM-DD format (ET). Defaults to tomorrow if not specified.',
+        },
+        duration_minutes: {
+          type: 'number',
+          enum: [60, 90, 120],
+          description: 'Session length in minutes. Default 60.',
+        },
+      },
+      required: [],
+    },
   },
 
   async execute(input) {
     const locationId = env.NEXT_PUBLIC_LOCATION_ID
-    const date = input.date ?? format(addDays(new Date(), 1), 'yyyy-MM-dd')
-    const duration = input.duration_minutes ? parseInt(input.duration_minutes, 10) : 60
+    const date = (input['date'] as string | undefined) ?? format(addDays(new Date(), 1), 'yyyy-MM-dd')
+    const duration = (input['duration_minutes'] as number | undefined) ?? 60
 
     const slots = await getAvailableSlots({ locationId, date, durationMinutes: duration })
 
@@ -40,7 +44,6 @@ registerTool({
       })
     }
 
-    // Group by time, list which bays are available at each time
     const byTime: Record<string, string[]> = {}
     for (const slot of slots) {
       const key = slot.startsAtET
@@ -49,7 +52,7 @@ registerTool({
 
     const formatted = formatInTimeZone(new Date(`${date}T12:00:00Z`), FACILITY_TZ, 'EEEE, MMMM d')
     const summary = Object.entries(byTime)
-      .slice(0, 8) // cap at 8 times to keep response concise
+      .slice(0, 8)
       .map(([time, bayLabels]) => `${time}: ${bayLabels.join(', ')}`)
       .join('\n')
 

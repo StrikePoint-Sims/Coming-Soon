@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { registerTool } from './index'
 import { db } from '@/db'
 import { bookings, bays } from '@/db/schema'
@@ -13,20 +12,25 @@ registerTool({
     description:
       'Look up booking details for a customer. Use when a customer asks about their reservation, ' +
       'upcoming session, or references a booking ID.',
-    parameters: z.object({
-      user_id: z
-        .string()
-        .optional()
-        .describe('The authenticated user ID (from session context).'),
-      booking_id: z
-        .string()
-        .optional()
-        .describe('Specific booking ID if the customer provided one.'),
-    }),
+    input_schema: {
+      type: 'object',
+      properties: {
+        user_id: {
+          type: 'string',
+          description: 'The authenticated user ID (from session context).',
+        },
+        booking_id: {
+          type: 'string',
+          description: 'Specific booking ID if the customer provided one.',
+        },
+      },
+      required: [],
+    },
   },
 
   async execute(input) {
-    const { user_id: userId, booking_id: bookingId } = input
+    const userId = input['user_id'] as string | undefined
+    const bookingId = input['booking_id'] as string | undefined
 
     if (!userId && !bookingId) {
       return JSON.stringify({

@@ -1,8 +1,8 @@
 import fs from 'fs'
 import path from 'path'
-import { streamText, stepCountIs } from 'ai'
-import { getModel } from './provider'
-import { getRegisteredTools } from './tools'
+import Anthropic from '@anthropic-ai/sdk'
+import { env } from '@/env'
+import { getToolDefinitions, executeToolCall } from './tools'
 
 // Side-effect imports register tools into the registry.
 // Add new imports here as tools come online each week.
@@ -64,28 +64,71 @@ export interface ChatMessage {
   content: string
 }
 
-// ── Agent ─────────────────────────────────────────────────────────────────────
+// ── Agent (Anthropic SDK directly — bypasses Vercel AI SDK tool serialization) ─
+
+const MAX_ITERATIONS = 5
 
 export async function runAgentTurn(
   messages: ChatMessage[],
   threadId: string,
   onDelta?: (text: string) => void,
 ): Promise<string> {
-  const tools = getRegisteredTools(threadId)
-  const hasTools = Object.keys(tools).length > 0
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY ?? '' })
+  const tools = getToolDefinitions()
 
-  const result = streamText({
-    model: getModel(),
-    system: SYSTEM_PROMPT,
-    messages,
-    tools: hasTools ? tools : undefined,
-    stopWhen: stepCountIs(5),
-  })
+  const anthropicMessages: Anthropic.MessageParam[] = messages.map((m) => ({
+    role: m.role,
+    content: m.content,
+  }))
 
   let fullText = ''
-  for await (const delta of result.textStream) {
-    fullText += delta
-    onDelta?.(delta)
+
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
+    const stream = client.messages.stream({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: SYSTEM_PROMPT,
+      messages: anthropicMessages,
+      ...(tools.length > 0 ? { tools } : {}),
+    })
+
+    // Stream text deltas to the caller
+    for await (const event of stream) {
+      if (
+        event.type === 'content_block_delta' &&
+        event.delta.type === 'text_delta'
+      ) {
+        fullText += event.delta.text
+        onDelta?.(event.delta.text)
+      }
+    }
+
+    const finalMessage = await stream.finalMessage()
+
+    if (finalMessage.stop_reason !== 'tool_use') {
+      break
+    }
+
+    // Execute tool calls and loop back
+    anthropicMessages.push({ role: 'assistant', content: finalMessage.content })
+
+    const toolResults: Anthropic.ToolResultBlockParam[] = []
+    for (const block of finalMessage.content) {
+      if (block.type === 'tool_use') {
+        const result = await executeToolCall(
+          block.name,
+          block.input as Record<string, unknown>,
+          threadId,
+        )
+        toolResults.push({
+          type: 'tool_result',
+          tool_use_id: block.id,
+          content: result,
+        })
+      }
+    }
+
+    anthropicMessages.push({ role: 'user', content: toolResults })
   }
 
   return fullText
