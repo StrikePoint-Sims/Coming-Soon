@@ -26,28 +26,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'messages required' }, { status: 400 })
   }
 
-  // Create or reuse a support thread
+  // Create or reuse a support thread (non-fatal — chat works even if DB is unavailable)
   const threadId = existingThreadId ?? nanoid()
 
   if (!existingThreadId) {
-    await db.insert(supportThreads).values({
+    db.insert(supportThreads).values({
       id: threadId,
       userId: null,
       channel: 'chat',
       status: 'open',
-    }).onConflictDoNothing()
+    }).onConflictDoNothing().catch(console.error)
   }
 
-  // Store the latest user message
+  // Store the latest user message (non-fatal)
   const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')
   if (lastUserMessage) {
-    await db.insert(supportMessages).values({
+    db.insert(supportMessages).values({
       id: nanoid(),
       threadId,
       direction: 'inbound',
       channel: 'chat',
       body: lastUserMessage.content,
-    })
+    }).catch(console.error)
   }
 
   // Stream the response
