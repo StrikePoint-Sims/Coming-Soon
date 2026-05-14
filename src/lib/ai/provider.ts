@@ -10,5 +10,5 @@ export function getModel() {
   }
   if (!env.ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY is required when AI_PROVIDER=anthropic')
   const anthropic = createAnthropic({ apiKey: env.ANTHROPIC_API_KEY })
-  return anthropic('claude-sonnet-4-6')
+  return anthropic('claude-haiku-4-5-20251001')
 }
