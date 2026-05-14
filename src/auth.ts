@@ -37,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
     Email({
       server: { host: 'localhost', port: 25, auth: { user: '', pass: '' } },
-      from: env.BREVO_TRANSACTIONAL_SENDER_EMAIL,
+      from: env.BREVO_TRANSACTIONAL_SENDER_EMAIL ?? '',
       sendVerificationRequest: async ({ identifier: email, url }) => {
         await brevo.sendEmail({
           to: [{ email }],

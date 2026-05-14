@@ -48,7 +48,7 @@ registerTool({
     await Promise.all([
       // Email the owner
       brevo.sendEmail({
-        to: [{ email: env.OWNER_EMAIL, name: 'Owner' }],
+        to: [{ email: env.OWNER_EMAIL ?? '', name: 'Owner' }],
         subject: `${urgency === 'urgent' ? '🚨 URGENT' : '📋'} Support escalation — ${threadId}`,
         htmlContent: `
           <h2>AI support escalation</h2>
@@ -64,7 +64,7 @@ registerTool({
       ...(urgency === 'urgent'
         ? [
             brevo.sendSms({
-              to: env.OWNER_PHONE,
+              to: env.OWNER_PHONE ?? '',
               content: `URGENT StrikePoint support: ${summary} — ${threadLink}`,
               tag: 'escalation-urgent',
             }),

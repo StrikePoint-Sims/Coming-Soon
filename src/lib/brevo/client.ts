@@ -34,8 +34,8 @@ class BrevoClient {
   private readonly smsSender: string
 
   constructor() {
-    this.apiKey = env.BREVO_API_KEY
-    this.senderEmail = env.BREVO_TRANSACTIONAL_SENDER_EMAIL
+    this.apiKey = env.BREVO_API_KEY ?? ''
+    this.senderEmail = env.BREVO_TRANSACTIONAL_SENDER_EMAIL ?? ''
     this.senderName = env.BREVO_TRANSACTIONAL_SENDER_NAME
     this.smsSender = env.BREVO_SMS_SENDER
   }

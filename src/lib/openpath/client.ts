@@ -25,9 +25,9 @@ class OpenpathClient {
   private readonly mockMode: boolean
 
   constructor() {
-    this.baseUrl = env.OPENPATH_API_BASE_URL
-    this.apiKey = env.OPENPATH_API_KEY
-    this.orgId = env.OPENPATH_ORG_ID
+    this.baseUrl = env.OPENPATH_API_BASE_URL ?? ''
+    this.apiKey = env.OPENPATH_API_KEY ?? ''
+    this.orgId = env.OPENPATH_ORG_ID ?? ''
     this.mockMode = env.OPENPATH_MOCK_MODE
   }
 
