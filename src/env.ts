@@ -2,6 +2,10 @@ import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 
 export const env = createEnv({
+  onValidationError: (error) => {
+    const fields = Object.keys(error.flatten().fieldErrors).join(', ')
+    throw new Error(`Invalid environment variables: ${fields}`)
+  },
   server: {
     DATABASE_URL: z.string().url(),
     AUTH_SECRET: z.string().min(32),
