@@ -32,6 +32,8 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: z.string().url().optional(),
     NEXT_PUBLIC_LOCATION_ID: z.string().min(1),
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: z.string().min(1).optional(),
+    NEXT_PUBLIC_META_PIXEL_ID: z.string().min(1).optional(),
   },
   runtimeEnv: {
     DATABASE_URL: process.env['DATABASE_URL'],
@@ -61,5 +63,7 @@ export const env = createEnv({
     NEXT_PUBLIC_POSTHOG_HOST: process.env['NEXT_PUBLIC_POSTHOG_HOST'],
     NEXT_PUBLIC_LOCATION_ID: process.env['NEXT_PUBLIC_LOCATION_ID'],
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env['NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'],
+    NEXT_PUBLIC_GA_MEASUREMENT_ID: process.env['NEXT_PUBLIC_GA_MEASUREMENT_ID'],
+    NEXT_PUBLIC_META_PIXEL_ID: process.env['NEXT_PUBLIC_META_PIXEL_ID'],
   },
 })

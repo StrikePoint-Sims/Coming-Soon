@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import HomeScripts from '@/components/HomeScripts';
+import { PrivacySettingsButton } from '@/components/PrivacySettingsButton';
 import './home.css';
 
 export const metadata: Metadata = {
@@ -321,7 +322,7 @@ export default function HomePage() {
             <span>© 2025 StrikePoint Sims. All rights reserved.</span>
             <a href="/privacy-policy">Privacy Policy</a>
             <a href="/terms">Terms of Service</a>
-            <button className="sp-privacy-btn">Privacy Settings</button>
+            <PrivacySettingsButton />
           </div>
         </div>
       </footer>

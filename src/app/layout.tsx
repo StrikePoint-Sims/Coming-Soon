@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { PostHogProvider } from '@/components/PostHogProvider'
+import { PrivacyConsent } from '@/components/PrivacyConsent'
 import { Suspense } from 'react'
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PostHogProvider>
             {children}
             <ChatWidget />
+            <PrivacyConsent />
           </PostHogProvider>
         </Suspense>
       </body>
