@@ -1,11 +1,16 @@
 import { inngest } from '@/lib/inngest/client'
 import { db } from '@/db'
-import { bookings, bays, users } from '@/db/schema'
+import { bookings, bays, users, accessCodes } from '@/db/schema'
 import { eq } from 'drizzle-orm'
+import { nanoid } from '@/lib/utils'
 import { sendUserEmail, sendUserSms } from '@/lib/comms'
 import { bookingConfirmationEmail, bookingConfirmationSms, bookingReminderSms } from '@/lib/comms/templates'
 
-// Fires immediately after booking/created — sends confirmation email + SMS
+function generateAccessCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+// Fires immediately after booking/created — sends confirmation and creates access code row
 export const bookingConfirmation = inngest.createFunction(
   { id: 'booking-confirmation', retries: 3 },
   { event: 'booking/created' },
@@ -41,6 +46,20 @@ export const bookingConfirmation = inngest.createFunction(
     const bayLabel = bay?.label ?? 'your bay'
     const firstName = user?.name?.split(' ')[0] ?? 'there'
 
+    // Generate access code — valid from T-5min to T+5min after session end
+    // OpenPath activation/expiry (T-5 and T+0) wired in Week 6
+    const validFrom = new Date(booking.startsAt.getTime() - 5 * 60_000)
+    const validTo = new Date(booking.endsAt.getTime() + 5 * 60_000)
+
+    await db.insert(accessCodes).values({
+      id: nanoid(),
+      bookingId,
+      code: generateAccessCode(),
+      validFrom,
+      validTo,
+      status: 'pending',
+    })
+
     const emailTemplate = bookingConfirmationEmail({ firstName, bookingId, bayLabel, startsAt, endsAt })
 
     await Promise.all([
@@ -57,7 +76,7 @@ export const bookingConfirmation = inngest.createFunction(
   },
 )
 
-// Fires at booking start time - 1 hour — sends access code reminder SMS
+// Fires at T-1h — sends SMS with the actual access code
 export const bookingReminder = inngest.createFunction(
   { id: 'booking-reminder', retries: 2 },
   { event: 'booking/created' },
@@ -73,7 +92,6 @@ export const bookingReminder = inngest.createFunction(
     if (!booking) return { skipped: true }
 
     const reminderAt = new Date(booking.startsAt.getTime() - 60 * 60_000)
-
     await step.sleepUntil('wait-for-reminder-time', reminderAt)
 
     // Re-check booking hasn't been cancelled
@@ -91,16 +109,32 @@ export const bookingReminder = inngest.createFunction(
       .where(eq(bays.id, booking.bayId))
       .limit(1)
 
+    // Look up the access code for this booking
+    const [accessCode] = await db
+      .select({ id: accessCodes.id, code: accessCodes.code })
+      .from(accessCodes)
+      .where(eq(accessCodes.bookingId, bookingId))
+      .limit(1)
+
+    if (!accessCode) return { skipped: true, reason: 'no access code found' }
+
     await sendUserSms({
       userId,
       content: bookingReminderSms({
         bayLabel: bay?.label ?? 'your bay',
         startsAt: booking.startsAt.toISOString(),
+        code: accessCode.code,
       }),
       tag: 'booking-reminder',
       transactional: true,
     })
 
-    return { sent: true }
+    // Mark code as sent
+    await db
+      .update(accessCodes)
+      .set({ sentAt: new Date() })
+      .where(eq(accessCodes.id, accessCode.id))
+
+    return { sent: true, code: accessCode.code }
   },
 )

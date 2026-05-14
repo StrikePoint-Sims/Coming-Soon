@@ -61,7 +61,8 @@ export function bookingConfirmationSms(params: {
 export function bookingReminderSms(params: {
   bayLabel: string
   startsAt: string
+  code: string
 }) {
-  const { bayLabel, startsAt } = params
-  return `StrikePoint Sims: Your session at ${bayLabel} starts at ${fmtTime(startsAt)} — about 1 hour from now. Your access code is on its way. Reply STOP to opt out.`
+  const { bayLabel, startsAt, code } = params
+  return `StrikePoint Sims: Your session at ${bayLabel} starts at ${fmtTime(startsAt)}. Access code: ${code}. Show this at the door. Reply STOP to opt out.`
 }
