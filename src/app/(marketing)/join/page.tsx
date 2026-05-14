@@ -62,7 +62,7 @@ export default function JoinPage() {
           Your card is saved today. You won&apos;t be charged until we open — and you can cancel at any time before that.
         </p>
 
-        <FounderForm stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY} />
+        <FounderForm stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''} />
       </div>
     </main>
   )
