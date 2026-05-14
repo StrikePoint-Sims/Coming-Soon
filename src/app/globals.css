@@ -2,7 +2,8 @@
 @tailwind utilities;
 
 :root {
-  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
 }
 
 /* Preserve existing brand styles from the static site */
