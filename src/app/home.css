@@ -157,7 +157,7 @@ body {
 .hero-bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .hero-bg-img {
   position: absolute; inset: -8%; width: 116%; height: 116%;
-  background: url('golf.png') center center / cover no-repeat;
+  background: url('/golf.png') center center / cover no-repeat;
   will-change: transform; animation: kenBurns 25s ease-in-out infinite alternate;
 }
 @keyframes kenBurns {
@@ -883,7 +883,7 @@ body {
   flex-direction: column;
 }
 .hero-bg-img {
-  background: url('background.jpg') center center / cover no-repeat;
+  background: url('/background.jpg') center center / cover no-repeat;
 }
 .hero-bg::after {
   content: '';
