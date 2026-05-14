@@ -57,6 +57,15 @@ export default async function AccountPage() {
           </div>
         )}
 
+        {!waiverExpired && (
+          <a
+            href="/book"
+            style={{ display: 'block', textAlign: 'center', padding: '16px', background: '#1B4332', color: '#D4AF37', border: '1px solid #D4AF37', borderRadius: 12, fontWeight: 700, fontSize: '1rem', textDecoration: 'none' }}
+          >
+            Book a bay →
+          </a>
+        )}
+
         {!waiverExpired && latestWaiver && (
           <div className="rounded-xl border border-[rgba(255,255,255,0.06)] bg-[#111] p-4 flex items-center justify-between">
             <div>

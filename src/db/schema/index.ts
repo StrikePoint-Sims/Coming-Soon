@@ -451,6 +451,18 @@ export const maintenanceTasks = pgTable('maintenance_tasks', {
   updatedAt: updatedAt(),
 })
 
+// Short-lived hold created when a user selects a slot; swept by Inngest cron on expiry
+export const bookingHolds = pgTable('booking_holds', {
+  id: id(),
+  locationId: locationId(),
+  bayId: text('bay_id').notNull().references(() => bays.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: createdAt(),
+})
+
 export const inventoryItems = pgTable('inventory_items', {
   id: id(),
   locationId: locationId(),
