@@ -1,0 +1,52 @@
+{
+  "name": "strikepointsims",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "inngest:dev": "npx inngest-cli@latest dev"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.77",
+    "@ai-sdk/google": "^3.0.73",
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@auth/drizzle-adapter": "^1.7.0",
+    "@neondatabase/serverless": "^0.10.0",
+    "@sentry/nextjs": "^8.45.0",
+    "@t3-oss/env-nextjs": "^0.11.0",
+    "@vercel/blob": "^0.27.0",
+    "ai": "^6.0.182",
+    "bcryptjs": "^2.4.3",
+    "drizzle-orm": "^0.38.0",
+    "inngest": "^3.27.0",
+    "nanoid": "^5.0.9",
+    "next": "^15.1.0",
+    "next-auth": "^5.0.0-beta.25",
+    "nodemailer": "^7.0.13",
+    "posthog-js": "^1.187.0",
+    "posthog-node": "^4.3.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "stripe": "^17.4.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.29.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.1.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.0"
+  }
+}

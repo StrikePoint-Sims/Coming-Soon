@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: system-ui, -apple-system, sans-serif;
+}
+
+/* Preserve existing brand styles from the static site */
+body {
+  font-family: var(--font-sans);
+  background-color: #0a0a0a;
+  color: #fafafa;
+}
