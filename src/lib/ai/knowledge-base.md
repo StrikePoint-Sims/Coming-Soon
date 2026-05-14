@@ -1,116 +1,95 @@
 # StrikePoint Sims — Knowledge Base
 
-## Facility
+## The Facility
 
-**Location:** Colchester, CT (exact address shared upon membership confirmation)
-**Opening:** Fall 2026
-**Bays:** Indoor golf simulator bays using Trackman launch monitor technology
+Indoor golf simulator facility opening **Fall 2026** in **Colchester, CT**. The exact address is shared upon membership confirmation. We run Trackman launch monitor technology — the same system tour pros use — with 300+ virtual courses. The facility is staffed remotely; access is keyless via a code sent before each session.
 
-## Hours of Operation
+## Hours
 
-| Day | Hours |
-|---|---|
-| Monday–Thursday | 9:00 AM – 10:00 PM |
-| Friday | 9:00 AM – 11:00 PM |
-| Saturday | 8:00 AM – 11:00 PM |
-| Sunday | 8:00 AM – 9:00 PM |
+Monday–Thursday: 9am–10pm  
+Friday: 9am–11pm  
+Saturday: 8am–11pm  
+Sunday: 8am–9pm  
 
-Hours may vary on holidays — check strikepointsims.com or ask.
+Hours may shift on holidays. Off-peak = weekdays before 5pm, and every night 10pm–6am.
 
-## Walk-In Pricing
+## Walk-In Rates
 
-| Session Length | Price |
-|---|---|
-| 30 minutes | $40 |
-| 60 minutes | $70 |
-| 90 minutes | $100 |
-| 2 hours | $130 |
-
-Walk-in sessions are pay-per-use. No membership required.
+$45–60 per session depending on time (off-peak vs peak). No membership required for walk-ins. Walk-ins book same-day based on availability.
 
 ## Membership Tiers
 
-### Bronze — $149/month
-- 60-minute sessions
-- 7-day advance booking window
+Three tiers. All include guest privileges and Trackman shot data.
 
-### Silver — $219/month
-- 90-minute sessions
-- 14-day advance booking window
+**Practice — $149/mo**  
+Unlimited off-peak access (no peak hours). 7-day advance booking window. Best for golfers with flexible schedules who want consistent practice time.
 
-### Gold — $279/month
-- 2-hour sessions
-- 30-day advance booking window
+**Standard — $279/mo**  
+8 peak hours/month + unlimited off-peak. 10-day advance booking window. The most popular tier — enough peak access for a regular weekly round.
 
-### Annual Prepay — $2,790/year
-- Equivalent to 10 months at Gold rate, 12 months of access
-- Best value for committed golfers
+**Elite — $419/mo**  
+16 peak hours/month + unlimited off-peak. 14-day advance booking window. For golfers who want priority access when demand is highest.
 
-All memberships lock in their rate for life as long as the member stays active.
+## Founding Member Program (Founding 20)
 
-## Founding Member Program
+**The short version:** 20 spots. Lock in a permanent discount off standard pricing for life.
 
-- 20 founding spots available
-- Founding members lock in their chosen tier rate permanently
-- Card saved at signup — not charged until opening day (Fall 2026)
-- Cancel any time before opening at no charge
+**The details:**
+- Only 20 founding spots exist. Once they're filled, founding pricing closes permanently.
+- Only 5 of the 20 spots are Elite.
+- Founding members lock in a reduced monthly rate for as long as their membership stays active.
+- Founding prices: Practice $119/mo (vs $149 regular), Standard $229/mo (vs $279 regular), Elite $349/mo (vs $419 regular).
+- Card is saved at signup — not charged until we open in Fall 2026.
+- Cancel any time before we open, no charge.
+- 14-day satisfaction guarantee after we launch (first billing period).
+- Founding members get permanent recognition on the wall at the facility and first access to opening week slots.
 - Sign up at strikepointsims.com/join
 
 ## Booking & Cancellation
 
-- Members book in advance per their tier window (7–30 days)
-- Walk-ins book same-day based on availability
-- **Cancellation policy:**
-  - 24+ hours before session: full refund
-  - 2–24 hours before: 50% refund
-  - Less than 2 hours: no refund
+Members book in advance per their tier window (7, 10, or 14 days). Cancellation policy:
+- 24+ hours before session: full refund
+- 2–24 hours before: 50% refund
+- Less than 2 hours: no refund
 
 ## Access & Entry
 
-- Members receive a unique access code before each session (sent via SMS ~1 hour before)
-- All guests must sign a digital waiver before entering a bay
-- Waivers are valid for 12 months from signing
+Members receive a unique access code via SMS approximately 1 hour before each session. The facility is unmanned — access is entirely via that code. All participants (including guests) must have a signed digital waiver on file before entering a bay.
 
 ## Waivers
 
-- Required for all participants, including guests
-- Signed digitally at strikepointsims.com/waiver (or via a link sent by the booker)
-- Valid for 12 months — no need to re-sign for every visit within that period
-- Members sign at strikepointsims.com/waiver after creating an account
+Required for all participants including guests. Signed digitally at strikepointsims.com/waiver. Valid for 12 months — no need to re-sign every visit within that window. Guests can sign via a tokenized link sent by the primary booker.
 
 ## Equipment
 
-- All simulator bays equipped with Trackman launch monitors
-- Clubs available for use (set variety TBD at opening)
-- Bring your own clubs if preferred — bag storage available
+All bays: Trackman launch monitors, full simulator setup. Clubs available to borrow; bring your own if preferred. Bag storage available.
 
 ## Guests & Groups
 
-- Members may bring guests per their tier's guest allowance
-- Groups of up to 5 people per bay
-- All guests must sign a waiver before their session
-- Group/event bookings available — contact us for corporate events
-
-## Contact & Support
-
-- Email: operations@strikepointsims.com
-- Website: strikepointsims.com
-- This AI agent (Striker) is available 24/7 for questions
-- For urgent issues (locked out, access problems), Striker escalates to the owner immediately
+All tiers include guest privileges. Up to 5 people per bay. All guests must have a signed waiver. Group/event bookings available — escalate to owner for corporate inquiries.
 
 ## Common Questions
 
-**Can I try before buying a membership?**
-Walk-in sessions are available — no commitment required.
+**Can I try before committing to a membership?**  
+Yes. Walk-in sessions are available — $45–60, no commitment.
 
-**What if I move or can't use my membership?**
-Members can freeze or cancel at any time. Frozen memberships pause billing.
+**What if I want to pause or cancel after opening?**  
+Members can freeze or cancel. Frozen memberships pause billing; access resumes when reactivated.
 
-**Do you have leagues?**
+**Do you have leagues?**  
 Leagues are planned for 2027. Founding members get first access.
 
-**Is parking available?**
-Yes, free parking on site.
+**Is parking available?**  
+Yes, free on site.
 
-**What's the youngest age allowed?**
-Minors are welcome with a parent or guardian present and a completed parental waiver.
+**Can minors use the facility?**  
+Yes, with a parent or guardian present and a completed parental waiver.
+
+**Why do you save a card at Founding signup instead of charging later?**  
+It's a real reservation, not a waitlist. Saving the card ensures the 20 spots go to people who are actually committed. You're not charged until we open, and you can cancel anytime before that.
+
+## Contact
+
+Email: operations@strikepointsims.com  
+Website: strikepointsims.com  
+AI support (Striker) available 24/7. Urgent issues (locked out, access problems) escalate to the owner immediately.
