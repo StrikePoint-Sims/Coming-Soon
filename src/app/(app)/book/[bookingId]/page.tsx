@@ -5,6 +5,7 @@ import { bookings, bays } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
+import '../book.css'
 
 export const metadata: Metadata = {
   title: 'Booking confirmed — StrikePoint Sims',
@@ -12,6 +13,14 @@ export const metadata: Metadata = {
 }
 
 const FACILITY_TZ = 'America/New_York'
+
+function durationLabel(startsAt: Date, endsAt: Date): string {
+  const min = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
+  if (min < 60) return `${min} min`
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  return m === 0 ? `${h} hr` : `${h} hr ${m} min`
+}
 
 export default async function BookingConfirmedPage({
   params,
@@ -40,49 +49,59 @@ export default async function BookingConfirmedPage({
   const fmtDate = (d: Date) => formatInTimeZone(d, FACILITY_TZ, 'EEEE, MMMM d, yyyy')
   const fmtTime = (d: Date) => formatInTimeZone(d, FACILITY_TZ, 'h:mm a')
 
+  const rows = [
+    ['Booking', `#${bookingId.slice(0, 8).toUpperCase()}`],
+    ['Bay', booking.bayLabel],
+    ['Date', fmtDate(booking.startsAt)],
+    ['Time', `${fmtTime(booking.startsAt)} – ${fmtTime(booking.endsAt)}`],
+    ['Length', durationLabel(booking.startsAt, booking.endsAt)],
+  ] as const
+
   return (
-    <main style={{ minHeight: '100vh', background: '#0a0a0a', padding: '48px 16px', display: 'flex', alignItems: 'flex-start', justifyContent: 'center' }}>
-      <div style={{ maxWidth: 520, width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: 40 }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(27,67,50,0.6)', border: '1px solid rgba(212,175,55,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '1.5rem' }}>
-            ✓
-          </div>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: '1.875rem', fontWeight: 600, color: '#fff', margin: '0 0 8px' }}>
-            You&apos;re booked.
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '0.95rem' }}>
-            A confirmation has been sent to your email.
-          </p>
+    <div className="book-wrap">
+      <div className="book-topbar">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <a href="/"><img src="/logohorizontal.png" alt="StrikePoint Sims" className="book-topbar-logo" /></a>
+        <a href="/account" className="book-topbar-back">Account →</a>
+      </div>
+
+      <div className="book-main" style={{ maxWidth: 520, textAlign: 'center' }}>
+
+        <div className="book-confirmed-icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="4 12 10 18 20 6" />
+          </svg>
         </div>
 
-        <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: 24, marginBottom: 16 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            {[
-              ['Booking ID', bookingId.slice(0, 8).toUpperCase()],
-              ['Bay', booking.bayLabel],
-              ['Date', fmtDate(booking.startsAt)],
-              ['Time', `${fmtTime(booking.startsAt)} – ${fmtTime(booking.endsAt)}`],
-              ['Status', booking.status.charAt(0).toUpperCase() + booking.status.slice(1)],
-            ].map(([label, value]) => (
-              <tr key={label}>
-                <td style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.45)', fontSize: '0.85rem' }}>{label}</td>
-                <td style={{ padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', textAlign: 'right', color: '#fff', fontSize: '0.9rem' }}>{value}</td>
-              </tr>
-            ))}
+        <h1 className="book-heading">You&apos;re booked.</h1>
+        <p className="book-subhead" style={{ marginBottom: 36 }}>
+          Confirmation sent to your email and phone.
+        </p>
+
+        <div className="book-card" style={{ textAlign: 'left' }}>
+          <table className="book-summary-table">
+            <tbody>
+              {rows.map(([label, value]) => (
+                <tr key={label}>
+                  <td className="book-summary-label">{label}</td>
+                  <td className="book-summary-value">{value}</td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
 
-        <p style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.6, textAlign: 'center', marginBottom: 24 }}>
-          Your access code will be sent by SMS 1 hour before your session.
+        <p className="book-fine" style={{ textAlign: 'center', marginBottom: 28 }}>
+          Your access code arrives by SMS 1 hour before your session.
+          Cancel at least 24 hours in advance for a full refund.
         </p>
 
-        <a
-          href="/account"
-          style={{ display: 'block', textAlign: 'center', padding: '14px', background: '#1B4332', color: '#D4AF37', border: '1px solid #D4AF37', borderRadius: 10, fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none' }}
-        >
-          Back to account
-        </a>
+        <div className="book-confirmed-actions">
+          <a href="/account" className="book-confirmed-primary">Back to account</a>
+          <a href="/book" className="book-confirmed-secondary">Book another session →</a>
+        </div>
+
       </div>
-    </main>
+    </div>
   )
 }
