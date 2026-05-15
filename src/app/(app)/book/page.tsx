@@ -10,10 +10,10 @@ const LOCATION_ID = process.env['NEXT_PUBLIC_LOCATION_ID'] ?? 'loc_main'
 const FACILITY_TZ = 'America/New_York'
 
 const DURATIONS = [
-  { minutes: 60,  label: '1 hr' },
-  { minutes: 90,  label: '1.5 hr' },
-  { minutes: 120, label: '2 hr' },
-  { minutes: 180, label: '3 hr' },
+  { minutes: 60,  main: '1 hr',   sub: '60 min' },
+  { minutes: 90,  main: '1.5 hr', sub: '90 min' },
+  { minutes: 120, main: '2 hr',   sub: '120 min' },
+  { minutes: 180, main: '3 hr',   sub: '180 min' },
 ]
 
 interface Slot {
@@ -98,11 +98,12 @@ export default function BookPage() {
     return acc
   }, {})
 
-  const durationLabel = DURATIONS.find(d => d.minutes === duration)?.label ?? `${duration} min`
+  const activeDuration = DURATIONS.find(d => d.minutes === duration)
 
   if (step === 'submitting') {
     return (
       <div className="book-loading">
+        <div className="book-spinner" />
         <p className="book-spinner-text">Confirming your booking…</p>
       </div>
     )
@@ -118,16 +119,26 @@ export default function BookPage() {
 
       <div className="book-main">
 
+        {/* Step indicator */}
+        <div className="book-step-row">
+          <div className={`book-step-pip ${step === 'pick' ? 'is-active' : 'is-done'}`} />
+          <div className={`book-step-pip ${step === 'confirm' ? 'is-active' : step === 'pick' ? '' : 'is-done'}`} />
+          <span className="book-step-label">
+            {step === 'pick' ? 'Step 1 of 2' : 'Step 2 of 2'}
+          </span>
+        </div>
+
         {/* ── Pick step ─────────────────────────────────────────────────────── */}
         {step === 'pick' && (
           <>
-            <h1 className="book-heading">Book a bay</h1>
-            <p className="book-subhead">Pick a date and session length, then choose your time.</p>
+            <span className="book-eyebrow">Book a session</span>
+            <h1 className="book-heading">When would you like to play?</h1>
+            <p className="book-subhead">Choose a date and session length, then pick your time slot.</p>
 
             {error && <p className="book-error">{error}</p>}
 
             <div className="book-card">
-              <label className="book-label" htmlFor="book-date">Date</label>
+              <label className="book-field-label" htmlFor="book-date">Date</label>
               <input
                 id="book-date"
                 type="date"
@@ -142,8 +153,8 @@ export default function BookPage() {
               />
 
               <div className="book-duration-group">
-                <span className="book-label">Session length</span>
-                <div className="book-duration-row">
+                <span className="book-field-label">Session length</span>
+                <div className="book-duration-grid">
                   {DURATIONS.map(d => (
                     <button
                       key={d.minutes}
@@ -155,7 +166,8 @@ export default function BookPage() {
                         setHasSearched(false)
                       }}
                     >
-                      {d.label}
+                      <span className="book-duration-main">{d.main}</span>
+                      <span className="book-duration-sub">{d.sub}</span>
                     </button>
                   ))}
                 </div>
@@ -174,14 +186,14 @@ export default function BookPage() {
             {hasSearched && (
               slots.length === 0 ? (
                 <p className="book-no-slots">
-                  No available times for this date and length. Try a different day or shorter session.
+                  No times available for this date and length.<br />Try a different day or shorter session.
                 </p>
               ) : (
                 <>
                   <div className="book-slots-header">
                     <span className="book-slots-date">
                       {formatInTimeZone(new Date(date + 'T12:00:00Z'), FACILITY_TZ, 'EEEE, MMMM d')}
-                      {' · '}{durationLabel}
+                      {' · '}{activeDuration?.main}
                     </span>
                     <span className="book-slots-count">
                       {Object.keys(slotsByTime).length} times available
@@ -213,8 +225,9 @@ export default function BookPage() {
         {/* ── Confirm step ──────────────────────────────────────────────────── */}
         {step === 'confirm' && selectedSlot && (
           <>
-            <h1 className="book-heading">Confirm your session</h1>
-            <p className="book-subhead">Review the details and reserve your bay.</p>
+            <span className="book-eyebrow">Almost there</span>
+            <h1 className="book-heading">Review your session</h1>
+            <p className="book-subhead">Your spot is held for 10 minutes. Confirm to reserve it.</p>
 
             {error && <p className="book-error">{error}</p>}
 
@@ -226,7 +239,7 @@ export default function BookPage() {
                     ['Bay', selectedSlot.bayLabel],
                     ['Date', formatInTimeZone(new Date(selectedSlot.startsAt), FACILITY_TZ, 'EEEE, MMMM d')],
                     ['Time', `${formatInTimeZone(new Date(selectedSlot.startsAt), FACILITY_TZ, 'h:mm a')} – ${formatInTimeZone(new Date(selectedSlot.endsAt), FACILITY_TZ, 'h:mm a')}`],
-                    ['Length', durationLabel],
+                    ['Length', activeDuration?.main ?? `${duration} min`],
                   ] as const).map(([label, value]) => (
                     <tr key={label}>
                       <td className="book-summary-label">{label}</td>
@@ -237,8 +250,8 @@ export default function BookPage() {
               </table>
 
               <p className="book-fine">
-                Your access code arrives by SMS 1 hour before your session. Cancellations at least
-                24 hours in advance receive a full refund. Your spot is held for 10 minutes.
+                Your access code will be sent by SMS 1 hour before your session.
+                Cancellations at least 24 hours in advance receive a full refund.
               </p>
 
               <div className="book-confirm-actions">

@@ -65,42 +65,45 @@ export default async function BookingConfirmedPage({
         <a href="/account" className="book-topbar-back">Account →</a>
       </div>
 
-      <div className="book-main" style={{ maxWidth: 520, textAlign: 'center' }}>
+      <div className="book-main" style={{ maxWidth: 520 }}>
+        <div className="book-confirmed-wrap">
 
-        <div className="book-confirmed-icon">
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="4 12 10 18 20 6" />
-          </svg>
+          <div className="book-confirmed-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="4 12 10 18 20 6" />
+            </svg>
+          </div>
+
+          <span className="book-eyebrow">Booking confirmed</span>
+          <h1 className="book-confirmed-heading">You&apos;re booked.</h1>
+          <p className="book-confirmed-subhead">
+            Confirmation sent to your email and phone.
+          </p>
+
+          <div className="book-confirmed-card">
+            <table className="book-summary-table">
+              <tbody>
+                {rows.map(([label, value]) => (
+                  <tr key={label}>
+                    <td className="book-summary-label">{label}</td>
+                    <td className="book-summary-value">{value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p className="book-confirmed-fine">
+            Your access code arrives by SMS 1 hour before your session.
+            Cancel at least 24 hours in advance for a full refund.
+          </p>
+
+          <div className="book-confirmed-actions">
+            <a href="/account" className="book-confirmed-primary">Back to account</a>
+            <a href="/book" className="book-confirmed-secondary">Book another session →</a>
+          </div>
+
         </div>
-
-        <h1 className="book-heading">You&apos;re booked.</h1>
-        <p className="book-subhead" style={{ marginBottom: 36 }}>
-          Confirmation sent to your email and phone.
-        </p>
-
-        <div className="book-card" style={{ textAlign: 'left' }}>
-          <table className="book-summary-table">
-            <tbody>
-              {rows.map(([label, value]) => (
-                <tr key={label}>
-                  <td className="book-summary-label">{label}</td>
-                  <td className="book-summary-value">{value}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <p className="book-fine" style={{ textAlign: 'center', marginBottom: 28 }}>
-          Your access code arrives by SMS 1 hour before your session.
-          Cancel at least 24 hours in advance for a full refund.
-        </p>
-
-        <div className="book-confirmed-actions">
-          <a href="/account" className="book-confirmed-primary">Back to account</a>
-          <a href="/book" className="book-confirmed-secondary">Book another session →</a>
-        </div>
-
       </div>
     </div>
   )
