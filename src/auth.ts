@@ -2,6 +2,8 @@ import NextAuth from 'next-auth'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
 import Email from 'next-auth/providers/email'
 import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+import Apple from 'next-auth/providers/apple'
 import { db } from '@/db'
 import { users } from '@/db/schema'
 import { authAccounts, authSessions, authVerificationTokens } from '@/db/schema/auth'
@@ -22,6 +24,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   }),
 
   providers: [
+    // OAuth providers — only active when env vars are present
+    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? [Google({ clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET })]
+      : []),
+    ...(env.APPLE_ID && env.APPLE_SECRET
+      ? [Apple({ clientId: env.APPLE_ID, clientSecret: env.APPLE_SECRET })]
+      : []),
+
     // OTP phone sign-in: client passes a short-lived HMAC token obtained from /api/auth/otp/verify
     Credentials({
       credentials: { loginToken: { type: 'text' } },

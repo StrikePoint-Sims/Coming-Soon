@@ -17,9 +17,9 @@ export async function createHold(params: {
   bayId: string
   startsAt: string
   endsAt: string
-}): Promise<{ holdId: string } | { error: string }> {
+}): Promise<{ holdId: string } | { error: string } | { needsAuth: true }> {
   const session = await auth()
-  if (!session?.user?.id) return { error: 'Not signed in.' }
+  if (!session?.user?.id) return { needsAuth: true }
 
   // Must have a valid waiver
   const [waiver] = await db

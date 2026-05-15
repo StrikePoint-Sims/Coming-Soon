@@ -1,13 +1,16 @@
 'use client'
 
 import './book.css'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { createHold, confirmBooking, releaseHold } from './actions'
 import { formatInTimeZone } from 'date-fns-tz'
 import { addDays, format } from 'date-fns'
 
 const LOCATION_ID = process.env['NEXT_PUBLIC_LOCATION_ID'] ?? 'loc_main'
 const FACILITY_TZ = 'America/New_York'
+const PENDING_SLOT_KEY = 'book:pendingSlot'
 
 const DURATIONS = [
   { minutes: 60,  main: '1 hr',   sub: '60 min' },
@@ -27,6 +30,8 @@ interface Slot {
 type Step = 'pick' | 'confirm' | 'submitting'
 
 export default function BookPage() {
+  const { data: session } = useSession()
+  const router = useRouter()
   const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd')
 
   const [date, setDate] = useState(tomorrow)
@@ -38,6 +43,56 @@ export default function BookPage() {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [holdId, setHoldId] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
+  const resumedRef = useRef(false)
+
+  const handleSlotClick = useCallback(async (slot: Slot) => {
+    setError('')
+    const result = await createHold({
+      locationId: LOCATION_ID,
+      bayId: slot.bayId,
+      startsAt: slot.startsAt,
+      endsAt: slot.endsAt,
+    })
+
+    if ('needsAuth' in result) {
+      sessionStorage.setItem(PENDING_SLOT_KEY, JSON.stringify(slot))
+      // Dynamic url — full navigation is fine post-login
+      window.location.href = '/login?callbackUrl=' + encodeURIComponent('/book')
+      return
+    }
+
+    if ('error' in result) {
+      // Waiver missing: keep pending slot so it survives the waiver redirect
+      if (result.error.includes('waiver')) {
+        sessionStorage.setItem(PENDING_SLOT_KEY, JSON.stringify(slot))
+        setError(result.error)
+      } else {
+        sessionStorage.removeItem(PENDING_SLOT_KEY)
+        setError(result.error)
+      }
+      return
+    }
+
+    sessionStorage.removeItem(PENDING_SLOT_KEY)
+    setHoldId(result.holdId)
+    setSelectedSlot(slot)
+    setStep('confirm')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [router])
+
+  // Resume a pending slot after login or waiver completion
+  useEffect(() => {
+    if (!session?.user?.id || resumedRef.current) return
+    const raw = sessionStorage.getItem(PENDING_SLOT_KEY)
+    if (!raw) return
+    resumedRef.current = true
+    try {
+      const slot = JSON.parse(raw) as Slot
+      void handleSlotClick(slot)
+    } catch {
+      sessionStorage.removeItem(PENDING_SLOT_KEY)
+    }
+  }, [session?.user?.id, handleSlotClick])
 
   const fetchSlots = useCallback(async () => {
     setLoading(true)
@@ -59,21 +114,6 @@ export default function BookPage() {
     }
   }, [date, duration])
 
-  async function handleSlotClick(slot: Slot) {
-    setError('')
-    const result = await createHold({
-      locationId: LOCATION_ID,
-      bayId: slot.bayId,
-      startsAt: slot.startsAt,
-      endsAt: slot.endsAt,
-    })
-    if ('error' in result) { setError(result.error); return }
-    setHoldId(result.holdId)
-    setSelectedSlot(slot)
-    setStep('confirm')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
   async function handleConfirm() {
     setStep('submitting')
     setError('')
@@ -92,7 +132,6 @@ export default function BookPage() {
     setStep('pick')
   }
 
-  // Group slots by start time
   const slotsByTime = slots.reduce<Record<string, Slot[]>>((acc, slot) => {
     acc[slot.startsAt] = [...(acc[slot.startsAt] ?? []), slot]
     return acc
@@ -114,7 +153,10 @@ export default function BookPage() {
       <div className="book-topbar">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <a href="/"><img src="/logohorizontal.png" alt="StrikePoint Sims" className="book-topbar-logo" /></a>
-        <a href="/account" className="book-topbar-back">← Account</a>
+        {session?.user
+          ? <a href="/account" className="book-topbar-back">← Account</a>
+          : <a href="/login" className="book-topbar-back">Sign in</a>
+        }
       </div>
 
       <div className="book-main">
@@ -135,7 +177,14 @@ export default function BookPage() {
             <h1 className="book-heading">When would you like to play?</h1>
             <p className="book-subhead">Choose a date and session length, then pick your time slot.</p>
 
-            {error && <p className="book-error">{error}</p>}
+            {error && (
+              <p className="book-error">
+                {error}
+                {error.includes('waiver') && (
+                  <>{' '}<a href="/waiver?callbackUrl=/book" style={{ color: '#D4AF37', textDecoration: 'underline' }}>Sign waiver →</a></>
+                )}
+              </p>
+            )}
 
             <div className="book-card">
               <label className="book-field-label" htmlFor="book-date">Date</label>

@@ -18,7 +18,9 @@ export const authConfig: NextAuthConfig = {
       if (token['userId']) session.user.id = token['userId'] as string
       return session
     },
-    async signIn({ user }) {
+    async signIn({ user, account }) {
+      // Phone OTP goes through Credentials provider — user may not have email yet
+      if (account?.provider === 'credentials') return true
       if (!user.email) return false
       return true
     },
