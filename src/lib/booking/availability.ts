@@ -4,8 +4,8 @@ import { eq, and, lt, gt, inArray, ne } from 'drizzle-orm'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
 
 const FACILITY_TZ = 'America/New_York'
-const OPEN_HOUR = 8    // 8am ET
-const CLOSE_HOUR = 22  // 10pm ET
+const OPEN_HOUR = 0    // midnight
+const CLOSE_HOUR = 24  // midnight next day
 const SLOT_INTERVAL = 30  // generate a potential start every 30 min
 
 export interface AvailableSlot {
@@ -43,8 +43,8 @@ export async function getAvailableSlots(params: {
       const endUTC = new Date(startUTC.getTime() + durationMinutes * 60_000)
       const endET = toZonedTime(endUTC, FACILITY_TZ)
 
-      // Drop slots that would run past closing
-      if (endET.getHours() > CLOSE_HOUR || (endET.getHours() === CLOSE_HOUR && endET.getMinutes() > 0)) break
+      // Drop slots that would run past closing (CLOSE_HOUR 24 = midnight, never drops)
+      if (CLOSE_HOUR < 24 && (endET.getHours() > CLOSE_HOUR || (endET.getHours() === CLOSE_HOUR && endET.getMinutes() > 0))) break
 
       const label = startET.toLocaleTimeString('en-US', {
         hour: 'numeric', minute: '2-digit', hour12: true,

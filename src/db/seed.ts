@@ -26,16 +26,27 @@ async function seed() {
       address: 'Colchester, CT',
       timezone: 'America/New_York',
       hoursConfigJson: {
-        mon: { open: '08:00', close: '22:00' },
-        tue: { open: '08:00', close: '22:00' },
-        wed: { open: '08:00', close: '22:00' },
-        thu: { open: '08:00', close: '22:00' },
-        fri: { open: '08:00', close: '22:00' },
-        sat: { open: '08:00', close: '22:00' },
-        sun: { open: '08:00', close: '22:00' },
+        mon: { open: '00:00', close: '24:00' },
+        tue: { open: '00:00', close: '24:00' },
+        wed: { open: '00:00', close: '24:00' },
+        thu: { open: '00:00', close: '24:00' },
+        fri: { open: '00:00', close: '24:00' },
+        sat: { open: '00:00', close: '24:00' },
+        sun: { open: '00:00', close: '24:00' },
       },
     })
-    .onConflictDoNothing()
+    .onConflictDoUpdate({
+      target: locations.id,
+      set: { hoursConfigJson: {
+        mon: { open: '00:00', close: '24:00' },
+        tue: { open: '00:00', close: '24:00' },
+        wed: { open: '00:00', close: '24:00' },
+        thu: { open: '00:00', close: '24:00' },
+        fri: { open: '00:00', close: '24:00' },
+        sat: { open: '00:00', close: '24:00' },
+        sun: { open: '00:00', close: '24:00' },
+      }},
+    })
 
   console.log('✓ Location seeded')
 
