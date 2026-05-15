@@ -3,8 +3,6 @@
 import { use, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { checkUserExists } from '@/app/(auth)/login/actions'
 
 type Mode = 'choose' | 'email' | 'phone' | 'terms' | 'otp'
@@ -25,7 +23,6 @@ export function LoginForm({ searchParams }: LoginFormProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [termsAccepted, setTermsAccepted] = useState(false)
-  // Pending intent while waiting for terms agreement
   const [pendingIntent, setPendingIntent] = useState<'email' | 'phone' | null>(null)
 
   function formatPhone(raw: string): string {
@@ -41,7 +38,6 @@ export function LoginForm({ searchParams }: LoginFormProps) {
     try {
       const isExisting = await checkUserExists(email, 'email')
       if (!isExisting) {
-        // New account — require terms agreement first
         setPendingIntent('email')
         setMode('terms')
         return
@@ -140,7 +136,6 @@ export function LoginForm({ searchParams }: LoginFormProps) {
         setError('Sign-in failed. Please try again.')
         return
       }
-      // Dynamic callbackUrl — full navigation clears Next.js router cache cleanly
       window.location.href = redirectTo
     } catch {
       setError('Network error. Please try again.')
@@ -153,7 +148,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
   if (mode === 'choose') {
     return (
-      <div className="flex flex-col gap-3">
+      <div className="auth-form">
         <OAuthButton
           provider="google"
           label="Continue with Google"
@@ -167,18 +162,18 @@ export function LoginForm({ searchParams }: LoginFormProps) {
           icon={<AppleIcon />}
         />
 
-        <div className="flex items-center gap-3 my-1">
-          <div className="flex-1 h-px bg-[rgba(255,255,255,0.08)]" />
-          <span className="text-xs text-[rgba(255,255,255,0.22)] font-medium tracking-wide">or</span>
-          <div className="flex-1 h-px bg-[rgba(255,255,255,0.08)]" />
+        <div className="auth-divider">
+          <div className="auth-divider-line" />
+          <span className="auth-divider-text">or</span>
+          <div className="auth-divider-line" />
         </div>
 
-        <Button size="lg" variant="ghost" className="w-full" onClick={() => setMode('email')}>
+        <button type="button" className="auth-method-btn" onClick={() => setMode('email')}>
           Continue with email
-        </Button>
-        <Button size="lg" variant="ghost" className="w-full" onClick={() => setMode('phone')}>
+        </button>
+        <button type="button" className="auth-method-btn" onClick={() => setMode('phone')}>
           Continue with phone number
-        </Button>
+        </button>
       </div>
     )
   }
@@ -187,22 +182,25 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
   if (mode === 'email') {
     return (
-      <form onSubmit={handleEmailSubmit} className="flex flex-col gap-4">
-        <Input
-          label="Email address"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          autoFocus
-          required
-          error={error}
-        />
-        <Button type="submit" size="lg" className="w-full" loading={loading}>
-          Continue →
-        </Button>
-        <button type="button" onClick={() => { setMode('choose'); setError('') }}
-          className="text-xs text-[rgba(255,255,255,0.4)] hover:text-white text-center">
+      <form onSubmit={handleEmailSubmit} className="auth-form">
+        <div className="auth-field">
+          <label className="auth-field-label" htmlFor="auth-email">Email address</label>
+          <input
+            id="auth-email"
+            className="auth-input"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            autoFocus
+            required
+          />
+          {error && <span className="auth-input-error">{error}</span>}
+        </div>
+        <button type="submit" className="auth-submit-btn" disabled={loading}>
+          {loading ? 'Sending link…' : 'Continue →'}
+        </button>
+        <button type="button" className="auth-back" onClick={() => { setMode('choose'); setError('') }}>
           ← Back
         </button>
       </form>
@@ -213,23 +211,26 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
   if (mode === 'phone') {
     return (
-      <form onSubmit={handlePhoneSubmit} className="flex flex-col gap-4">
-        <Input
-          label="Phone number"
-          type="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="(203) 555-0100"
-          autoFocus
-          required
-          hint="US numbers only. We'll send a 6-digit code."
-          error={error}
-        />
-        <Button type="submit" size="lg" className="w-full" loading={loading}>
-          Continue →
-        </Button>
-        <button type="button" onClick={() => { setMode('choose'); setError('') }}
-          className="text-xs text-[rgba(255,255,255,0.4)] hover:text-white text-center">
+      <form onSubmit={handlePhoneSubmit} className="auth-form">
+        <div className="auth-field">
+          <label className="auth-field-label" htmlFor="auth-phone">Phone number</label>
+          <input
+            id="auth-phone"
+            className="auth-input"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="(203) 555-0100"
+            autoFocus
+            required
+          />
+          <span className="auth-input-hint">US numbers only. We&apos;ll send a 6-digit code.</span>
+          {error && <span className="auth-input-error">{error}</span>}
+        </div>
+        <button type="submit" className="auth-submit-btn" disabled={loading}>
+          {loading ? 'Sending code…' : 'Continue →'}
+        </button>
+        <button type="button" className="auth-back" onClick={() => { setMode('choose'); setError('') }}>
           ← Back
         </button>
       </form>
@@ -240,33 +241,25 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
   if (mode === 'terms') {
     return (
-      <div className="flex flex-col gap-5">
-        <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#111] p-5">
-          <p className="text-xs font-bold tracking-[0.13em] uppercase text-[rgba(255,255,255,0.3)] mb-3">
-            Creating your account
-          </p>
-          <p className="text-sm text-[rgba(255,255,255,0.55)] leading-relaxed">
+      <div className="auth-form">
+        <div className="auth-terms-card">
+          <p className="auth-terms-eyebrow">Creating your account</p>
+          <p className="auth-terms-body">
             We didn&apos;t find an account for{' '}
-            <span className="text-white font-medium">
-              {pendingIntent === 'email' ? email : phone}
-            </span>
-            . A new account will be created.
+            <strong>{pendingIntent === 'email' ? email : phone}</strong>.
+            {' '}A new account will be created.
           </p>
         </div>
 
-        <label className="flex items-start gap-3 cursor-pointer group">
-          <div className="relative mt-0.5 flex-shrink-0">
+        <label className="auth-checkbox-label">
+          <div className="relative flex-shrink-0">
             <input
               type="checkbox"
               className="sr-only"
               checked={termsAccepted}
               onChange={e => setTermsAccepted(e.target.checked)}
             />
-            <div className={`w-5 h-5 rounded-[5px] border flex items-center justify-center transition-all duration-150 ${
-              termsAccepted
-                ? 'bg-[rgba(212,175,55,0.12)] border-[rgba(212,175,55,0.6)]'
-                : 'border-[rgba(255,255,255,0.18)] group-hover:border-[rgba(255,255,255,0.35)]'
-            }`}>
+            <div className={`auth-checkbox-box${termsAccepted ? ' is-checked' : ''}`}>
               {termsAccepted && (
                 <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
                   <path d="M1 4L4.5 7.5L10 1" stroke="#D4AF37" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
@@ -274,39 +267,32 @@ export function LoginForm({ searchParams }: LoginFormProps) {
               )}
             </div>
           </div>
-          <span className="text-sm text-[rgba(255,255,255,0.5)] leading-relaxed">
+          <span className="auth-checkbox-text">
             I agree to the{' '}
-            <a href="/terms.html" target="_blank" rel="noopener noreferrer"
-              className="text-[rgba(255,255,255,0.75)] underline underline-offset-2 hover:text-white">
-              Terms of Service
-            </a>{' '}
-            and{' '}
-            <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer"
-              className="text-[rgba(255,255,255,0.75)] underline underline-offset-2 hover:text-white">
-              Privacy Policy
-            </a>
+            <a href="/terms.html" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+            {' '}and{' '}
+            <a href="/privacy-policy.html" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
           </span>
         </label>
 
-        {error && <p className="text-sm text-[#e8735a]">{error}</p>}
+        {error && <p className="auth-error">{error}</p>}
 
-        <Button
-          size="lg"
-          className="w-full"
-          disabled={!termsAccepted}
-          loading={loading}
-          onClick={() => void handleTermsAccepted()}
-        >
-          Create account →
-        </Button>
         <button
           type="button"
+          className="auth-submit-btn"
+          disabled={!termsAccepted || loading}
+          onClick={() => void handleTermsAccepted()}
+        >
+          {loading ? 'Creating account…' : 'Create account →'}
+        </button>
+        <button
+          type="button"
+          className="auth-back"
           onClick={() => {
             setMode(pendingIntent ?? 'choose')
             setTermsAccepted(false)
             setError('')
           }}
-          className="text-xs text-[rgba(255,255,255,0.4)] hover:text-white text-center"
         >
           ← Back
         </button>
@@ -317,28 +303,31 @@ export function LoginForm({ searchParams }: LoginFormProps) {
   // ── OTP entry ─────────────────────────────────────────────────────────────
 
   return (
-    <form onSubmit={handleOtpSubmit} className="flex flex-col gap-4">
-      <p className="text-sm text-[rgba(255,255,255,0.6)] text-center">
-        Enter the 6-digit code sent to <span className="text-white">{phone}</span>
+    <form onSubmit={handleOtpSubmit} className="auth-form">
+      <p className="auth-otp-hint">
+        Enter the 6-digit code sent to <strong>{phone}</strong>
       </p>
-      <Input
-        label="Verification code"
-        type="text"
-        inputMode="numeric"
-        pattern="[0-9]{6}"
-        maxLength={6}
-        value={otp}
-        onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-        placeholder="123456"
-        autoFocus
-        required
-        error={error}
-      />
-      <Button type="submit" size="lg" className="w-full" loading={loading}>
-        Verify & sign in
-      </Button>
-      <button type="button" onClick={() => { setMode('phone'); setOtp(''); setError('') }}
-        className="text-xs text-[rgba(255,255,255,0.4)] hover:text-white text-center">
+      <div className="auth-field">
+        <label className="auth-field-label" htmlFor="auth-otp">Verification code</label>
+        <input
+          id="auth-otp"
+          className="auth-input"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]{6}"
+          maxLength={6}
+          value={otp}
+          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+          placeholder="123456"
+          autoFocus
+          required
+        />
+        {error && <span className="auth-input-error">{error}</span>}
+      </div>
+      <button type="submit" className="auth-submit-btn" disabled={loading}>
+        {loading ? 'Verifying…' : 'Verify & sign in →'}
+      </button>
+      <button type="button" className="auth-back" onClick={() => { setMode('phone'); setOtp(''); setError('') }}>
         ← Resend code
       </button>
     </form>
@@ -362,12 +351,12 @@ function OAuthButton({
   return (
     <button
       type="button"
+      className="auth-oauth-btn"
       disabled={loading}
       onClick={async () => {
         setLoading(true)
         await signIn(provider, { callbackUrl })
       }}
-      className="w-full h-12 flex items-center justify-center gap-3 rounded-xl border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] text-[rgba(255,255,255,0.8)] text-sm font-semibold hover:bg-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.18)] active:scale-[0.98] transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
     >
       {icon}
       {loading ? 'Redirecting…' : label}

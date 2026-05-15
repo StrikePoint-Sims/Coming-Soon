@@ -1,0 +1,373 @@
+/* ── Layout ───────────────────────────────────────────────────────────────── */
+
+.auth-wrap {
+  min-height: 100vh;
+  background: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px 64px;
+}
+
+.auth-inner {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Logo ─────────────────────────────────────────────────────────────────── */
+
+.auth-logo {
+  height: 36px;
+  width: auto;
+  display: block;
+  margin: 0 auto 48px;
+  opacity: 0.9;
+}
+
+/* ── Page heading ─────────────────────────────────────────────────────────── */
+
+.auth-heading {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 8px;
+  text-align: center;
+}
+
+.auth-subhead {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.38);
+  text-align: center;
+  margin: 0 0 36px;
+  line-height: 1.6;
+}
+
+/* ── Form container ───────────────────────────────────────────────────────── */
+
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── OAuth buttons ────────────────────────────────────────────────────────── */
+
+.auth-oauth-btn {
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.78);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background 0.18s, border-color 0.18s, color 0.18s, transform 0.15s;
+}
+
+.auth-oauth-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.auth-oauth-btn:active {
+  transform: scale(0.98);
+}
+
+.auth-oauth-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Divider ──────────────────────────────────────────────────────────────── */
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.auth-divider-text {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── Secondary method buttons (email / phone) ─────────────────────────────── */
+
+.auth-method-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s;
+}
+
+.auth-method-btn:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ── Field label ──────────────────────────────────────────────────────────── */
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.auth-field-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Input ────────────────────────────────────────────────────────────────── */
+
+.auth-input {
+  width: 100%;
+  height: 54px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  padding: 0 18px;
+  font-size: 0.95rem;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.auth-input::placeholder {
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.auth-input:focus {
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.07);
+}
+
+.auth-input-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.28);
+  line-height: 1.5;
+}
+
+.auth-input-error {
+  font-size: 0.72rem;
+  color: #e8735a;
+  line-height: 1.5;
+}
+
+/* ── Primary submit button ────────────────────────────────────────────────── */
+
+.auth-submit-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  color: #D4AF37;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, transform 0.15s, box-shadow 0.25s, opacity 0.2s;
+  box-shadow: 0 2px 12px rgba(27, 67, 50, 0.35);
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+  border-color: rgba(212, 175, 55, 0.75);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 18px rgba(27, 67, 50, 0.5);
+}
+
+.auth-submit-btn:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ── Back link ────────────────────────────────────────────────────────────── */
+
+.auth-back {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  width: 100%;
+  margin-top: 4px;
+  transition: color 0.18s;
+  letter-spacing: 0.02em;
+}
+
+.auth-back:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Error banner ─────────────────────────────────────────────────────────── */
+
+.auth-error {
+  color: #e8735a;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  padding: 12px 16px;
+  background: rgba(232, 115, 90, 0.06);
+  border: 1px solid rgba(232, 115, 90, 0.18);
+  border-radius: 11px;
+  text-align: center;
+}
+
+/* ── Terms step card ──────────────────────────────────────────────────────── */
+
+.auth-terms-card {
+  width: 100%;
+  background: #111;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 4px;
+}
+
+.auth-terms-eyebrow {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0 0 10px;
+}
+
+.auth-terms-body {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.48);
+  line-height: 1.6;
+}
+
+.auth-terms-body strong {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+}
+
+/* ── Checkbox ─────────────────────────────────────────────────────────────── */
+
+.auth-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.auth-checkbox-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.auth-checkbox-label:hover .auth-checkbox-box {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.auth-checkbox-box.is-checked {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.12);
+}
+
+.auth-checkbox-text {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.6;
+}
+
+.auth-checkbox-text a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.auth-checkbox-text a:hover {
+  color: #fff;
+}
+
+/* ── OTP hint ─────────────────────────────────────────────────────────────── */
+
+.auth-otp-hint {
+  font-size: 0.83rem;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: center;
+  line-height: 1.6;
+}
+
+.auth-otp-hint strong {
+  color: rgba(255, 255, 255, 0.82);
+  font-weight: 500;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 440px) {
+  .auth-wrap {
+    padding: 36px 16px 56px;
+  }
+
+  .auth-heading {
+    font-size: 1.7rem;
+  }
+}
