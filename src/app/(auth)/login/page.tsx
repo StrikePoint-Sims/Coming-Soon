@@ -11,11 +11,5 @@ export default function LoginPage({
 }: {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>
 }) {
-  return (
-    <>
-      <h1 className="auth-heading">Welcome back.</h1>
-      <p className="auth-subhead">Sign in or create your account to continue.</p>
-      <LoginForm searchParams={searchParams} />
-    </>
-  )
+  return <LoginForm searchParams={searchParams} />
 }

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { checkUserExists } from '@/app/(auth)/login/actions'
 
 type Mode = 'choose' | 'email' | 'phone' | 'terms' | 'otp'
+type Intent = 'signin' | 'signup'
 
 interface LoginFormProps {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>
@@ -17,6 +18,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
   const redirectTo = callbackUrl ?? '/account'
 
   const [mode, setMode] = useState<Mode>('choose')
+  const [intent, setIntent] = useState<Intent>('signin')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState('')
@@ -36,6 +38,12 @@ export function LoginForm({ searchParams }: LoginFormProps) {
     setError('')
     setLoading(true)
     try {
+      if (intent === 'signup') {
+        // Skip existence check — go straight to terms
+        setPendingIntent('email')
+        setMode('terms')
+        return
+      }
       const isExisting = await checkUserExists(email, 'email')
       if (!isExisting) {
         setPendingIntent('email')
@@ -66,6 +74,11 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       return
     }
     try {
+      if (intent === 'signup') {
+        setPendingIntent('phone')
+        setMode('terms')
+        return
+      }
       const isExisting = await checkUserExists(e164, 'phone')
       if (!isExisting) {
         setPendingIntent('phone')
@@ -148,33 +161,63 @@ export function LoginForm({ searchParams }: LoginFormProps) {
 
   if (mode === 'choose') {
     return (
-      <div className="auth-form">
-        <OAuthButton
-          provider="google"
-          label="Continue with Google"
-          callbackUrl={redirectTo}
-          icon={<GoogleIcon />}
-        />
-        <OAuthButton
-          provider="apple"
-          label="Continue with Apple"
-          callbackUrl={redirectTo}
-          icon={<AppleIcon />}
-        />
+      <>
+        {/* Heading */}
+        <h1 className="auth-heading">
+          {intent === 'signin' ? 'Welcome back.' : 'Create an account.'}
+        </h1>
+        <p className="auth-subhead">
+          {intent === 'signin'
+            ? 'Sign in to your StrikePoint account.'
+            : 'Join StrikePoint and book your first session.'}
+        </p>
 
-        <div className="auth-divider">
-          <div className="auth-divider-line" />
-          <span className="auth-divider-text">or</span>
-          <div className="auth-divider-line" />
+        {/* Tab switcher */}
+        <div className="auth-tabs">
+          <button
+            type="button"
+            className={`auth-tab${intent === 'signin' ? ' is-active' : ''}`}
+            onClick={() => setIntent('signin')}
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            className={`auth-tab${intent === 'signup' ? ' is-active' : ''}`}
+            onClick={() => setIntent('signup')}
+          >
+            Create account
+          </button>
         </div>
 
-        <button type="button" className="auth-method-btn" onClick={() => setMode('email')}>
-          Continue with email
-        </button>
-        <button type="button" className="auth-method-btn" onClick={() => setMode('phone')}>
-          Continue with phone number
-        </button>
-      </div>
+        <div className="auth-form">
+          <OAuthButton
+            provider="google"
+            label={intent === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
+            callbackUrl={redirectTo}
+            icon={<GoogleIcon />}
+          />
+          <OAuthButton
+            provider="apple"
+            label={intent === 'signin' ? 'Continue with Apple' : 'Sign up with Apple'}
+            callbackUrl={redirectTo}
+            icon={<AppleIcon />}
+          />
+
+          <div className="auth-divider">
+            <div className="auth-divider-line" />
+            <span className="auth-divider-text">or</span>
+            <div className="auth-divider-line" />
+          </div>
+
+          <button type="button" className="auth-method-btn" onClick={() => setMode('email')}>
+            {intent === 'signin' ? 'Continue with email' : 'Sign up with email'}
+          </button>
+          <button type="button" className="auth-method-btn" onClick={() => setMode('phone')}>
+            {intent === 'signin' ? 'Continue with phone number' : 'Sign up with phone number'}
+          </button>
+        </div>
+      </>
     )
   }
 
@@ -237,7 +280,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
     )
   }
 
-  // ── Terms (new account only) ───────────────────────────────────────────────
+  // ── Terms (new account) ────────────────────────────────────────────────────
 
   if (mode === 'terms') {
     return (
@@ -245,9 +288,18 @@ export function LoginForm({ searchParams }: LoginFormProps) {
         <div className="auth-terms-card">
           <p className="auth-terms-eyebrow">Creating your account</p>
           <p className="auth-terms-body">
-            We didn&apos;t find an account for{' '}
-            <strong>{pendingIntent === 'email' ? email : phone}</strong>.
-            {' '}A new account will be created.
+            {intent === 'signin' ? (
+              <>
+                We didn&apos;t find an account for{' '}
+                <strong>{pendingIntent === 'email' ? email : phone}</strong>.
+                {' '}A new account will be created.
+              </>
+            ) : (
+              <>
+                Creating a new account for{' '}
+                <strong>{pendingIntent === 'email' ? email : phone}</strong>.
+              </>
+            )}
           </p>
         </div>
 
