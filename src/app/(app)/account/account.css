@@ -1,0 +1,454 @@
+/* ── Shared account page styles ───────────────────────────────────────────── */
+
+.ap-page {
+  max-width: 760px;
+}
+
+.ap-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.ap-subtitle {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 36px;
+  line-height: 1.6;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.ap-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+
+.ap-card-title {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  margin: 0 0 16px;
+}
+
+/* ── Alert card (waiver, action required) ─────────────────────────────────── */
+
+.ap-alert {
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.ap-alert-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: rgba(212, 175, 55, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ap-alert-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 3px;
+}
+
+.ap-alert-body {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.ap-alert-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #D4AF37;
+  text-decoration: none;
+}
+
+.ap-alert-link:hover {
+  opacity: 0.8;
+}
+
+/* ── Booking card ─────────────────────────────────────────────────────────── */
+
+.ap-booking-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 18px 22px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.ap-booking-date-col {
+  flex-shrink: 0;
+  width: 48px;
+  height: 52px;
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ap-booking-month {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.7);
+  line-height: 1;
+}
+
+.ap-booking-day {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.ap-booking-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ap-booking-bay {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 2px;
+}
+
+.ap-booking-time {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.ap-booking-link {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.ap-booking-link:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Quick links grid ─────────────────────────────────────────────────────── */
+
+.ap-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.ap-quick-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 16px 18px;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.ap-quick-link:hover {
+  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.ap-quick-link-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.ap-quick-link-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.ap-quick-link-sub {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.28);
+  margin-top: 1px;
+}
+
+/* ── Table ────────────────────────────────────────────────────────────────── */
+
+.ap-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ap-table th {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  padding: 0 0 10px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ap-table td {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.7);
+  vertical-align: middle;
+}
+
+.ap-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Status badge ─────────────────────────────────────────────────────────── */
+
+.ap-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ap-badge.confirmed {
+  background: rgba(74, 110, 52, 0.12);
+  border: 1px solid rgba(74, 110, 52, 0.25);
+  color: #8fbc58;
+}
+
+.ap-badge.pending {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: rgba(212, 175, 55, 0.8);
+}
+
+.ap-badge.cancelled {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Section heading ──────────────────────────────────────────────────────── */
+
+.ap-section-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 16px;
+}
+
+/* ── Text row (label / value pairs) ──────────────────────────────────────── */
+
+.ap-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  font-size: 0.86rem;
+}
+
+.ap-row:last-child {
+  border-bottom: none;
+}
+
+.ap-row-label {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ap-row-value {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.78);
+  text-align: right;
+}
+
+/* ── Button ───────────────────────────────────────────────────────────────── */
+
+.ap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.ap-btn.primary {
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: #D4AF37;
+}
+
+.ap-btn.primary:hover {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+}
+
+.ap-btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ap-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.ap-btn.danger {
+  background: transparent;
+  border: 1px solid rgba(232, 115, 90, 0.2);
+  color: rgba(232, 115, 90, 0.7);
+}
+
+.ap-btn.danger:hover {
+  background: rgba(232, 115, 90, 0.06);
+  color: #e8735a;
+}
+
+/* ── Form ─────────────────────────────────────────────────────────────────── */
+
+.ap-form-group {
+  margin-bottom: 18px;
+}
+
+.ap-form-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 7px;
+}
+
+.ap-form-input,
+.ap-form-select {
+  width: 100%;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.ap-form-input:focus,
+.ap-form-select:focus {
+  outline: none;
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.06);
+}
+
+.ap-form-hint {
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.25);
+  margin-top: 5px;
+  line-height: 1.5;
+}
+
+.ap-form-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 22px 0;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────────────── */
+
+.ap-tabs {
+  display: flex;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+  width: fit-content;
+}
+
+.ap-tab {
+  padding: 8px 20px;
+  border-radius: 9px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.38);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  text-decoration: none;
+}
+
+.ap-tab.is-active {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
+
+.ap-empty {
+  padding: 40px 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}

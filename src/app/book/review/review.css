@@ -1,0 +1,343 @@
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.rv-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.rv-content {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 48px 40px 96px;
+  box-sizing: border-box;
+}
+
+.rv-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 32px;
+  transition: color 0.15s;
+}
+
+.rv-back-btn:hover {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rv-hero {
+  margin-bottom: 40px;
+}
+
+.rv-eyebrow {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.6);
+  margin-bottom: 10px;
+}
+
+.rv-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.rv-subtitle {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.32);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Two-column body ──────────────────────────────────────────────────────── */
+
+.rv-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Left column ──────────────────────────────────────────────────────────── */
+
+.rv-left {
+  min-width: 0;
+}
+
+/* ── Section cards ────────────────────────────────────────────────────────── */
+
+.rv-section {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.rv-section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0 0 18px;
+}
+
+/* Reservation details table */
+.rv-details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rv-details-table tr + tr td {
+  padding-top: 10px;
+}
+
+.rv-dt-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.32);
+  width: 100px;
+  vertical-align: top;
+  padding-right: 16px;
+  white-space: nowrap;
+}
+
+.rv-dt-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Access & waiver checklist */
+.rv-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rv-check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+}
+
+.rv-check-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(74, 110, 52, 0.2);
+  border: 1px solid rgba(74, 110, 52, 0.4);
+  color: #8fbc58;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Stripe Payment Element section */
+.rv-payment-section {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px;
+  padding: 24px;
+}
+
+/* ── Right rail / order summary ───────────────────────────────────────────── */
+
+.rv-rail {
+  position: sticky;
+  top: 88px;
+}
+
+.rv-summary-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rv-summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(212, 175, 55, 0.35) 40%,
+    rgba(212, 175, 55, 0.35) 60%,
+    transparent 95%
+  );
+}
+
+.rv-summary-head {
+  padding: 20px 22px 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.rv-summary-body {
+  padding: 14px 22px;
+}
+
+.rv-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  font-size: 0.84rem;
+}
+
+.rv-summary-label {
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.rv-summary-value {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.rv-summary-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 8px 0;
+}
+
+.rv-summary-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 0;
+}
+
+.rv-summary-total-label {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.rv-summary-total-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rv-pay-btn {
+  display: block;
+  width: 100%;
+  height: 54px;
+  border-radius: 0 0 19px 19px;
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: none;
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
+  color: #D4AF37;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.rv-pay-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+}
+
+.rv-pay-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.rv-secure-note {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.2);
+  text-align: center;
+  padding: 10px 22px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* ── Error / loading states ───────────────────────────────────────────────── */
+
+.rv-error {
+  color: #e8735a;
+  font-size: 0.83rem;
+  padding: 14px 18px;
+  background: rgba(232, 115, 90, 0.05);
+  border: 1px solid rgba(232, 115, 90, 0.15);
+  border-radius: 13px;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.rv-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.85rem;
+}
+
+.rv-spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 175, 55, 0.1);
+  border-top-color: rgba(212, 175, 55, 0.5);
+  animation: rv-spin 0.75s linear infinite;
+}
+
+@keyframes rv-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .rv-body {
+    grid-template-columns: 1fr;
+  }
+
+  .rv-rail {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .rv-content {
+    padding: 28px 16px 80px;
+  }
+}

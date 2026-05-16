@@ -1,0 +1,256 @@
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.conf-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.conf-content {
+  width: 100%;
+  max-width: 560px;
+  padding: 56px 24px 96px;
+  box-sizing: border-box;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.conf-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 24px;
+  padding: 40px 36px 36px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.conf-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(212, 175, 55, 0.4) 40%,
+    rgba(212, 175, 55, 0.4) 60%,
+    transparent 95%
+  );
+}
+
+/* ── Check icon ───────────────────────────────────────────────────────────── */
+
+.conf-icon-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.conf-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(74, 110, 52, 0.25) 0%, rgba(27, 67, 50, 0.35) 100%);
+  border: 1.5px solid rgba(74, 110, 52, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8fbc58;
+}
+
+.conf-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* ── Heading ──────────────────────────────────────────────────────────────── */
+
+.conf-heading {
+  font-family: var(--font-serif);
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.conf-number {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #D4AF37;
+  margin: 0 0 28px;
+  opacity: 0.8;
+}
+
+/* ── Summary ──────────────────────────────────────────────────────────────── */
+
+.conf-summary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.conf-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.conf-table tr + tr td {
+  padding-top: 8px;
+}
+
+.conf-td-label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  width: 80px;
+  vertical-align: top;
+  padding-right: 12px;
+  white-space: nowrap;
+}
+
+.conf-td-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* ── What happens next ────────────────────────────────────────────────────── */
+
+.conf-next-section {
+  text-align: left;
+  margin-bottom: 28px;
+}
+
+.conf-next-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0 0 14px;
+}
+
+.conf-next-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conf-next-item {
+  display: flex;
+  gap: 12px;
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.55;
+}
+
+.conf-next-item strong {
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 600;
+}
+
+.conf-next-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: rgba(212, 175, 55, 0.7);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+
+.conf-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conf-btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  color: #D4AF37;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.conf-btn-primary:hover {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+}
+
+.conf-btn-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.conf-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.conf-btn-ghost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.28);
+  text-decoration: none;
+  padding: 6px 0;
+  transition: color 0.15s;
+}
+
+.conf-btn-ghost:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .conf-content {
+    padding: 28px 16px 80px;
+  }
+
+  .conf-card {
+    padding: 28px 20px 24px;
+  }
+}

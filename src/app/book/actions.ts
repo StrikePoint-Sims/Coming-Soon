@@ -2,12 +2,17 @@
 
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { bookings, bookingHolds, waiverSignings, auditLog } from '@/db/schema'
-import { eq, and, gt, desc, lt } from 'drizzle-orm'
+import { bookings, bookingHolds, waiverSignings, auditLog, payments, bays } from '@/db/schema'
+import { eq, and, gt, lt } from 'drizzle-orm'
 import { nanoid } from '@/lib/utils'
 import { redirect } from 'next/navigation'
 import { inngest } from '@/lib/inngest/client'
 import { revalidatePath } from 'next/cache'
+import { toZonedTime, formatInTimeZone } from 'date-fns-tz'
+import { calculatePriceCents, CT_SALES_TAX } from '@/lib/booking/pricing'
+import { stripe } from '@/lib/stripe/client'
+
+const FACILITY_TZ = 'America/New_York'
 
 const HOLD_TTL_MINUTES = 10
 
@@ -118,6 +123,215 @@ export async function confirmBooking(holdId: string): Promise<void> {
 
   revalidatePath('/account')
   redirect(`/book/${bookingId}`)
+}
+
+// ── New actions for Review & Pay flow ─────────────────────────────────────────
+
+export interface HoldDetails {
+  holdId: string
+  bayLabel: string
+  startsAt: string   // ISO UTC
+  endsAt: string     // ISO UTC
+  durationMinutes: number
+  dateLabel: string  // "Tue, May 20"
+  timeRange: string  // "9:00 AM – 10:30 AM"
+}
+
+export async function getHoldDetails(holdId: string): Promise<HoldDetails | { error: string }> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: 'Not authenticated.' }
+
+  const now = new Date()
+  const [hold] = await db
+    .select()
+    .from(bookingHolds)
+    .where(and(
+      eq(bookingHolds.id, holdId),
+      eq(bookingHolds.userId, session.user.id),
+      gt(bookingHolds.expiresAt, now),
+    ))
+    .limit(1)
+
+  if (!hold) return { error: 'Hold expired or not found.' }
+
+  const [bay] = await db
+    .select({ label: bays.label })
+    .from(bays)
+    .where(eq(bays.id, hold.bayId))
+    .limit(1)
+
+  const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
+  const durationMinutes = Math.round(durationMs / 60_000)
+
+  const dateLabel = formatInTimeZone(hold.startsAt, FACILITY_TZ, 'EEE, MMM d')
+  const startLabel = formatInTimeZone(hold.startsAt, FACILITY_TZ, 'h:mm a')
+  const endLabel = formatInTimeZone(hold.endsAt, FACILITY_TZ, 'h:mm a')
+
+  return {
+    holdId: hold.id,
+    bayLabel: bay?.label ?? 'Bay',
+    startsAt: hold.startsAt.toISOString(),
+    endsAt: hold.endsAt.toISOString(),
+    durationMinutes,
+    dateLabel,
+    timeRange: `${startLabel} – ${endLabel}`,
+  }
+}
+
+export interface PaymentIntentResult {
+  clientSecret: string
+  subtotalCents: number
+  taxCents: number
+  totalCents: number
+}
+
+export async function createPaymentIntent(
+  holdId: string,
+): Promise<PaymentIntentResult | { error: string }> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: 'Not authenticated.' }
+
+  const now = new Date()
+  const [hold] = await db
+    .select()
+    .from(bookingHolds)
+    .where(and(
+      eq(bookingHolds.id, holdId),
+      eq(bookingHolds.userId, session.user.id),
+      gt(bookingHolds.expiresAt, now),
+    ))
+    .limit(1)
+
+  if (!hold) return { error: 'Hold expired or not found. Please select a new time.' }
+
+  // Calculate price using ET start hour
+  const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
+  const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
+  const durationMinutes = Math.round(durationMs / 60_000)
+  const subtotalCents = calculatePriceCents(startET.getHours(), durationMinutes)
+  const taxCents = Math.round(subtotalCents * CT_SALES_TAX)
+  const totalCents = subtotalCents + taxCents
+
+  const pi = await stripe.paymentIntents.create({
+    amount: totalCents,
+    currency: 'usd',
+    automatic_payment_methods: { enabled: true },
+    metadata: {
+      holdId,
+      userId: session.user.id,
+      bayId: hold.bayId,
+      startsAt: hold.startsAt.toISOString(),
+      endsAt: hold.endsAt.toISOString(),
+    },
+  })
+
+  if (!pi.client_secret) return { error: 'Payment setup failed. Please try again.' }
+
+  return { clientSecret: pi.client_secret, subtotalCents, taxCents, totalCents }
+}
+
+export async function confirmBookingAfterPayment(
+  holdId: string,
+  paymentIntentId: string,
+): Promise<{ bookingId: string } | { error: string }> {
+  const session = await auth()
+  if (!session?.user?.id) return { error: 'Not authenticated.' }
+
+  // Verify payment succeeded
+  const pi = await stripe.paymentIntents.retrieve(paymentIntentId)
+  if (pi.status !== 'succeeded') {
+    return { error: 'Payment not yet confirmed. Please wait a moment and try again.' }
+  }
+
+  const [hold] = await db
+    .select()
+    .from(bookingHolds)
+    .where(and(
+      eq(bookingHolds.id, holdId),
+      eq(bookingHolds.userId, session.user.id),
+    ))
+    .limit(1)
+
+  if (!hold) return { error: 'Hold not found. Your booking may already be confirmed.' }
+
+  // Check for conflicts
+  const conflict = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(and(
+      eq(bookings.bayId, hold.bayId),
+      eq(bookings.locationId, hold.locationId),
+      lt(bookings.startsAt, hold.endsAt),
+      gt(bookings.endsAt, hold.startsAt),
+    ))
+    .limit(1)
+
+  if (conflict.length > 0) {
+    return { error: 'This slot was booked by someone else while you were paying. Please contact us.' }
+  }
+
+  const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
+  const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
+  const durationMinutes = Math.round(durationMs / 60_000)
+  const subtotalCents = calculatePriceCents(startET.getHours(), durationMinutes)
+  const taxCents = Math.round(subtotalCents * CT_SALES_TAX)
+  const totalCents = subtotalCents + taxCents
+
+  const userId = session.user.id
+  const bookingId = nanoid()
+  const paymentId = nanoid()
+
+  await db.transaction(async (tx) => {
+    await tx.insert(bookings).values({
+      id: bookingId,
+      locationId: hold.locationId,
+      bayId: hold.bayId,
+      userId,
+      type: 'member',
+      startsAt: hold.startsAt,
+      endsAt: hold.endsAt,
+      status: 'confirmed',
+      source: 'web',
+      totalCents,
+      paidAt: new Date(),
+    })
+    await tx.insert(payments).values({
+      id: paymentId,
+      userId,
+      bookingId,
+      amountCents: totalCents,
+      processor: 'stripe',
+      processorRef: paymentIntentId,
+      type: 'charge',
+      status: 'succeeded',
+      idempotencyKey: `booking-${bookingId}`,
+      description: `Bay booking ${bookingId}`,
+    })
+    await tx.delete(bookingHolds).where(eq(bookingHolds.id, holdId))
+    await tx.insert(auditLog).values({
+      id: nanoid(),
+      actorType: 'user',
+      actorId: userId,
+      action: 'booking.created',
+      targetType: 'booking',
+      targetId: bookingId,
+      payloadJson: {
+        bayId: hold.bayId,
+        startsAt: hold.startsAt.toISOString(),
+        totalCents,
+        paymentIntentId,
+      },
+      at: new Date(),
+    })
+  })
+
+  await inngest.send({
+    name: 'booking/created',
+    data: { bookingId, userId, locationId: hold.locationId },
+  })
+
+  revalidatePath('/account')
+  return { bookingId }
 }
 
 // Release a hold (user clicked back)
