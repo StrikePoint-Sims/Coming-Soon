@@ -644,3 +644,399 @@
     height: 36px;
   }
 }
+
+/* ── Visibility toggles ───────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .book-desktop-ui { display: none !important; }
+}
+
+@media (min-width: 641px) {
+  .book-mobile-ui  { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE STEP FLOW
+══════════════════════════════════════════════════════════════════════════ */
+
+.book-mobile-ui {
+  /* Extra bottom padding to clear sticky bottom bar + bottom nav */
+  padding-bottom: 140px;
+}
+
+.book-m-step {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Step header ──────────────────────────────────────────────────────────── */
+
+.book-m-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0 22px;
+}
+
+.book-m-back {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: var(--font-sans);
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-title {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* ── Month navigation ─────────────────────────────────────────────────────── */
+
+.book-m-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.book-m-month-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.78);
+  letter-spacing: 0.01em;
+}
+
+.book-m-month-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.14s, color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-month-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-month-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* ── Calendar day-of-week row ─────────────────────────────────────────────── */
+
+.book-m-cal-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+
+.book-m-cal-dow-cell {
+  text-align: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.22);
+  padding-bottom: 8px;
+}
+
+/* ── Calendar day grid ────────────────────────────────────────────────────── */
+
+.book-m-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  margin-bottom: 28px;
+}
+
+.book-m-cal-day {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+
+.book-m-cal-day:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.book-m-cal-day.is-selected {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.65);
+  color: #D4AF37;
+}
+
+.book-m-cal-day.is-past {
+  color: rgba(255, 255, 255, 0.18);
+  cursor: not-allowed;
+}
+
+.book-m-cal-day.is-empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── Step 2: Section label ────────────────────────────────────────────────── */
+
+.book-m-section-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  margin: 0 0 12px;
+}
+
+/* ── Step 2: Duration tiles ───────────────────────────────────────────────── */
+
+.book-m-dur-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.book-m-dur-tile {
+  height: 58px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-dur-tile:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-dur-tile.is-active {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.55);
+  color: #D4AF37;
+}
+
+/* ── Step 2: Players stepper ──────────────────────────────────────────────── */
+
+.book-m-players-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.book-m-players-label {
+  flex: 1;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+.book-m-players-count {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  min-width: 26px;
+  text-align: center;
+}
+
+.book-m-players-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.13s, color 0.13s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.book-m-players-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.book-m-players-btn:disabled {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+
+/* ── Step 3: Summary line ─────────────────────────────────────────────────── */
+
+.book-m-step3-summary {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+/* ── Step 3: Legend ───────────────────────────────────────────────────────── */
+
+.book-m-legend {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.book-m-legend-item {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.book-m-legend-item::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.book-m-legend-item.available {
+  color: rgba(143, 166, 94, 0.8);
+}
+
+.book-m-legend-item.available::before {
+  background: rgba(74, 110, 52, 0.35);
+  border: 1px solid rgba(74, 110, 52, 0.5);
+}
+
+.book-m-legend-item.booked {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.book-m-legend-item.booked::before {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ── Continue button ──────────────────────────────────────────────────────── */
+
+.book-m-continue {
+  display: block;
+  width: 100%;
+  height: 52px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: #D4AF37;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-continue:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+}
+
+.book-m-continue:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+}
+
+/* ── Sticky bottom bar (step 3, slot selected) ────────────────────────────── */
+
+.book-m-bottom-bar {
+  position: fixed;
+  bottom: 56px; /* height of MobileBottomNav */
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 12, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  z-index: 40;
+}
+
+.book-m-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.book-m-bar-label {
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+}
+
+.book-m-bar-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* Continue button when inside the bottom bar — smaller, right-aligned */
+.book-m-bar-continue {
+  width: auto !important;
+  min-width: 130px;
+  height: 44px !important;
+  border-radius: 10px !important;
+  font-size: 0.86rem !important;
+  flex-shrink: 0;
+}

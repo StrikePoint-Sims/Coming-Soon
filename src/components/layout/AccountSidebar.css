@@ -158,3 +158,15 @@
     padding: 24px 16px 60px;
   }
 }
+
+/* ── Phone: hide sidebar entirely — bottom nav takes over ─────────────────── */
+
+@media (max-width: 640px) {
+  .acct-sidebar {
+    display: none;
+  }
+
+  .acct-content {
+    padding: 20px 16px 90px;
+  }
+}

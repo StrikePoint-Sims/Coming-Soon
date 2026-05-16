@@ -452,3 +452,44 @@
   font-size: 0.88rem;
   line-height: 1.75;
 }
+
+/* ── Mobile responsive ────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  /* Extra bottom padding so content clears the bottom nav */
+  .ap-page {
+    padding-bottom: 90px;
+  }
+
+  /* Single-column quick links */
+  .ap-quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Tighter card padding */
+  .ap-card {
+    padding: 16px 16px;
+    border-radius: 14px;
+  }
+
+  /* Tables get horizontal scroll */
+  .ap-table {
+    min-width: 480px;
+  }
+
+  /* Booking cards: stack on narrow viewports */
+  .ap-booking-card {
+    flex-wrap: wrap;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  /* Smaller title on mobile */
+  .ap-title {
+    font-size: 1.4rem;
+  }
+
+  .ap-subtitle {
+    margin-bottom: 24px;
+  }
+}
