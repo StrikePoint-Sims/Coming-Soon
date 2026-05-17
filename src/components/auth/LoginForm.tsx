@@ -157,6 +157,17 @@ export function LoginForm({ searchParams }: LoginFormProps) {
     }
   }
 
+  async function handleDevBypass() {
+    setLoading(true)
+    const result = await signIn('dev-bypass', { email: 'mrock@gmail.com', redirect: false })
+    if (result?.error) {
+      setError('Dev bypass failed.')
+      setLoading(false)
+      return
+    }
+    window.location.href = redirectTo
+  }
+
   // ── Choose ────────────────────────────────────────────────────────────────
 
   if (mode === 'choose') {
@@ -217,6 +228,19 @@ export function LoginForm({ searchParams }: LoginFormProps) {
             {intent === 'signin' ? 'Continue with phone number' : 'Sign up with phone number'}
           </button>
         </div>
+
+        {process.env.NODE_ENV === 'development' && (
+          <div className="auth-dev-bypass">
+            <button
+              type="button"
+              className="auth-dev-bypass-btn"
+              disabled={loading}
+              onClick={() => void handleDevBypass()}
+            >
+              {loading ? 'Signing in…' : '⚙ Dev: sign in as mrock@gmail.com'}
+            </button>
+          </div>
+        )}
       </>
     )
   }

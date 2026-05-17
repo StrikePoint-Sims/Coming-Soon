@@ -82,8 +82,8 @@
 }
 
 .auth-tab.is-active {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: rgba(74, 110, 52, 0.18);
+  color: #8fa65e;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
 
@@ -241,23 +241,23 @@
   width: 100%;
   height: 54px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
-  border: 1px solid rgba(212, 175, 55, 0.5);
-  color: #D4AF37;
+  background: #4a6e34;
+  border: 1px solid #4a6e34;
+  color: #fff;
   font-family: var(--font-sans);
   font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.25s, border-color 0.25s, transform 0.15s, box-shadow 0.25s, opacity 0.2s;
-  box-shadow: 0 2px 12px rgba(27, 67, 50, 0.35);
+  transition: all 0.2s;
 }
 
 .auth-submit-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
-  border-color: rgba(212, 175, 55, 0.75);
+  background: #5a8040;
+  border-color: #5a8040;
   transform: translateY(-1px);
-  box-shadow: 0 4px 18px rgba(27, 67, 50, 0.5);
+  box-shadow: 0 4px 18px rgba(74, 110, 52, 0.35);
 }
 
 .auth-submit-btn:active:not(:disabled) {
@@ -396,6 +396,33 @@
 .auth-otp-hint strong {
   color: rgba(255, 255, 255, 0.82);
   font-weight: 500;
+}
+
+/* ── Dev bypass ───────────────────────────────────────────────────────────── */
+
+.auth-dev-bypass {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.auth-dev-bypass-btn {
+  width: 100%;
+  height: 38px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px dashed rgba(255, 200, 0, 0.3);
+  color: rgba(255, 200, 0, 0.55);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.auth-dev-bypass-btn:hover {
+  background: rgba(255, 200, 0, 0.06);
+  border-color: rgba(255, 200, 0, 0.5);
+  color: rgba(255, 200, 0, 0.8);
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */

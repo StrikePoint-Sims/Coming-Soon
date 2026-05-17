@@ -23,8 +23,6 @@ const stripePromise = loadStripe(
   process.env['NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'] ?? ''
 )
 
-// ── Inner checkout form (needs Stripe context) ─────────────────────────────
-
 interface CheckoutFormProps {
   holdId: string
   pricing: PaymentIntentResult
@@ -61,7 +59,10 @@ function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
         setSubmitting(false)
         return
       }
-      window.location.href = `/book/${result.bookingId}`
+      // If party has guests, send them to the add-guests step first.
+      window.location.href = result.partySize > 1
+        ? `/book/${result.bookingId}/guests`
+        : `/book/${result.bookingId}`
       return
     }
 
@@ -71,25 +72,13 @@ function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
 
   return (
     <form onSubmit={e => void handleSubmit(e)}>
-      <PaymentElement
-        options={{
-          layout: 'tabs',
-        }}
-      />
-      <div style={{ height: 24 }} />
-      <button
-        type="submit"
-        className="rv-pay-btn"
-        disabled={!stripe || submitting}
-        style={{ borderRadius: 14, marginTop: 0 }}
-      >
-        {submitting ? 'Processing…' : `Confirm & Pay $${(pricing.totalCents / 100).toFixed(2)}`}
+      <PaymentElement options={{ layout: 'tabs' }} />
+      <button type="submit" className="rv-confirm-btn" disabled={!stripe || submitting}>
+        {submitting ? 'Processing…' : `Confirm Reservation · $${(pricing.totalCents / 100).toFixed(2)}`}
       </button>
     </form>
   )
 }
-
-// ── Main page ──────────────────────────────────────────────────────────────
 
 export default function ReviewPage() {
   const params = useSearchParams()
@@ -147,11 +136,9 @@ export default function ReviewPage() {
   if (!holdId) {
     return (
       <div className="rv-page">
-        <div className="rv-content">
-          <div className="rv-loading">
-            <p style={{ color: 'rgba(255,255,255,0.4)' }}>No booking hold found.</p>
-            <a href="/book" style={{ color: '#D4AF37', fontSize: '0.85rem' }}>← Back to booking</a>
-          </div>
+        <div className="rv-content rv-empty">
+          <p>No booking hold found.</p>
+          <a href="/book" className="rv-back-link">← Back to booking</a>
         </div>
       </div>
     )
@@ -160,11 +147,9 @@ export default function ReviewPage() {
   if (loading) {
     return (
       <div className="rv-page">
-        <div className="rv-content">
-          <div className="rv-loading">
-            <div className="rv-spinner" />
-            <span>Setting up checkout…</span>
-          </div>
+        <div className="rv-content rv-empty">
+          <div className="rv-spinner" />
+          <span>Setting up checkout…</span>
         </div>
       </div>
     )
@@ -173,11 +158,9 @@ export default function ReviewPage() {
   if (pageError) {
     return (
       <div className="rv-page">
-        <div className="rv-content">
-          <div className="rv-loading">
-            <p className="rv-error" style={{ maxWidth: 420, textAlign: 'center' }}>{pageError}</p>
-            <a href="/book" style={{ color: '#D4AF37', fontSize: '0.85rem' }}>← Back to booking</a>
-          </div>
+        <div className="rv-content rv-empty">
+          <p className="rv-error">{pageError}</p>
+          <a href="/book" className="rv-back-link">← Back to booking</a>
         </div>
       </div>
     )
@@ -188,13 +171,25 @@ export default function ReviewPage() {
       <div className="rv-content">
 
         <button className="rv-back-btn" onClick={() => void handleBack()} disabled={releasingHold}>
-          ← Back
+          <span>‹</span> Back
         </button>
 
         <div className="rv-hero">
-          <span className="rv-eyebrow">Almost done</span>
-          <h1 className="rv-title">Review &amp; Pay</h1>
-          <p className="rv-subtitle">Your spot is held for 10 minutes. Complete payment to confirm.</p>
+          <h1 className="rv-title">Review Your Booking</h1>
+
+          <div className="rv-steps">
+            <span className="rv-step done">
+              <span className="rv-step-num">1</span>
+              <span className="rv-step-label">Select Time</span>
+            </span>
+            <span className="rv-step-line" />
+            <span className="rv-step active">
+              <span className="rv-step-num">2</span>
+              <span className="rv-step-label">Review &amp; Pay</span>
+            </span>
+          </div>
+
+          <p className="rv-subtitle">Please review your reservation details and complete payment to confirm.</p>
         </div>
 
         <div className="rv-body">
@@ -202,56 +197,69 @@ export default function ReviewPage() {
           <div className="rv-left">
 
             {/* Reservation details */}
-            <div className="rv-section">
-              <p className="rv-section-title">Reservation Details</p>
+            <div className="rv-card">
+              <div className="rv-card-head">
+                <span className="rv-section-label">YOUR RESERVATION</span>
+                <button onClick={() => void handleBack()} className="rv-edit-btn">
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M11 2l3 3L6 13H3v-3L11 2z"/>
+                  </svg>
+                  Edit
+                </button>
+              </div>
+
               {hold && (
-                <table className="rv-details-table">
-                  <tbody>
-                    <tr>
-                      <td className="rv-dt-label">Date</td>
-                      <td className="rv-dt-value">{hold.dateLabel}</td>
-                    </tr>
-                    <tr>
-                      <td className="rv-dt-label">Time</td>
-                      <td className="rv-dt-value">{hold.timeRange}</td>
-                    </tr>
-                    <tr>
-                      <td className="rv-dt-label">Duration</td>
-                      <td className="rv-dt-value">{durationHours} hr</td>
-                    </tr>
-                    <tr>
-                      <td className="rv-dt-label">Bay</td>
-                      <td className="rv-dt-value">{hold.bayLabel}</td>
-                    </tr>
-                  </tbody>
-                </table>
+                <div className="rv-res-grid">
+                  <div className="rv-res-item">
+                    <div className="rv-res-icon">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="3" y="4" width="14" height="13" rx="2"/>
+                        <path d="M7 2v4M13 2v4M3 9h14"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="rv-res-label">Date</p>
+                      <p className="rv-res-value">{hold.dateLabel}</p>
+                    </div>
+                  </div>
+
+                  <div className="rv-res-item">
+                    <div className="rv-res-icon">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <circle cx="10" cy="10" r="7"/>
+                        <path d="M10 6v4l2.5 2.5"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="rv-res-label">Time</p>
+                      <p className="rv-res-value">{hold.timeRange}</p>
+                      <p className="rv-res-sub">({durationHours} hr)</p>
+                    </div>
+                  </div>
+
+                  <div className="rv-res-item">
+                    <div className="rv-res-icon">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                        <rect x="2" y="3" width="16" height="14" rx="2"/>
+                        <path d="M2 7h16"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="rv-res-label">Bay</p>
+                      <p className="rv-res-value">{hold.bayLabel}</p>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* Access & waiver info */}
-            <div className="rv-section">
-              <p className="rv-section-title">Access &amp; Waiver</p>
-              <ul className="rv-checklist">
-                <li className="rv-check-item">
-                  <span className="rv-check-icon">✓</span>
-                  All players must have a signed waiver on file before your session.
-                </li>
-                <li className="rv-check-item">
-                  <span className="rv-check-icon">✓</span>
-                  Your bay access code will be sent by SMS 1 hour before your session.
-                </li>
-                <li className="rv-check-item">
-                  <span className="rv-check-icon">✓</span>
-                  Cancellations at least 24 hours in advance receive a full refund.
-                </li>
-              </ul>
-            </div>
+            {/* Payment section */}
+            <div className="rv-card">
+              <div className="rv-card-head">
+                <span className="rv-section-label">PAYMENT METHOD</span>
+              </div>
 
-            {/* Stripe Payment Element */}
-            <div className="rv-payment-section">
-              <p className="rv-section-title" style={{ marginBottom: 20 }}>Payment</p>
-
-              {payError && <p className="rv-error">{payError}</p>}
+              {payError && <p className="rv-pay-error">{payError}</p>}
 
               {clientSecret && pricing ? (
                 <Elements
@@ -262,74 +270,120 @@ export default function ReviewPage() {
                       theme: 'night',
                       variables: {
                         colorPrimary: '#D4AF37',
-                        colorBackground: '#141414',
+                        colorBackground: '#0f0f0f',
                         colorText: '#ffffff',
-                        colorTextSecondary: 'rgba(255,255,255,0.45)',
+                        colorTextSecondary: 'rgba(255,255,255,0.5)',
+                        colorTextPlaceholder: 'rgba(255,255,255,0.3)',
                         colorDanger: '#e8735a',
+                        colorIcon: '#D4AF37',
                         borderRadius: '10px',
                         fontFamily: 'var(--font-sans)',
+                        fontSizeBase: '15px',
+                        spacingUnit: '4px',
+                      },
+                      rules: {
+                        '.Input': {
+                          border: '1px solid rgba(212, 175, 55, 0.18)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                        },
+                        '.Input:focus': {
+                          border: '1px solid rgba(212, 175, 55, 0.5)',
+                          boxShadow: '0 0 0 3px rgba(212, 175, 55, 0.08)',
+                        },
+                        '.Tab': {
+                          border: '1px solid rgba(212, 175, 55, 0.14)',
+                          backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                        },
+                        '.Tab--selected': {
+                          border: '1px solid rgba(212, 175, 55, 0.4)',
+                          backgroundColor: 'rgba(212, 175, 55, 0.06)',
+                        },
                       },
                     },
                   }}
                 >
-                  <CheckoutForm
-                    holdId={holdId}
-                    pricing={pricing}
-                    onError={setPayError}
-                  />
+                  <CheckoutForm holdId={holdId} pricing={pricing} onError={setPayError} />
                 </Elements>
               ) : (
-                <div className="rv-loading" style={{ minHeight: 120 }}>
+                <div className="rv-loading-block">
                   <div className="rv-spinner" />
                 </div>
               )}
+
+              <p className="rv-secure-note">
+                <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="6" width="8" height="6" rx="1"/>
+                  <path d="M5 6V4a2 2 0 014 0v2"/>
+                </svg>
+                Secure payment processed by Stripe. Your card details never touch our servers.
+              </p>
             </div>
 
+            {/* Info blocks */}
+            <div className="rv-info-row">
+              <div className="rv-info-block">
+                <div className="rv-info-icon">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 18s6-3 6-8V4l-6-2-6 2v6c0 5 6 8 6 8z"/>
+                    <path d="M7 10l2.5 2.5L13 8"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="rv-info-title">Waivers for Guests</p>
+                  <p className="rv-info-body">All players must have a signed waiver on file. Guests can complete theirs online before your visit.</p>
+                </div>
+              </div>
+              <div className="rv-info-block">
+                <div className="rv-info-icon">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="5" width="16" height="11" rx="2"/>
+                    <path d="M2 7l8 5 8-5"/>
+                  </svg>
+                </div>
+                <div>
+                  <p className="rv-info-title">Access Details</p>
+                  <p className="rv-info-body">Your bay access code arrives by SMS 1 hour before your session.</p>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* ── Right rail: Order summary ────────────────────────────────── */}
           <aside className="rv-rail">
-            <div className="rv-summary-card">
-              <p className="rv-summary-head">Order Summary</p>
-              <div className="rv-summary-body">
-                {pricing ? (
-                  <>
-                    <div className="rv-summary-row">
-                      <span className="rv-summary-label">Subtotal</span>
-                      <span className="rv-summary-value">
-                        ${(pricing.subtotalCents / 100).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="rv-summary-row">
-                      <span className="rv-summary-label">Sales Tax (6.35%)</span>
-                      <span className="rv-summary-value">
-                        ${(pricing.taxCents / 100).toFixed(2)}
-                      </span>
-                    </div>
-                    <div className="rv-summary-divider" />
-                    <div className="rv-summary-total-row">
-                      <span className="rv-summary-total-label">Total</span>
-                      <span className="rv-summary-total-value">
-                        ${(pricing.totalCents / 100).toFixed(2)}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.82rem' }}>
-                    Calculating…
-                  </p>
-                )}
-              </div>
-              <div className="rv-secure-note">
-                <svg width="12" height="14" viewBox="0 0 12 14" fill="none" aria-hidden="true">
-                  <path d="M6 1L1 3v4c0 2.76 2.13 5.33 5 6 2.87-.67 5-3.24 5-6V3L6 1z" stroke="rgba(255,255,255,0.25)" strokeWidth="1.2" fill="none"/>
-                </svg>
-                Secure checkout powered by Stripe
-              </div>
+            <div className="rv-summary">
+              <span className="rv-section-label">ORDER SUMMARY</span>
+
+              {pricing ? (
+                <>
+                  <div className="rv-summary-row">
+                    <span>Subtotal</span>
+                    <span>${(pricing.subtotalCents / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="rv-summary-row">
+                    <span>Sales Tax (6.35%)</span>
+                    <span>${(pricing.taxCents / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="rv-summary-divider" />
+                  <div className="rv-summary-total">
+                    <span>Total</span>
+                    <span className="rv-total-amount">${(pricing.totalCents / 100).toFixed(2)}</span>
+                  </div>
+                  <p className="rv-summary-note">All amounts in USD.</p>
+                </>
+              ) : (
+                <p className="rv-summary-note">Calculating…</p>
+              )}
+            </div>
+
+            <div className="rv-hold-note">
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+                <circle cx="7" cy="7" r="5.5"/>
+                <path d="M7 4v3l2 1.5"/>
+              </svg>
+              Your spot is held for 10 minutes.
             </div>
           </aside>
         </div>
-
       </div>
     </div>
   )

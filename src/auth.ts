@@ -7,6 +7,7 @@ import Apple from 'next-auth/providers/apple'
 import { db } from '@/db'
 import { users } from '@/db/schema'
 import { authAccounts, authSessions, authVerificationTokens } from '@/db/schema/auth'
+import { nanoid } from '@/lib/utils'
 import { brevo } from '@/lib/brevo/client'
 import { env } from '@/env'
 import { eq } from 'drizzle-orm'
@@ -44,6 +45,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return user ?? null
       },
     }),
+
+    // Dev-only bypass — upserts user by email, no auth required
+    ...(process.env.NODE_ENV === 'development' ? [
+      Credentials({
+        id: 'dev-bypass',
+        credentials: { email: { type: 'text' } },
+        authorize: async (credentials) => {
+          const email = credentials?.email as string | undefined
+          if (!email) return null
+          const [existing] = await db.select().from(users).where(eq(users.email, email)).limit(1)
+          if (existing) return existing
+          const [created] = await db.insert(users).values({
+            id: nanoid(),
+            email,
+            name: email.split('@')[0],
+          }).returning()
+          return created ?? null
+        },
+      }),
+    ] : []),
 
     Email({
       server: { host: 'localhost', port: 25, auth: { user: '', pass: '' } },

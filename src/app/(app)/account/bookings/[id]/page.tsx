@@ -8,7 +8,7 @@ import type { Metadata } from 'next'
 import '../../account.css'
 
 export const metadata: Metadata = {
-  title: 'Booking Details — StrikePoint Sims',
+  title: 'Manage Booking — StrikePoint Sims',
   robots: { index: false },
 }
 
@@ -16,12 +16,23 @@ const FACILITY_TZ = 'America/New_York'
 
 function durationLabel(startsAt: Date, endsAt: Date): string {
   const min = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
-  const h = Math.floor(min / 60)
-  const m = min % 60
-  return m === 0 ? `${h} hr` : `${h} hr ${m} min`
+  return min % 60 === 0 ? `${min / 60} hr` : `${(min / 60).toFixed(1)} hr`
 }
 
-export default async function BookingDetailPage({
+function statusLabel(s: string): string {
+  if (s === 'checked_in') return 'Checked In'
+  if (s === 'no_show') return 'No Show'
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+function statusClass(s: string): string {
+  if (s === 'confirmed' || s === 'checked_in') return 'confirmed'
+  if (s === 'completed') return 'completed'
+  if (s === 'pending') return 'pending'
+  return 'cancelled'
+}
+
+export default async function ManageBookingPage({
   params,
 }: {
   params: Promise<{ id: string }>
@@ -38,8 +49,8 @@ export default async function BookingDetailPage({
       bayLabel: bays.label,
       status: bookings.status,
       totalCents: bookings.totalCents,
+      partySize: bookings.partySize,
       paidAt: bookings.paidAt,
-      source: bookings.source,
     })
     .from(bookings)
     .innerJoin(bays, eq(bookings.bayId, bays.id))
@@ -51,8 +62,8 @@ export default async function BookingDetailPage({
 
   const now = new Date()
   const isFuture = booking.startsAt > now
+  const isCancellable = isFuture && booking.status !== 'cancelled'
 
-  // Waiver check
   const [waiver] = await db
     .select({ expiresAt: waiverSignings.expiresAt })
     .from(waiverSignings)
@@ -61,79 +72,194 @@ export default async function BookingDetailPage({
     .limit(1)
 
   const confirmationNum = `SPC-${id.slice(0, 6).toUpperCase()}-${id.slice(-4).toUpperCase()}`
-  const statusMap: Record<string, string> = {
-    confirmed: 'confirmed',
-    checked_in: 'confirmed',
-    pending: 'pending',
-    cancelled: 'cancelled',
-    no_show: 'cancelled',
-  }
-  const badgeCls = statusMap[booking.status] ?? 'cancelled'
 
   return (
-    <div className="ap-page">
-      <a href="/account/bookings" className="ap-btn ghost" style={{ marginBottom: 24, height: 36, fontSize: '0.8rem', padding: '0 14px', display: 'inline-flex' }}>
-        ← My Bookings
+    <div className="dash-page">
+      {/* Header with back link */}
+      <a href="/account/bookings" className="mb-back">
+        <span className="mb-back-arrow">‹</span> My Bookings
       </a>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-        <h1 className="ap-title" style={{ margin: 0 }}>Booking Details</h1>
-        <span className={`ap-badge ${badgeCls}`}>{booking.status.replace('_', ' ')}</span>
-      </div>
-      <p className="ap-subtitle">{confirmationNum}</p>
-
-      {/* Reservation info */}
-      <div className="ap-card">
-        <p className="ap-card-title">Reservation</p>
-        <div className="ap-row"><span className="ap-row-label">Date</span><span className="ap-row-value">{formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEEE, MMMM d, yyyy')}</span></div>
-        <div className="ap-row"><span className="ap-row-label">Time</span><span className="ap-row-value">{formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} – {formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}</span></div>
-        <div className="ap-row"><span className="ap-row-label">Duration</span><span className="ap-row-value">{durationLabel(booking.startsAt, booking.endsAt)}</span></div>
-        <div className="ap-row"><span className="ap-row-label">Bay</span><span className="ap-row-value">{booking.bayLabel}</span></div>
-        {booking.totalCents > 0 && (
-          <div className="ap-row"><span className="ap-row-label">Total Paid</span><span className="ap-row-value">${(booking.totalCents / 100).toFixed(2)}</span></div>
-        )}
-        {booking.paidAt && (
-          <div className="ap-row"><span className="ap-row-label">Paid On</span><span className="ap-row-value">{formatInTimeZone(booking.paidAt, FACILITY_TZ, 'MMM d, yyyy')}</span></div>
-        )}
+      <div className="dash-header" style={{ marginTop: 8 }}>
+        <h1 className="dash-title">Manage Booking</h1>
+        <p className="dash-subtitle">View your reservation and make changes.</p>
       </div>
 
-      {/* Waiver & access */}
-      <div className="ap-card">
-        <p className="ap-card-title">Access &amp; Waiver</p>
-        <div className="ap-row">
-          <span className="ap-row-label">Your Waiver</span>
-          <span className="ap-row-value">
-            {waiver ? (
-              <span style={{ color: '#8fbc58' }}>✓ Valid until {formatInTimeZone(waiver.expiresAt, FACILITY_TZ, 'MMM d, yyyy')}</span>
-            ) : (
-              <a href="/waiver?callbackUrl=/account/bookings" style={{ color: '#D4AF37', textDecoration: 'none', fontWeight: 600 }}>Sign waiver →</a>
-            )}
+      {/* ── Current Reservation card ────────────────────────────────────── */}
+      <div className="dash-section-card">
+        <div className="dash-section-header">
+          <span className="dash-section-label gold">CURRENT RESERVATION</span>
+          <span className={`dash-status ${statusClass(booking.status)}`}>
+            {statusLabel(booking.status)}
           </span>
         </div>
-        {isFuture && (
-          <div className="ap-row">
-            <span className="ap-row-label">Access Code</span>
-            <span className="ap-row-value" style={{ color: 'rgba(255,255,255,0.4)' }}>Sent by SMS 1 hour before session</span>
+
+        <div className="mb-res-grid">
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <rect x="3" y="4" width="14" height="13" rx="2"/>
+                <path d="M7 2v4M13 2v4M3 9h14"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Date</p>
+              <p className="mb-res-value">
+                {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, yyyy')}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <circle cx="10" cy="10" r="7"/>
+                <path d="M10 6v4l2.5 2.5"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Time</p>
+              <p className="mb-res-value">
+                {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} –{' '}
+                {formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}
+              </p>
+            </div>
+          </div>
+
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 3h8M6 17h8M7 3v3l3 3-3 3v3M13 3v3l-3 3 3 3v3"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Duration</p>
+              <p className="mb-res-value">{durationLabel(booking.startsAt, booking.endsAt)}</p>
+            </div>
+          </div>
+
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <circle cx="7" cy="7" r="3"/>
+                <path d="M2 17a5 5 0 0110 0"/>
+                <circle cx="14" cy="8" r="2.5"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Players</p>
+              <p className="mb-res-value">{booking.partySize || 1} Player{booking.partySize !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <rect x="2" y="3" width="16" height="14" rx="2"/>
+                <path d="M2 7h16"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Bay</p>
+              <p className="mb-res-value">{booking.bayLabel}</p>
+            </div>
+          </div>
+
+          <div className="mb-res-item">
+            <div className="mb-res-icon">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                <rect x="2" y="5" width="16" height="11" rx="2"/>
+                <path d="M2 9h16"/>
+              </svg>
+            </div>
+            <div>
+              <p className="mb-res-label">Total</p>
+              <p className="mb-res-value">
+                {booking.totalCents > 0 ? `$${(booking.totalCents / 100).toFixed(2)}` : 'Free'}
+                {booking.paidAt && <span className="mb-res-paid"> · Paid</span>}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <p className="mb-conf-num">
+          Confirmation: <span>{confirmationNum}</span>
+        </p>
+      </div>
+
+      {/* ── Action buttons ──────────────────────────────────────────────── */}
+      {isFuture && (
+        <div className="mb-action-row">
+          <a href="#change" className="dash-btn ghost mb-action">
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+              <circle cx="9" cy="9" r="7"/>
+              <path d="M9 5v4l3 2"/>
+            </svg>
+            Change Time
+          </a>
+          <a href="/account/guests" className="dash-btn ghost mb-action">
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+              <circle cx="7" cy="6" r="3"/>
+              <path d="M2 16a5 5 0 0110 0"/>
+              <path d="M13 7h3M14.5 5.5v3"/>
+            </svg>
+            Add Guests
+          </a>
+          {isCancellable && (
+            <button className="dash-btn danger mb-action" type="button">
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 5h12M6 5V3a1 1 0 011-1h4a1 1 0 011 1v2M5 5l1 10h6l1-10"/>
+              </svg>
+              Cancel Booking
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* ── Waiver status ──────────────────────────────────────────────── */}
+      <div className="dash-section-card">
+        <div className="dash-section-header">
+          <span className="dash-section-label gold">ACCESS &amp; WAIVER</span>
+        </div>
+        <div className="mb-waiver-row">
+          <div className="mb-waiver-info">
+            <p className="mb-waiver-label">Your Waiver</p>
+            {waiver ? (
+              <p className="mb-waiver-status valid">
+                ✓ Valid until {formatInTimeZone(waiver.expiresAt, FACILITY_TZ, 'MMM d, yyyy')}
+              </p>
+            ) : (
+              <p className="mb-waiver-status invalid">No active waiver</p>
+            )}
+          </div>
+          {!waiver && (
+            <a href="/waiver" className="dash-btn ghost">Sign Waiver</a>
+          )}
+        </div>
+        {isFuture && waiver && (
+          <div className="mb-waiver-row" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 14, marginTop: 6 }}>
+            <div className="mb-waiver-info">
+              <p className="mb-waiver-label">Access Code</p>
+              <p className="mb-waiver-status">Sent by SMS 1 hour before your session.</p>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Actions */}
-      {isFuture && (
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <a href={`/api/book/${booking.id}/ics`} download className="ap-btn ghost">
+      {/* ── Bottom CTAs ─────────────────────────────────────────────────── */}
+      {isFuture ? (
+        <div className="mb-bottom-actions">
+          <a href={`/api/book/${booking.id}/ics`} download className="dash-btn ghost dash-btn-full">
             Add to Calendar
           </a>
-          <a href="/book" className="ap-btn primary">
-            Book Another Session →
+          <a href="/book" className="dash-btn primary dash-btn-full">
+            Book Another Session
           </a>
         </div>
-      )}
-
-      {!isFuture && (
-        <div style={{ display: 'flex', gap: 10 }}>
-          <a href="/book" className="ap-btn primary">Book Again →</a>
-        </div>
+      ) : (
+        <a href="/book" className="dash-btn primary dash-btn-full">
+          Book Again
+        </a>
       )}
     </div>
   )

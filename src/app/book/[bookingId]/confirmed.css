@@ -3,179 +3,254 @@
 .conf-page {
   min-height: 100vh;
   background: #0a0a0a;
+  padding: 48px 24px 80px;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
 }
 
-.conf-content {
+.conf-wrap {
   width: 100%;
-  max-width: 560px;
-  padding: 56px 24px 96px;
-  box-sizing: border-box;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
 }
 
-/* ── Card ─────────────────────────────────────────────────────────────────── */
-
-.conf-card {
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 24px;
-  padding: 40px 36px 36px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.conf-main {
+  min-width: 0;
 }
 
-.conf-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 5%,
-    rgba(212, 175, 55, 0.4) 40%,
-    rgba(212, 175, 55, 0.4) 60%,
-    transparent 95%
-  );
-}
+/* ── Success check ────────────────────────────────────────────────────────── */
 
-/* ── Check icon ───────────────────────────────────────────────────────────── */
-
-.conf-icon-wrap {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.conf-icon {
+.conf-check {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, rgba(74, 110, 52, 0.25) 0%, rgba(27, 67, 50, 0.35) 100%);
-  border: 1.5px solid rgba(74, 110, 52, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #8fbc58;
+  margin-bottom: 22px;
 }
 
-.conf-icon svg {
-  width: 28px;
-  height: 28px;
+.conf-check svg {
+  width: 100%;
+  height: 100%;
 }
-
-/* ── Heading ──────────────────────────────────────────────────────────────── */
 
 .conf-heading {
   font-family: var(--font-serif);
-  font-size: 1.9rem;
+  font-size: clamp(2rem, 4vw, 2.8rem);
   font-weight: 600;
   color: #fff;
-  margin: 0 0 8px;
+  margin: 0 0 14px;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
-.conf-number {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #D4AF37;
+.conf-intro {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.55);
   margin: 0 0 28px;
-  opacity: 0.8;
+  line-height: 1.55;
 }
 
-/* ── Summary ──────────────────────────────────────────────────────────────── */
+/* ── Confirmation number card ────────────────────────────────────────────── */
 
-.conf-summary {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+.conf-number-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.26);
   border-radius: 14px;
   padding: 16px 20px;
   margin-bottom: 28px;
-  text-align: left;
 }
 
-.conf-table {
-  width: 100%;
-  border-collapse: collapse;
+.conf-number-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(212, 175, 55, 0.7);
+  margin: 0 0 3px;
 }
 
-.conf-table tr + tr td {
-  padding-top: 8px;
-}
-
-.conf-td-label {
-  font-size: 0.78rem;
-  color: rgba(255, 255, 255, 0.3);
-  width: 80px;
-  vertical-align: top;
-  padding-right: 12px;
-  white-space: nowrap;
-}
-
-.conf-td-value {
-  font-size: 0.88rem;
+.conf-number-value {
+  font-family: 'SF Mono', Monaco, Menlo, monospace;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.82);
+  color: #8fbc58;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.conf-copy {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(74, 110, 52, 0.3);
+  color: rgba(212, 175, 55, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.conf-copy:hover {
+  background: rgba(212, 175, 55, 0.12);
+  color: #D4AF37;
+}
+
+.conf-copy svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Section label (shared) ───────────────────────────────────────────────── */
+
+.conf-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(212, 175, 55, 0.7);
+  margin: 0 0 16px;
 }
 
 /* ── What happens next ────────────────────────────────────────────────────── */
 
-.conf-next-section {
-  text-align: left;
+.conf-next {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.22);
+  border-radius: 14px;
+  padding: 20px 22px;
   margin-bottom: 28px;
-}
-
-.conf-next-title {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.28);
-  margin: 0 0 14px;
-}
-
-.conf-next-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .conf-next-item {
   display: flex;
-  gap: 12px;
-  font-size: 0.84rem;
-  color: rgba(255, 255, 255, 0.55);
-  line-height: 1.55;
+  gap: 14px;
+  padding: 12px 0;
 }
 
-.conf-next-item strong {
-  color: rgba(255, 255, 255, 0.78);
-  font-weight: 600;
+.conf-next-item:first-of-type {
+  padding-top: 0;
 }
 
-.conf-next-num {
-  width: 22px;
-  height: 22px;
+.conf-next-item + .conf-next-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.conf-next-icon {
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(212, 175, 55, 0.08);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: rgba(212, 175, 55, 0.7);
-  font-size: 0.68rem;
-  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 1px;
+  margin-top: 2px;
+}
+
+.conf-next-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.conf-next-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 4px;
+}
+
+.conf-next-body {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Aside (booking summary) ──────────────────────────────────────────────── */
+
+.conf-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conf-summary {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.22);
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.conf-summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.conf-summary-row:first-of-type {
+  padding-top: 0;
+}
+
+.conf-summary-icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(212, 175, 55, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.conf-summary-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.conf-summary-label {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.conf-summary-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 2px 0 0;
+}
+
+.conf-total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(74, 110, 52, 0.22);
+}
+
+.conf-total-label {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.conf-total-value {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #D4AF37;
 }
 
 /* ── Actions ──────────────────────────────────────────────────────────────── */
@@ -186,71 +261,97 @@
   gap: 10px;
 }
 
-.conf-btn-primary {
+.conf-actions-desktop {
+  display: flex;
+}
+
+.conf-actions-mobile {
+  display: none;
+  margin-top: 28px;
+}
+
+.conf-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 50px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
-  border: 1px solid rgba(212, 175, 55, 0.2);
-  color: #D4AF37;
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.conf-btn-primary:hover {
-  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
-}
-
-.conf-btn-secondary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  border-radius: 12px;
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.conf-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.conf-btn-ghost {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  height: 46px;
+  border-radius: 10px;
   font-size: 0.82rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.28);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   text-decoration: none;
-  padding: 6px 0;
-  transition: color 0.15s;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
 }
 
-.conf-btn-ghost:hover {
-  color: rgba(255, 255, 255, 0.6);
+.conf-btn.primary {
+  background: #4a6e34;
+  color: #fff;
+  border-color: #4a6e34;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────────────── */
+.conf-btn.primary:hover {
+  background: #5a8040;
+  border-color: #5a8040;
+  box-shadow: 0 2px 12px rgba(74, 110, 52, 0.3);
+}
 
-@media (max-width: 640px) {
-  .conf-content {
-    padding: 28px 16px 80px;
+.conf-btn.ghost {
+  background: transparent;
+  border-color: rgba(74, 110, 52, 0.4);
+  color: rgba(143, 166, 94, 0.95);
+}
+
+.conf-btn.ghost:hover {
+  background: rgba(74, 110, 52, 0.08);
+  border-color: rgba(74, 110, 52, 0.6);
+  color: #8fa65e;
+}
+
+.conf-footer-note {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin: 24px 0 0;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .conf-wrap {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
-  .conf-card {
-    padding: 28px 20px 24px;
+  .conf-aside {
+    order: -1;
+  }
+
+  .conf-actions-desktop {
+    display: none;
+  }
+
+  .conf-actions-mobile {
+    display: flex;
+  }
+
+  .conf-check {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .conf-page {
+    padding: 32px 16px 64px;
+  }
+
+  .conf-number-card,
+  .conf-next,
+  .conf-summary {
+    padding: 18px;
   }
 }

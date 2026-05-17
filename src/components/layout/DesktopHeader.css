@@ -163,16 +163,8 @@
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .dh-inner {
-    padding: 0 20px;
-    height: 60px;
-  }
-
-  .dh-logo {
-    height: 34px;
-  }
-
-  .dh-nav {
+  /* Hide desktop header on phones — bottom nav handles navigation */
+  .dh-header {
     display: none;
   }
 }

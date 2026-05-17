@@ -5,6 +5,7 @@ import { bookings, bays } from '@/db/schema'
 import { eq, and } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
+import { CopyButton } from './CopyButton'
 import './confirmed.css'
 
 export const metadata: Metadata = {
@@ -17,9 +18,7 @@ const FACILITY_TZ = 'America/New_York'
 function durationLabel(startsAt: Date, endsAt: Date): string {
   const min = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
   if (min < 60) return `${min} min`
-  const h = Math.floor(min / 60)
-  const m = min % 60
-  return m === 0 ? `${h} hr` : `${h} hr ${m} min`
+  return min % 60 === 0 ? `${min / 60} hr` : `${(min / 60).toFixed(1)} hr`
 }
 
 export default async function BookingConfirmedPage({
@@ -39,6 +38,7 @@ export default async function BookingConfirmedPage({
       status: bookings.status,
       bayLabel: bays.label,
       totalCents: bookings.totalCents,
+      partySize: bookings.partySize,
     })
     .from(bookings)
     .innerJoin(bays, eq(bookings.bayId, bays.id))
@@ -47,96 +47,196 @@ export default async function BookingConfirmedPage({
 
   if (!booking) redirect('/account')
 
-  const fmtDate = (d: Date) => formatInTimeZone(d, FACILITY_TZ, 'EEEE, MMMM d')
-  const fmtTime = (d: Date) => formatInTimeZone(d, FACILITY_TZ, 'h:mm a')
-
   const confirmationNum = `SPC-${bookingId.slice(0, 6).toUpperCase()}-${bookingId.slice(-4).toUpperCase()}`
-
-  const summaryRows = [
-    ['Date',     fmtDate(booking.startsAt)],
-    ['Time',     `${fmtTime(booking.startsAt)} – ${fmtTime(booking.endsAt)}`],
-    ['Bay',      booking.bayLabel],
-    ['Duration', durationLabel(booking.startsAt, booking.endsAt)],
-  ] as const
 
   return (
     <div className="conf-page">
-      <div className="conf-content">
+      <div className="conf-wrap">
 
-        {/* ── Success card ─────────────────────────────────────────────────── */}
-        <div className="conf-card">
-
-          {/* Check icon */}
-          <div className="conf-icon-wrap">
-            <div className="conf-icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
-                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="4 12 10 18 20 6" />
-              </svg>
-            </div>
+        {/* ── Left: success message + what happens next ───────────────────── */}
+        <div className="conf-main">
+          <div className="conf-check">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="24" cy="24" r="22"/>
+              <path d="M14 24l8 8 14-16"/>
+            </svg>
           </div>
 
-          <h1 className="conf-heading">Booking Confirmed!</h1>
-          <p className="conf-number">{confirmationNum}</p>
+          <h1 className="conf-heading">Booking Confirmed</h1>
+          <p className="conf-intro">
+            Your reservation has been confirmed.<br/>We look forward to seeing you!
+          </p>
 
-          {/* Summary */}
-          <div className="conf-summary">
-            <table className="conf-table">
-              <tbody>
-                {summaryRows.map(([label, value]) => (
-                  <tr key={label}>
-                    <td className="conf-td-label">{label}</td>
-                    <td className="conf-td-value">{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Confirmation number */}
+          <div className="conf-number-card">
+            <div>
+              <p className="conf-number-label">CONFIRMATION NUMBER</p>
+              <p className="conf-number-value">{confirmationNum}</p>
+            </div>
+            <CopyButton text={confirmationNum} />
           </div>
 
           {/* What happens next */}
-          <div className="conf-next-section">
-            <p className="conf-next-title">What happens next?</p>
-            <ul className="conf-next-list">
-              <li className="conf-next-item">
-                <span className="conf-next-num">1</span>
-                <span>
-                  <strong>Confirmation email</strong> — a receipt and session details are on their way to your inbox.
-                </span>
-              </li>
-              <li className="conf-next-item">
-                <span className="conf-next-num">2</span>
-                <span>
-                  <strong>Access code by SMS</strong> — your bay entry code will be texted 1 hour before your session.
-                </span>
-              </li>
-              <li className="conf-next-item">
-                <span className="conf-next-num">3</span>
-                <span>
-                  <strong>Waiver check</strong> — all players need a signed waiver. You can add guests in your account.
-                </span>
-              </li>
-            </ul>
+          <div className="conf-next">
+            <p className="conf-section-label">WHAT HAPPENS NEXT</p>
+
+            <div className="conf-next-item">
+              <div className="conf-next-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="4" width="16" height="12" rx="2"/>
+                  <path d="M2 6l8 6 8-6"/>
+                </svg>
+              </div>
+              <div>
+                <p className="conf-next-title">Access Details</p>
+                <p className="conf-next-body">
+                  You&apos;ll receive an email with everything you need to access {booking.bayLabel} before your session.
+                </p>
+              </div>
+            </div>
+
+            <div className="conf-next-item">
+              <div className="conf-next-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="10" cy="7" r="3"/>
+                  <path d="M3 18a7 7 0 0114 0"/>
+                </svg>
+              </div>
+              <div>
+                <p className="conf-next-title">Waivers Required</p>
+                <p className="conf-next-body">
+                  All players must have a signed waiver on file. Guests will receive a link to complete theirs.
+                </p>
+              </div>
+            </div>
+
+            <div className="conf-next-item">
+              <div className="conf-next-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                  <rect x="3" y="4" width="14" height="13" rx="2"/>
+                  <path d="M7 2v4M13 2v4M3 9h14"/>
+                </svg>
+              </div>
+              <div>
+                <p className="conf-next-title">Arrive Early</p>
+                <p className="conf-next-body">
+                  We recommend arriving 10–15 minutes early to check in and get set up.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Actions */}
-          <div className="conf-actions">
-            <a
-              href={`/account/bookings/${bookingId}`}
-              className="conf-btn-primary"
-            >
+          {/* Buttons (mobile shows here, desktop shows on side) */}
+          <div className="conf-actions conf-actions-mobile">
+            <a href={`/account/bookings/${bookingId}`} className="conf-btn primary">
               View Booking
             </a>
-            <a
-              href={`/api/book/${bookingId}/ics`}
-              className="conf-btn-secondary"
-              download
-            >
+            <a href={`/api/book/${bookingId}/ics`} download className="conf-btn ghost">
               Add to Calendar
             </a>
-            <a href="/book" className="conf-btn-ghost">Book Another Session →</a>
+            <a href="/book" className="conf-btn ghost">
+              Book Another Session
+            </a>
           </div>
 
+          <p className="conf-footer-note">A confirmation email has been sent to you.</p>
         </div>
+
+        {/* ── Right: booking summary ──────────────────────────────────────── */}
+        <aside className="conf-aside">
+          <div className="conf-summary">
+            <p className="conf-section-label">YOUR BOOKING</p>
+
+            <div className="conf-summary-row">
+              <span className="conf-summary-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                  <rect x="3" y="4" width="14" height="13" rx="2"/>
+                  <path d="M7 2v4M13 2v4M3 9h14"/>
+                </svg>
+              </span>
+              <div>
+                <p className="conf-summary-label">Date</p>
+                <p className="conf-summary-value">
+                  {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, yyyy')}
+                </p>
+              </div>
+            </div>
+
+            <div className="conf-summary-row">
+              <span className="conf-summary-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                  <circle cx="10" cy="10" r="7"/>
+                  <path d="M10 6v4l2.5 2.5"/>
+                </svg>
+              </span>
+              <div>
+                <p className="conf-summary-label">Time</p>
+                <p className="conf-summary-value">
+                  {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} –{' '}
+                  {formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}
+                </p>
+              </div>
+            </div>
+
+            <div className="conf-summary-row">
+              <span className="conf-summary-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 3h8M6 17h8M7 3v3l3 3-3 3v3M13 3v3l-3 3 3 3v3"/>
+                </svg>
+              </span>
+              <div>
+                <p className="conf-summary-label">Duration</p>
+                <p className="conf-summary-value">{durationLabel(booking.startsAt, booking.endsAt)}</p>
+              </div>
+            </div>
+
+            <div className="conf-summary-row">
+              <span className="conf-summary-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                  <circle cx="7" cy="7" r="3"/>
+                  <path d="M2 17a5 5 0 0110 0"/>
+                  <circle cx="14" cy="8" r="2.5"/>
+                </svg>
+              </span>
+              <div>
+                <p className="conf-summary-label">Players</p>
+                <p className="conf-summary-value">{booking.partySize || 1} Player{booking.partySize !== 1 ? 's' : ''}</p>
+              </div>
+            </div>
+
+            <div className="conf-summary-row">
+              <span className="conf-summary-icon">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+                  <rect x="2" y="3" width="16" height="14" rx="2"/>
+                  <path d="M2 7h16"/>
+                </svg>
+              </span>
+              <div>
+                <p className="conf-summary-label">Bay</p>
+                <p className="conf-summary-value">{booking.bayLabel}</p>
+              </div>
+            </div>
+
+            <div className="conf-total-row">
+              <span className="conf-total-label">Total</span>
+              <span className="conf-total-value">
+                {booking.totalCents > 0 ? `$${(booking.totalCents / 100).toFixed(2)}` : 'Free'}
+              </span>
+            </div>
+          </div>
+
+          <div className="conf-actions conf-actions-desktop">
+            <a href={`/account/bookings/${bookingId}`} className="conf-btn primary">
+              View Booking
+            </a>
+            <a href={`/api/book/${bookingId}/ics`} download className="conf-btn ghost">
+              Add to Calendar
+            </a>
+            <a href="/book" className="conf-btn ghost">
+              Book Another Session
+            </a>
+          </div>
+        </aside>
       </div>
     </div>
   )

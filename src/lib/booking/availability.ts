@@ -154,7 +154,7 @@ export async function getAvailabilityGrid(params: {
   const now = new Date()
 
   // Generate all candidate start times
-  const times: Array<{ startsAt: Date; endsAt: Date; label: string; hourET: number }> = []
+  const times: Array<{ startsAt: Date; endsAt: Date; label: string; hourET: number; minuteET: number; dayOfWeek: number }> = []
 
   for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
     for (const m of [0, SLOT_INTERVAL]) {
@@ -170,7 +170,7 @@ export async function getAvailabilityGrid(params: {
       const label = startET.toLocaleTimeString('en-US', {
         hour: 'numeric', minute: '2-digit', hour12: true,
       })
-      times.push({ startsAt: startUTC, endsAt: endUTC, label, hourET: h })
+      times.push({ startsAt: startUTC, endsAt: endUTC, label, hourET: h, minuteET: m, dayOfWeek: startET.getDay() })
     }
   }
 
@@ -224,7 +224,7 @@ export async function getAvailabilityGrid(params: {
         bayId: bay.id,
         bayLabel: bay.label,
         status: blocked ? 'booked' : 'available',
-        priceCents: blocked ? undefined : calculatePriceCents(t.hourET, durationMinutes),
+        priceCents: blocked ? undefined : calculatePriceCents(t.hourET, t.minuteET, durationMinutes, t.dayOfWeek),
       }
     })
 

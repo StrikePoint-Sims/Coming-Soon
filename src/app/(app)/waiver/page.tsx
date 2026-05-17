@@ -31,7 +31,7 @@ export default async function WaiverPage({
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-12 pb-24">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#8fa65e] mb-4 block">
+        <span className="text-xs font-bold uppercase tracking-widest text-[rgba(212,175,55,0.75)] mb-4 block">
           Legal
         </span>
         <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-semibold text-white mb-2">
@@ -109,7 +109,7 @@ export default async function WaiverPage({
 
             <button
               type="submit"
-              className="w-full h-12 rounded-lg bg-[#1B4332] text-[#D4AF37] border border-[#D4AF37] font-semibold text-sm hover:bg-[#2a5c46] transition-colors"
+              className="w-full h-12 rounded-lg bg-[#4a6e34] text-white border border-[#4a6e34] font-bold text-sm tracking-wider uppercase hover:bg-[#5a8040] hover:border-[#5a8040] hover:shadow-lg hover:shadow-[#4a6e34]/30 transition-all"
             >
               Sign waiver and continue
             </button>

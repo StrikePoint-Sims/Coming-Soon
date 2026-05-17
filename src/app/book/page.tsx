@@ -1,9 +1,9 @@
 'use client'
 
 import './book.css'
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { addDays, format, startOfMonth, getDaysInMonth, getDay, addMonths, subMonths } from 'date-fns'
+import { addDays, format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
 import { createHold } from './actions'
 import type { GridRow } from '@/lib/booking/availability'
@@ -13,17 +13,16 @@ const FACILITY_TZ = 'America/New_York'
 const DRAFT_KEY = 'book:draft'
 
 const DURATIONS = [
-  { minutes: 60,  label: '1 HR' },
-  { minutes: 90,  label: '1.5 HR' },
-  { minutes: 120, label: '2 HR' },
-  { minutes: 180, label: '3 HR' },
+  { minutes: 60,  label: '1 hr' },
+  { minutes: 90,  label: '1.5 hr' },
+  { minutes: 120, label: '2 hr' },
+  { minutes: 180, label: '3 hr' },
 ]
 
-const CAL_DOW = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+const PLAYER_COUNTS = [1, 2, 3, 4]
 
 interface SelectedSlot {
-  bayId: string
-  bayLabel: string
+  bayId: string   // used internally for hold creation, not shown to customer
   startsAt: string
   endsAt: string
   priceCents: number
@@ -45,32 +44,9 @@ function buildDateList(offset: number) {
     const idx = offset + i
     const dayName = idx === 0 ? 'Today' : idx === 1 ? 'Tomorrow' : format(d, 'EEE')
     const dayNum = format(d, 'd')
-    return { date: dateStr, dayName, dayNum }
+    const monthDay = format(d, 'MMM d')
+    return { date: dateStr, dayName, dayNum, monthDay }
   })
-}
-
-type CalCell = { date: string; day: number; isPast: boolean } | null
-
-function buildCalendar(month: Date, todayStr: string): CalCell[] {
-  const firstDay = startOfMonth(month)
-  const daysInMonth = getDaysInMonth(month)
-  const startDow = getDay(firstDay) // 0 = Sunday
-
-  const cells: CalCell[] = []
-
-  // Leading empty cells
-  for (let i = 0; i < startDow; i++) cells.push(null)
-
-  // Day cells
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = format(addDays(firstDay, d - 1), 'yyyy-MM-dd')
-    cells.push({ date: dateStr, day: d, isPast: dateStr < todayStr })
-  }
-
-  // Pad to a full 6-row grid (42 cells)
-  while (cells.length < 42) cells.push(null)
-
-  return cells
 }
 
 export default function BookPage() {
@@ -78,7 +54,6 @@ export default function BookPage() {
   const today = format(new Date(), 'yyyy-MM-dd')
   const tomorrow = format(addDays(new Date(), 1), 'yyyy-MM-dd')
 
-  // ── Desktop state ──────────────────────────────────────────────────────────
   const [dateOffset, setDateOffset] = useState(0)
   const [selectedDate, setSelectedDate] = useState(tomorrow)
   const [duration, setDuration] = useState(60)
@@ -90,13 +65,6 @@ export default function BookPage() {
   const [submitting, setSubmitting] = useState(false)
   const resumedRef = useRef(false)
   const calInputRef = useRef<HTMLInputElement>(null)
-
-  // ── Mobile step state ──────────────────────────────────────────────────────
-  const [mobileStep, setMobileStep] = useState<1 | 2 | 3>(1)
-  const [mobileMonth, setMobileMonth] = useState(() => startOfMonth(new Date()))
-  const [mobilePicked, setMobilePicked] = useState<string | null>(null)
-
-  const calendarCells = useMemo(() => buildCalendar(mobileMonth, today), [mobileMonth, today])
 
   const dates = buildDateList(dateOffset)
 
@@ -118,12 +86,10 @@ export default function BookPage() {
     }
   }, [])
 
-  // Auto-fetch when date or duration changes
   useEffect(() => {
     void fetchGrid(selectedDate, duration)
   }, [selectedDate, duration, fetchGrid])
 
-  // Resume draft slot after login redirect
   useEffect(() => {
     if (!session?.user?.id || resumedRef.current) return
     const raw = sessionStorage.getItem(DRAFT_KEY)
@@ -156,6 +122,7 @@ export default function BookPage() {
       bayId: target.bayId,
       startsAt: target.startsAt,
       endsAt: target.endsAt,
+      partySize: players,
     })
 
     if ('needsAuth' in result) {
@@ -186,10 +153,17 @@ export default function BookPage() {
     setRows([])
   }
 
+  function stepDuration(delta: number) {
+    const newDur = Math.max(60, Math.min(240, duration + delta))
+    if (newDur === duration) return
+    handleDurationChange(newDur)
+  }
+
   const availableCount = rows.reduce(
     (sum, row) => sum + row.cells.filter(c => c.status === 'available').length,
     0
   )
+  const availableSlotCount = rows.filter(r => r.cells.some(c => c.status === 'available')).length
 
   const formatTimeRange = (startsAt: string, endsAt: string) => {
     const start = formatInTimeZone(new Date(startsAt), FACILITY_TZ, 'h:mm a')
@@ -200,87 +174,15 @@ export default function BookPage() {
   const formatDateDisplay = (dateStr: string) =>
     formatInTimeZone(new Date(dateStr + 'T12:00:00Z'), FACILITY_TZ, 'EEE, MMM d')
 
-  const durationLabel = DURATIONS.find(d => d.minutes === duration)?.label ?? `${duration} min`
-
-  // Unique bay list from first row
-  const bayHeaders = rows[0]?.cells ?? []
-
-  // Availability grid table (shared by desktop and mobile step 3)
-  const GridTable = () => (
-    loading ? (
-      <div className="book-loading-row">
-        <div className="book-spinner" />
-        <span>Loading availability…</span>
-      </div>
-    ) : rows.length === 0 ? (
-      <p className="book-no-slots">No times available. Try a different date or duration.</p>
-    ) : (
-      <div className="book-table-wrap">
-        <table className="book-avail-table">
-          <thead>
-            <tr>
-              <th className="book-th-time">Time</th>
-              {bayHeaders.map(cell => (
-                <th key={cell.bayId} className="book-th-bay">{cell.bayLabel}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map(row => (
-              <tr key={row.startsAt}>
-                <td className="book-td-time">{row.timeLabel}</td>
-                {row.cells.map(cell => {
-                  const isSelected =
-                    selected?.startsAt === row.startsAt &&
-                    selected?.bayId === cell.bayId
-
-                  if (cell.status === 'booked') {
-                    return (
-                      <td key={cell.bayId} className="book-td-cell">
-                        <div className="book-cell-btn is-booked">Booked</div>
-                      </td>
-                    )
-                  }
-
-                  const slotData: SelectedSlot = {
-                    bayId: cell.bayId,
-                    bayLabel: cell.bayLabel,
-                    startsAt: row.startsAt,
-                    endsAt: row.endsAt,
-                    priceCents: cell.priceCents ?? 0,
-                    timeLabel: row.timeLabel,
-                  }
-
-                  return (
-                    <td key={cell.bayId} className="book-td-cell">
-                      <button
-                        className={`book-cell-btn is-available${isSelected ? ' is-selected' : ''}`}
-                        onClick={() => setSelected(slotData)}
-                        disabled={submitting}
-                      >
-                        <span className="book-cell-price">
-                          ${((cell.priceCents ?? 0) / 100).toFixed(0)}
-                        </span>
-                        <span className="book-cell-check">{isSelected ? '✓' : '+'}</span>
-                      </button>
-                    </td>
-                  )
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
-  )
+  const durationLabel = `${duration / 60} hr`
 
   return (
     <div className="book-page">
       <div className="book-content">
 
-        {/* ════════════════════════════════════════════════════════════════════
-            DESKTOP UI  (hidden at ≤640px via book-desktop-ui class)
-        ════════════════════════════════════════════════════════════════════ */}
+        {/* ════════════════════════════════════════════════════════════════
+            DESKTOP UI  — hidden at ≤640px
+        ════════════════════════════════════════════════════════════════ */}
         <div className="book-desktop-ui">
 
           <div className="book-hero">
@@ -290,54 +192,23 @@ export default function BookPage() {
 
           {/* Date scroller */}
           <div className="book-date-row">
-            <button
-              className="book-date-arrow"
-              onClick={() => setDateOffset(o => Math.max(0, o - 7))}
-              disabled={dateOffset === 0}
-              aria-label="Previous week"
-            >
-              ‹
-            </button>
-
+            <button className="book-date-arrow" onClick={() => setDateOffset(o => Math.max(0, o - 7))} disabled={dateOffset === 0} aria-label="Previous week">‹</button>
             {dates.map(({ date, dayName, dayNum }) => (
-              <button
-                key={date}
-                className={`book-date-btn${selectedDate === date ? ' is-selected' : ''}`}
-                onClick={() => handleDateChange(date)}
-              >
+              <button key={date} className={`book-date-btn${selectedDate === date ? ' is-selected' : ''}`} onClick={() => handleDateChange(date)}>
                 <span className="book-date-name">{dayName}</span>
                 <span className="book-date-num">{dayNum}</span>
               </button>
             ))}
-
-            <button
-              className="book-date-arrow"
-              onClick={() => setDateOffset(o => o + 7)}
-              aria-label="Next week"
-            >
-              ›
-            </button>
-
-            <button
-              className="book-date-cal-btn"
-              onClick={() => calInputRef.current?.showPicker?.()}
-              aria-label="Open calendar"
-            >
+            <button className="book-date-arrow" onClick={() => setDateOffset(o => o + 7)} aria-label="Next week">›</button>
+            <button className="book-date-cal-btn" onClick={() => calInputRef.current?.showPicker?.()} aria-label="Open calendar">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                 <rect x="1" y="3" width="14" height="12" rx="2" stroke="currentColor" strokeWidth="1.5"/>
                 <path d="M5 1v4M11 1v4M1 7h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              <input
-                ref={calInputRef}
-                type="date"
-                className="book-date-cal-input"
-                min={today}
-                tabIndex={-1}
+              <input ref={calInputRef} type="date" className="book-date-cal-input" min={today} tabIndex={-1}
                 onChange={e => {
                   if (!e.target.value) return
-                  const diffDays = Math.floor(
-                    (new Date(e.target.value).getTime() - new Date(today).getTime()) / 86400000
-                  )
+                  const diffDays = Math.floor((new Date(e.target.value).getTime() - new Date(today).getTime()) / 86400000)
                   setDateOffset(Math.max(0, Math.floor(diffDays / 7) * 7))
                   handleDateChange(e.target.value)
                 }}
@@ -345,70 +216,82 @@ export default function BookPage() {
             </button>
           </div>
 
-          {/* Controls: duration + players */}
+          {/* Controls */}
           <div className="book-controls-row">
             <div className="book-duration-pills">
               {DURATIONS.map(d => (
-                <button
-                  key={d.minutes}
-                  className={`book-dur-pill${duration === d.minutes ? ' is-active' : ''}`}
-                  onClick={() => handleDurationChange(d.minutes)}
-                >
+                <button key={d.minutes} className={`book-dur-pill${duration === d.minutes ? ' is-active' : ''}`} onClick={() => handleDurationChange(d.minutes)}>
                   {d.label}
                 </button>
               ))}
             </div>
-
             <div className="book-players-stepper">
               <span className="book-players-label">Players</span>
-              <button
-                className="book-step-btn"
-                onClick={() => setPlayers(p => Math.max(1, p - 1))}
-                disabled={players <= 1}
-                aria-label="Decrease players"
-              >
-                −
-              </button>
+              <button className="book-step-btn" onClick={() => setPlayers(p => Math.max(1, p - 1))} disabled={players <= 1} aria-label="Decrease">−</button>
               <span className="book-players-count">{players}</span>
-              <button
-                className="book-step-btn"
-                onClick={() => setPlayers(p => Math.min(6, p + 1))}
-                disabled={players >= 6}
-                aria-label="Increase players"
-              >
-                +
-              </button>
+              <button className="book-step-btn" onClick={() => setPlayers(p => Math.min(4, p + 1))} disabled={players >= 4} aria-label="Increase">+</button>
             </div>
           </div>
 
           {error && (
             <p className="book-error">
               {error}
-              {error.toLowerCase().includes('waiver') && (
-                <>{' '}<a href="/waiver?callbackUrl=/book" className="book-error-link">Sign waiver →</a></>
-              )}
+              {error.toLowerCase().includes('waiver') && <>{' '}<a href="/waiver?callbackUrl=/book" className="book-error-link">Sign waiver →</a></>}
             </p>
           )}
 
           {/* Two-column body */}
           <div className="book-body">
-
-            {/* Grid column */}
             <div className="book-grid-col">
               <div className="book-avail-header">
-                <span className="book-avail-title">Bay Availability</span>
-                {!loading && rows.length > 0 && (
-                  <span className="book-avail-count">{availableCount} slots open</span>
-                )}
+                <span className="book-avail-title">Available Times</span>
+                {!loading && rows.length > 0 && <span className="book-avail-count">{availableSlotCount} times open</span>}
               </div>
-              <GridTable />
+              {loading ? (
+                <div className="book-loading-row"><div className="book-spinner" /><span>Loading availability…</span></div>
+              ) : rows.length === 0 ? (
+                <p className="book-no-slots">No times available. Try a different date or duration.</p>
+              ) : (
+                <div className="book-slot-list">
+                  {rows.map(row => {
+                    const avail = row.cells.filter(c => c.status === 'available')
+                    const total = row.cells.length
+                    const isBooked = avail.length === 0
+                    const isLimited = avail.length === 1
+                    const isSelected = selected?.startsAt === row.startsAt
+                    const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
+                    const price = avail[0]?.priceCents ?? 0
+                    return (
+                      <button
+                        key={row.startsAt}
+                        className={`book-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
+                        onClick={() => {
+                          if (isBooked) return
+                          const bay = avail[0]
+                          if (!bay) return
+                          setSelected({ bayId: bay.bayId, startsAt: row.startsAt, endsAt: row.endsAt, priceCents: bay.priceCents ?? 0, timeLabel: row.timeLabel })
+                        }}
+                        disabled={isBooked || submitting}
+                      >
+                        <span className="book-slot-time">{row.timeLabel}</span>
+                        <span className="book-slot-avail">
+                          <span className={`book-slot-dot ${dotCls}`} />
+                          {isBooked ? 'Fully booked' : `${avail.length} of ${total} bay${total !== 1 ? 's' : ''} available`}
+                        </span>
+                        {!isBooked && <span className="book-slot-price">${(price / 100).toFixed(0)}</span>}
+                        <span className="book-slot-action">
+                          {isBooked ? '' : isSelected ? '✓ Selected' : 'Select →'}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Right rail */}
             <aside className="book-rail">
               <div className="book-rail-card">
                 <p className="book-rail-label">YOUR BOOKING</p>
-
                 {selected ? (
                   <>
                     <p className="book-rail-date">{formatDateDisplay(selectedDate)}</p>
@@ -418,234 +301,199 @@ export default function BookPage() {
                       <span className="book-rail-dot">·</span>
                       <span>{players} Player{players !== 1 ? 's' : ''}</span>
                     </div>
-                    <p className="book-rail-bay">{selected.bayLabel}</p>
-
                     <div className="book-rail-divider" />
-
                     <div className="book-rail-price-row">
                       <span>Subtotal</span>
-                      <span className="book-rail-price">
-                        ${(selected.priceCents / 100).toFixed(2)}
-                      </span>
+                      <span className="book-rail-price">${(selected.priceCents / 100).toFixed(2)}</span>
                     </div>
                     <p className="book-rail-tax-note">Sales tax shown at checkout</p>
-
-                    <button
-                      className="book-rail-btn"
-                      onClick={() => void handleReserve()}
-                      disabled={submitting}
-                    >
+                    <button className="book-rail-btn" onClick={() => void handleReserve()} disabled={submitting}>
                       {submitting ? 'Reserving…' : 'Reserve Bay →'}
                     </button>
                   </>
                 ) : (
-                  <p className="book-rail-empty">
-                    Select an available time to see your booking summary.
-                  </p>
+                  <p className="book-rail-empty">Select an available time to see your booking summary.</p>
                 )}
               </div>
             </aside>
-
           </div>
         </div>
         {/* end .book-desktop-ui */}
 
-        {/* ════════════════════════════════════════════════════════════════════
-            MOBILE UI  (hidden at ≥641px via book-mobile-ui class)
-        ════════════════════════════════════════════════════════════════════ */}
-        <div className="book-mobile-ui">
+        {/* ════════════════════════════════════════════════════════════════
+            MOBILE UI — single-scroll page, hidden at ≥641px
+        ════════════════════════════════════════════════════════════════ */}
+        <div className={`book-mobile-ui${selected ? ' has-bar' : ''}`}>
 
-          {/* ── Step 1: Select Date ─────────────────────────────────────────── */}
-          {mobileStep === 1 && (
-            <div className="book-m-step">
-              <div className="book-m-header">
-                <h1 className="book-m-title">Book a Bay</h1>
-              </div>
+          {/* Page heading */}
+          <div className="book-m-hero">
+            <h1 className="book-m-title">Book a Bay</h1>
+            <p className="book-m-subtitle">Find a time that fits your schedule.</p>
+          </div>
 
-              {/* Month navigation */}
-              <div className="book-m-month-nav">
+          {/* ── Date scroller ───────────────────────────────────────────── */}
+          <div className="book-m-date-row">
+            <button
+              className="book-m-nav-btn"
+              onClick={() => setDateOffset(o => Math.max(0, o - 7))}
+              disabled={dateOffset === 0}
+              aria-label="Previous"
+            >
+              ‹
+            </button>
+            <div className="book-m-dates-scroll">
+              {dates.map(({ date, dayName, monthDay }) => (
                 <button
-                  className="book-m-month-btn"
-                  onClick={() => setMobileMonth(m => subMonths(m, 1))}
-                  disabled={format(mobileMonth, 'yyyy-MM') <= format(new Date(), 'yyyy-MM')}
-                  aria-label="Previous month"
+                  key={date}
+                  className={`book-m-date-pill${selectedDate === date ? ' is-selected' : ''}`}
+                  onClick={() => handleDateChange(date)}
                 >
-                  ‹
+                  <span className="book-m-date-pill-name">{dayName}</span>
+                  <span className="book-m-date-pill-md">{monthDay}</span>
                 </button>
-                <span className="book-m-month-label">{format(mobileMonth, 'MMMM yyyy')}</span>
-                <button
-                  className="book-m-month-btn"
-                  onClick={() => setMobileMonth(m => addMonths(m, 1))}
-                  aria-label="Next month"
-                >
-                  ›
-                </button>
-              </div>
-
-              {/* Day-of-week headers */}
-              <div className="book-m-cal-dow">
-                {CAL_DOW.map(d => (
-                  <span key={d} className="book-m-cal-dow-cell">{d}</span>
-                ))}
-              </div>
-
-              {/* Calendar grid */}
-              <div className="book-m-calendar">
-                {calendarCells.map((cell, i) => (
-                  cell === null ? (
-                    <span key={i} className="book-m-cal-day is-empty" aria-hidden="true" />
-                  ) : (
-                    <button
-                      key={cell.date}
-                      className={[
-                        'book-m-cal-day',
-                        cell.isPast ? 'is-past' : '',
-                        mobilePicked === cell.date ? 'is-selected' : '',
-                      ].join(' ').trim()}
-                      onClick={() => !cell.isPast && setMobilePicked(cell.date)}
-                      disabled={cell.isPast}
-                      aria-label={cell.date}
-                      aria-pressed={mobilePicked === cell.date}
-                    >
-                      {cell.day}
-                    </button>
-                  )
-                ))}
-              </div>
-
-              <button
-                className="book-m-continue"
-                disabled={!mobilePicked}
-                onClick={() => {
-                  if (!mobilePicked) return
-                  handleDateChange(mobilePicked)
-                  setMobileStep(2)
-                }}
-              >
-                Continue →
-              </button>
+              ))}
             </div>
-          )}
+            <button
+              className="book-m-nav-btn"
+              onClick={() => setDateOffset(o => o + 7)}
+              aria-label="Next"
+            >
+              ›
+            </button>
+          </div>
 
-          {/* ── Step 2: Duration & Players ──────────────────────────────────── */}
-          {mobileStep === 2 && (
-            <div className="book-m-step">
-              <div className="book-m-header">
-                <button
-                  className="book-m-back"
-                  onClick={() => setMobileStep(1)}
-                >
-                  ← Back
-                </button>
-                <h1 className="book-m-title">Session Details</h1>
-              </div>
-
-              <p className="book-m-section-label">Duration</p>
-              <div className="book-m-dur-grid">
-                {DURATIONS.map(d => (
-                  <button
-                    key={d.minutes}
-                    className={`book-m-dur-tile${duration === d.minutes ? ' is-active' : ''}`}
-                    onClick={() => handleDurationChange(d.minutes)}
-                  >
-                    {d.label}
-                  </button>
-                ))}
-              </div>
-
-              <p className="book-m-section-label">Players</p>
-              <div className="book-m-players-row">
-                <span className="book-m-players-label">Number of players</span>
-                <button
-                  className="book-m-players-btn"
-                  onClick={() => setPlayers(p => Math.max(1, p - 1))}
-                  disabled={players <= 1}
-                  aria-label="Decrease players"
-                >
-                  −
-                </button>
-                <span className="book-m-players-count">{players}</span>
-                <button
-                  className="book-m-players-btn"
-                  onClick={() => setPlayers(p => Math.min(6, p + 1))}
-                  disabled={players >= 6}
-                  aria-label="Increase players"
-                >
-                  +
-                </button>
-              </div>
-
+          {/* ── Duration ───────────────────────────────────────────────── */}
+          <div className="book-m-control-block">
+            <span className="book-m-ctrl-label">DURATION</span>
+            <div className="book-m-dur-stepper">
               <button
-                className="book-m-continue"
-                onClick={() => setMobileStep(3)}
-              >
-                Continue →
-              </button>
+                className="book-m-dur-step-btn"
+                onClick={() => stepDuration(-30)}
+                disabled={duration <= 60}
+                aria-label="Decrease duration"
+              >−</button>
+              <span className="book-m-dur-value">{durationLabel}</span>
+              <button
+                className="book-m-dur-step-btn"
+                onClick={() => stepDuration(30)}
+                disabled={duration >= 240}
+                aria-label="Increase duration"
+              >+</button>
             </div>
-          )}
+          </div>
 
-          {/* ── Step 3: Choose Time ─────────────────────────────────────────── */}
-          {mobileStep === 3 && (
-            <div className="book-m-step">
-              <div className="book-m-header">
+          {/* ── Players ────────────────────────────────────────────────── */}
+          <div className="book-m-control-block">
+            <span className="book-m-ctrl-label">PLAYERS</span>
+            <div className="book-m-pill-row">
+              {PLAYER_COUNTS.map(n => (
                 <button
-                  className="book-m-back"
-                  onClick={() => {
-                    setMobileStep(2)
-                    setSelected(null)
-                  }}
+                  key={n}
+                  className={`book-m-pill book-m-pill-num${players === n ? ' is-active' : ''}`}
+                  onClick={() => setPlayers(n)}
                 >
-                  ← Back
+                  {n}
                 </button>
-                <h1 className="book-m-title">Choose a Time</h1>
-              </div>
+              ))}
+            </div>
+          </div>
 
-              <p className="book-m-step3-summary">
-                {formatDateDisplay(selectedDate)}
-                {' · '}
-                {durationLabel}
-                {' · '}
-                {players} Player{players !== 1 ? 's' : ''}
-              </p>
+          {/* ── Available times ─────────────────────────────────────────── */}
+          <div className="book-m-times-hdr">
+            <span className="book-m-ctrl-label" style={{ margin: 0 }}>AVAILABLE TIMES</span>
+            {!loading && rows.length > 0 && (
+              <span className="book-m-slots-count">{availableSlotCount} times open</span>
+            )}
+          </div>
 
-              {/* Legend */}
-              <div className="book-m-legend">
-                <span className="book-m-legend-item available">Available</span>
-                <span className="book-m-legend-item booked">Booked</span>
-              </div>
-
-              {error && (
-                <p className="book-error" style={{ marginBottom: 16 }}>
-                  {error}
-                  {error.toLowerCase().includes('waiver') && (
-                    <>{' '}<a href="/waiver?callbackUrl=/book" className="book-error-link">Sign waiver →</a></>
-                  )}
-                </p>
+          {error && (
+            <p className="book-error" style={{ marginBottom: 16 }}>
+              {error}
+              {error.toLowerCase().includes('waiver') && (
+                <>{' '}<a href="/waiver?callbackUrl=/book" className="book-error-link">Sign waiver →</a></>
               )}
+            </p>
+          )}
 
-              {/* Availability grid */}
-              <div className="book-grid-col">
-                <GridTable />
-              </div>
+          {loading ? (
+            <div className="book-loading-row">
+              <div className="book-spinner" />
+              <span>Loading availability…</span>
+            </div>
+          ) : rows.length === 0 ? (
+            <p className="book-no-slots">No times available. Try a different date or duration.</p>
+          ) : (
+            <div className="book-m-slot-list">
+              {rows.map(row => {
+                const avail = row.cells.filter(c => c.status === 'available')
+                const total = row.cells.length
+                const isBooked = avail.length === 0
+                const isLimited = avail.length === 1
+                const isSelected = selected?.startsAt === row.startsAt
+                const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
 
-              {/* Sticky bottom bar — appears when a slot is selected */}
-              {selected && (
-                <div className="book-m-bottom-bar">
-                  <div className="book-m-bar-info">
-                    <span className="book-m-bar-label">YOUR BOOKING</span>
-                    <span className="book-m-bar-price">
-                      ${(selected.priceCents / 100).toFixed(2)}
+                return (
+                  <button
+                    key={row.startsAt}
+                    className={`book-m-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
+                    onClick={() => {
+                      if (isBooked) return
+                      const bay = avail[0]
+                      if (!bay) return
+                      setSelected({
+                        bayId: bay.bayId,
+                        startsAt: row.startsAt,
+                        endsAt: row.endsAt,
+                        priceCents: bay.priceCents ?? 0,
+                        timeLabel: row.timeLabel,
+                      })
+                    }}
+                    disabled={isBooked}
+                  >
+                    <span className="book-m-slot-time">{row.timeLabel}</span>
+                    <span className="book-m-slot-avail">
+                      <span className={`book-m-dot ${dotCls}`} />
+                      {isBooked
+                        ? 'Booked'
+                        : `${avail.length} of ${total} bay${total !== 1 ? 's' : ''} left`}
                     </span>
-                  </div>
-                  <button
-                    className="book-m-continue book-m-bar-continue"
-                    onClick={() => void handleReserve()}
-                    disabled={submitting}
-                  >
-                    {submitting ? 'Reserving…' : 'Continue →'}
+                    {!isBooked && (
+                      <span className="book-m-slot-price">
+                        ${((avail[0]?.priceCents ?? 0) / 100).toFixed(0)}
+                      </span>
+                    )}
+                    <span className="book-m-slot-end">
+                      {!isBooked && (isSelected ? '✓' : '›')}
+                    </span>
                   </button>
-                </div>
-              )}
+                )
+              })}
+            </div>
+          )}
+
+          {/* ── Sticky bottom bar (appears when slot selected) ──────────── */}
+          {selected && (
+            <div className="book-m-bar">
+              <div className="book-m-bar-info">
+                <span className="book-m-bar-headline">
+                  {formatDateDisplay(selectedDate)}, {selected.timeLabel}
+                </span>
+                <span className="book-m-bar-meta">
+                  {durationLabel} · {players} Player{players !== 1 ? 's' : ''}
+                </span>
+              </div>
+              <div className="book-m-bar-cta">
+                <span className="book-m-bar-price">
+                  ${(selected.priceCents / 100).toFixed(2)}
+                </span>
+                <button
+                  className="book-m-reserve"
+                  onClick={() => void handleReserve()}
+                  disabled={submitting}
+                >
+                  {submitting ? 'Reserving…' : 'RESERVE BAY →'}
+                </button>
+              </div>
             </div>
           )}
 

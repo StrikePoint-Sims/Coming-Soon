@@ -401,6 +401,100 @@
   text-align: center;
 }
 
+/* ── Desktop slot list (replaces bay×time table) ──────────────────────────── */
+
+.book-slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.book-slot {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+  transition: all 0.14s;
+  font-family: var(--font-sans);
+  text-align: left;
+  gap: 16px;
+}
+
+.book-slot:hover:not(:disabled):not(.is-unavail) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.book-slot.is-selected {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.book-slot.is-unavail {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.book-slot-time {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  min-width: 90px;
+  flex-shrink: 0;
+}
+
+.book-slot.is-selected .book-slot-time {
+  color: #D4AF37;
+}
+
+.book-slot-avail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.book-slot-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.book-slot-dot.is-avail   { background: #5CA910; }
+.book-slot-dot.is-limited { background: #D4AF37; }
+.book-slot-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
+
+.book-slot-price {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.book-slot.is-selected .book-slot-price {
+  color: #D4AF37;
+}
+
+.book-slot-action {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.22);
+  flex-shrink: 0;
+  min-width: 90px;
+  text-align: right;
+}
+
+.book-slot.is-selected .book-slot-action {
+  color: #D4AF37;
+}
+
 /* ── Availability cells ───────────────────────────────────────────────────── */
 
 .book-cell-btn {
@@ -584,20 +678,22 @@
   width: 100%;
   height: 54px;
   border-radius: 0 0 19px 19px;
-  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  background: #4a6e34;
   border: none;
-  border-top: 1px solid rgba(212, 175, 55, 0.25);
-  color: #D4AF37;
+  border-top: 1px solid rgba(74, 110, 52, 0.6);
+  color: #fff;
   font-family: var(--font-sans);
   font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  transition: background 0.2s, opacity 0.2s, box-shadow 0.2s;
 }
 
 .book-rail-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+  background: #5a8040;
+  box-shadow: 0 -2px 16px rgba(74, 110, 52, 0.3);
 }
 
 .book-rail-btn:disabled {
@@ -620,7 +716,7 @@
 
 @media (max-width: 640px) {
   .book-content {
-    padding: 28px 16px 80px;
+    padding: 0 20px 80px;
   }
 
   .book-date-btn {
@@ -656,75 +752,211 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   MOBILE STEP FLOW
+   MOBILE — single-scroll booking page
 ══════════════════════════════════════════════════════════════════════════ */
 
 .book-mobile-ui {
-  /* Extra bottom padding to clear sticky bottom bar + bottom nav */
-  padding-bottom: 140px;
+  padding-bottom: 100px; /* clear bottom nav */
 }
 
-.book-m-step {
-  display: flex;
-  flex-direction: column;
+.book-mobile-ui.has-bar {
+  padding-bottom: 160px; /* also clear sticky bottom bar */
 }
 
-/* ── Step header ──────────────────────────────────────────────────────────── */
+/* ── Page hero ────────────────────────────────────────────────────────────── */
 
-.book-m-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 0 22px;
-}
-
-.book-m-back {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  font-family: var(--font-sans);
-  flex-shrink: 0;
-  -webkit-tap-highlight-color: transparent;
+.book-m-hero {
+  padding: 24px 0 18px;
 }
 
 .book-m-title {
   font-family: var(--font-serif);
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: 600;
   color: #fff;
-  margin: 0;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
   line-height: 1.1;
-  letter-spacing: -0.01em;
 }
 
-/* ── Month navigation ─────────────────────────────────────────────────────── */
+.book-m-subtitle {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.5;
+}
 
-.book-m-month-nav {
+/* ── Date scroller ────────────────────────────────────────────────────────── */
+
+.book-m-date-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
-.book-m-month-label {
-  font-size: 0.9rem;
+.book-m-dates-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book-m-dates-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.book-m-date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 58px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  flex-shrink: 0;
+  gap: 2px;
+  transition: all 0.15s;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-date-pill:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-date-pill.is-selected {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.55);
+  color: #C9A84C;
+}
+
+.book-m-date-pill-name {
+  font-size: 0.6rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.78);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
 }
 
-.book-m-month-btn {
+.book-m-date-pill-md {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.book-m-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.14s, color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.book-m-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* ── Control blocks (Duration / Players) ──────────────────────────────────── */
+
+.book-m-control-block {
+  margin-bottom: 18px;
+}
+
+.book-m-ctrl-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: 9px;
+}
+
+.book-m-pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.book-m-pill {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.48);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-pill.is-active {
+  background: #C9A84C;
+  border-color: #C9A84C;
+  color: #0d0a00;
+  font-weight: 700;
+}
+
+/* Square number pills for player count */
+.book-m-pill-num {
+  min-width: 40px;
+  padding: 0;
+  text-align: center;
+}
+
+/* ── Duration stepper (mobile) ───────────────────────────────────────────── */
+
+.book-m-dur-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.book-m-dur-step-btn {
   width: 38px;
   height: 38px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.45);
-  font-size: 1.25rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -734,295 +966,180 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.book-m-month-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.book-m-month-btn:disabled {
-  opacity: 0.2;
-  cursor: not-allowed;
-}
-
-/* ── Calendar day-of-week row ─────────────────────────────────────────────── */
-
-.book-m-cal-dow {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 6px;
-}
-
-.book-m-cal-dow-cell {
-  text-align: center;
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.22);
-  padding-bottom: 8px;
-}
-
-/* ── Calendar day grid ────────────────────────────────────────────────────── */
-
-.book-m-calendar {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  margin-bottom: 28px;
-}
-
-.book-m-cal-day {
-  aspect-ratio: 1;
-  border-radius: 50%;
-  border: 1.5px solid transparent;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.68);
-  font-size: 0.88rem;
-  font-weight: 600;
-  font-family: var(--font-sans);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.13s, border-color 0.13s, color 0.13s;
-  -webkit-tap-highlight-color: transparent;
-  line-height: 1;
-}
-
-.book-m-cal-day:hover:not(:disabled) {
+.book-m-dur-step-btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.85);
 }
 
-.book-m-cal-day.is-selected {
-  background: rgba(212, 175, 55, 0.1);
-  border-color: rgba(212, 175, 55, 0.65);
-  color: #D4AF37;
-}
-
-.book-m-cal-day.is-past {
-  color: rgba(255, 255, 255, 0.18);
-  cursor: not-allowed;
-}
-
-.book-m-cal-day.is-empty {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* ── Step 2: Section label ────────────────────────────────────────────────── */
-
-.book-m-section-label {
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.28);
-  margin: 0 0 12px;
-}
-
-/* ── Step 2: Duration tiles ───────────────────────────────────────────────── */
-
-.book-m-dur-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 28px;
-}
-
-.book-m-dur-tile {
-  height: 58px;
-  border-radius: 14px;
-  border: 1.5px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.02);
-  color: rgba(255, 255, 255, 0.5);
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background 0.13s, border-color 0.13s, color 0.13s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.book-m-dur-tile:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.book-m-dur-tile.is-active {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.55);
-  color: #D4AF37;
-}
-
-/* ── Step 2: Players stepper ──────────────────────────────────────────────── */
-
-.book-m-players-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-  padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.book-m-players-label {
-  flex: 1;
-  font-size: 0.88rem;
-  color: rgba(255, 255, 255, 0.55);
-  font-weight: 500;
-}
-
-.book-m-players-count {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-  min-width: 26px;
-  text-align: center;
-}
-
-.book-m-players-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.65);
-  font-size: 1.25rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.13s, color 0.13s;
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-
-.book-m-players-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.07);
-  color: #fff;
-}
-
-.book-m-players-btn:disabled {
+.book-m-dur-step-btn:disabled {
   opacity: 0.22;
   cursor: not-allowed;
 }
 
-/* ── Step 3: Summary line ─────────────────────────────────────────────────── */
-
-.book-m-step3-summary {
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.38);
-  margin: 0 0 18px;
-  line-height: 1.5;
+.book-m-dur-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+  min-width: 52px;
+  text-align: center;
 }
 
-/* ── Step 3: Legend ───────────────────────────────────────────────────────── */
+/* ── Available times header ────────────────────────────────────────────────── */
 
-.book-m-legend {
+.book-m-times-hdr {
   display: flex;
-  gap: 18px;
-  margin-bottom: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 6px 0 10px;
 }
 
-.book-m-legend-item {
-  font-size: 0.68rem;
+.book-m-slots-count {
+  font-size: 0.65rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  color: rgba(201, 168, 76, 0.55);
+}
+
+/* ── Time slot list ───────────────────────────────────────────────────────── */
+
+.book-m-slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.book-m-slot {
   display: flex;
   align-items: center;
-  gap: 7px;
-}
-
-.book-m-legend-item::before {
-  content: '';
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-.book-m-legend-item.available {
-  color: rgba(143, 166, 94, 0.8);
-}
-
-.book-m-legend-item.available::before {
-  background: rgba(74, 110, 52, 0.35);
-  border: 1px solid rgba(74, 110, 52, 0.5);
-}
-
-.book-m-legend-item.booked {
-  color: rgba(255, 255, 255, 0.25);
-}
-
-.book-m-legend-item.booked::before {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* ── Continue button ──────────────────────────────────────────────────────── */
-
-.book-m-continue {
-  display: block;
   width: 100%;
-  height: 52px;
+  padding: 15px 16px;
   border-radius: 13px;
-  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  color: #D4AF37;
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
-  font-weight: 700;
-  letter-spacing: 0.03em;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  background: rgba(255, 255, 255, 0.025);
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  transition: all 0.14s;
+  font-family: var(--font-sans);
+  text-align: left;
   -webkit-tap-highlight-color: transparent;
 }
 
-.book-m-continue:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+.book-m-slot:hover:not(:disabled):not(.is-unavail) {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.book-m-continue:disabled {
-  opacity: 0.28;
-  cursor: not-allowed;
+.book-m-slot.is-selected {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: rgba(201, 168, 76, 0.4);
 }
 
-/* ── Sticky bottom bar (step 3, slot selected) ────────────────────────────── */
+.book-m-slot.is-unavail {
+  cursor: default;
+  opacity: 0.38;
+}
 
-.book-m-bottom-bar {
+.book-m-slot-time {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  min-width: 76px;
+  flex-shrink: 0;
+}
+
+.book-m-slot.is-selected .book-m-slot-time {
+  color: #C9A84C;
+}
+
+.book-m-slot-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.book-m-slot.is-selected .book-m-slot-price {
+  color: #C9A84C;
+}
+
+.book-m-slot-avail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+/* Availability dot */
+.book-m-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.book-m-dot.is-avail   { background: #5CA910; }
+.book-m-dot.is-limited { background: #C9A84C; }
+.book-m-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
+
+.book-m-slot-end {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.22);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.book-m-slot.is-selected .book-m-slot-end {
+  color: #C9A84C;
+  font-weight: 700;
+}
+
+/* ── Sticky bottom bar ────────────────────────────────────────────────────── */
+
+.book-m-bar {
   position: fixed;
-  bottom: 56px; /* height of MobileBottomNav */
+  bottom: 56px; /* above MobileBottomNav */
   left: 0;
   right: 0;
-  background: rgba(10, 10, 12, 0.97);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid rgba(212, 175, 55, 0.15);
-  padding: 12px 20px;
+  background: rgba(10, 10, 8, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 20px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
   z-index: 40;
 }
 
 .book-m-bar-info {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+  gap: 3px;
 }
 
-.book-m-bar-label {
-  font-size: 0.56rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.22);
+.book-m-bar-headline {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.2;
+}
+
+.book-m-bar-meta {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}
+
+.book-m-bar-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .book-m-bar-price {
@@ -1031,12 +1148,28 @@
   color: #fff;
 }
 
-/* Continue button when inside the bottom bar — smaller, right-aligned */
-.book-m-bar-continue {
-  width: auto !important;
-  min-width: 130px;
-  height: 44px !important;
-  border-radius: 10px !important;
-  font-size: 0.86rem !important;
-  flex-shrink: 0;
+.book-m-reserve {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 11px;
+  background: #4a6e34;
+  border: none;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-reserve:hover:not(:disabled) {
+  background: #5a8040;
+}
+
+.book-m-reserve:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }

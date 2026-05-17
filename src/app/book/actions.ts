@@ -22,6 +22,7 @@ export async function createHold(params: {
   bayId: string
   startsAt: string
   endsAt: string
+  partySize?: number
 }): Promise<{ holdId: string } | { error: string } | { needsAuth: true }> {
   const session = await auth()
   if (!session?.user?.id) return { needsAuth: true }
@@ -51,6 +52,7 @@ export async function createHold(params: {
     startsAt: new Date(params.startsAt),
     endsAt: new Date(params.endsAt),
     expiresAt,
+    partySize: Math.min(4, Math.max(1, params.partySize ?? 1)),
   })
 
   return { holdId: id }
@@ -90,30 +92,31 @@ export async function confirmBooking(holdId: string): Promise<void> {
   const userId = session.user!.id!
   const bookingId = nanoid()
 
-  await db.transaction(async (tx) => {
-    await tx.insert(bookings).values({
-      id: bookingId,
-      locationId: hold.locationId,
-      bayId: hold.bayId,
-      userId,
-      type: 'member',
-      startsAt: hold.startsAt,
-      endsAt: hold.endsAt,
-      status: 'confirmed',
-      source: 'web',
-      totalCents: 0,
-    })
-    await tx.delete(bookingHolds).where(eq(bookingHolds.id, holdId))
-    await tx.insert(auditLog).values({
-      id: nanoid(),
-      actorType: 'user',
-      actorId: userId,
-      action: 'booking.created',
-      targetType: 'booking',
-      targetId: bookingId,
-      payloadJson: { bayId: hold.bayId, startsAt: hold.startsAt.toISOString() },
-      at: new Date(),
-    })
+  // neon-http doesn't support transactions; sequential writes with the
+  // booking insert as the critical step. Hold + audit are best-effort cleanup.
+  await db.insert(bookings).values({
+    id: bookingId,
+    locationId: hold.locationId,
+    bayId: hold.bayId,
+    userId,
+    type: 'member',
+    startsAt: hold.startsAt,
+    endsAt: hold.endsAt,
+    partySize: hold.partySize,
+    status: 'confirmed',
+    source: 'web',
+    totalCents: 0,
+  })
+  await db.delete(bookingHolds).where(eq(bookingHolds.id, holdId))
+  await db.insert(auditLog).values({
+    id: nanoid(),
+    actorType: 'user',
+    actorId: userId,
+    action: 'booking.created',
+    targetType: 'booking',
+    targetId: bookingId,
+    payloadJson: { bayId: hold.bayId, startsAt: hold.startsAt.toISOString() },
+    at: new Date(),
   })
 
   await inngest.send({
@@ -208,7 +211,7 @@ export async function createPaymentIntent(
   const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
   const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
   const durationMinutes = Math.round(durationMs / 60_000)
-  const subtotalCents = calculatePriceCents(startET.getHours(), durationMinutes)
+  const subtotalCents = calculatePriceCents(startET.getHours(), startET.getMinutes(), durationMinutes, startET.getDay())
   const taxCents = Math.round(subtotalCents * CT_SALES_TAX)
   const totalCents = subtotalCents + taxCents
 
@@ -233,7 +236,7 @@ export async function createPaymentIntent(
 export async function confirmBookingAfterPayment(
   holdId: string,
   paymentIntentId: string,
-): Promise<{ bookingId: string } | { error: string }> {
+): Promise<{ bookingId: string; partySize: number } | { error: string }> {
   const session = await auth()
   if (!session?.user?.id) return { error: 'Not authenticated.' }
 
@@ -273,7 +276,7 @@ export async function confirmBookingAfterPayment(
   const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
   const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
   const durationMinutes = Math.round(durationMs / 60_000)
-  const subtotalCents = calculatePriceCents(startET.getHours(), durationMinutes)
+  const subtotalCents = calculatePriceCents(startET.getHours(), startET.getMinutes(), durationMinutes, startET.getDay())
   const taxCents = Math.round(subtotalCents * CT_SALES_TAX)
   const totalCents = subtotalCents + taxCents
 
@@ -281,48 +284,49 @@ export async function confirmBookingAfterPayment(
   const bookingId = nanoid()
   const paymentId = nanoid()
 
-  await db.transaction(async (tx) => {
-    await tx.insert(bookings).values({
-      id: bookingId,
-      locationId: hold.locationId,
+  // neon-http doesn't support transactions; sequential writes. Stripe is the
+  // source of truth for payment — local payment row + audit are bookkeeping.
+  await db.insert(bookings).values({
+    id: bookingId,
+    locationId: hold.locationId,
+    bayId: hold.bayId,
+    userId,
+    type: 'member',
+    startsAt: hold.startsAt,
+    endsAt: hold.endsAt,
+    partySize: hold.partySize,
+    status: 'confirmed',
+    source: 'web',
+    totalCents,
+    paidAt: new Date(),
+  })
+  await db.insert(payments).values({
+    id: paymentId,
+    userId,
+    bookingId,
+    amountCents: totalCents,
+    processor: 'stripe',
+    processorRef: paymentIntentId,
+    type: 'charge',
+    status: 'succeeded',
+    idempotencyKey: `booking-${bookingId}`,
+    description: `Bay booking ${bookingId}`,
+  })
+  await db.delete(bookingHolds).where(eq(bookingHolds.id, holdId))
+  await db.insert(auditLog).values({
+    id: nanoid(),
+    actorType: 'user',
+    actorId: userId,
+    action: 'booking.created',
+    targetType: 'booking',
+    targetId: bookingId,
+    payloadJson: {
       bayId: hold.bayId,
-      userId,
-      type: 'member',
-      startsAt: hold.startsAt,
-      endsAt: hold.endsAt,
-      status: 'confirmed',
-      source: 'web',
+      startsAt: hold.startsAt.toISOString(),
       totalCents,
-      paidAt: new Date(),
-    })
-    await tx.insert(payments).values({
-      id: paymentId,
-      userId,
-      bookingId,
-      amountCents: totalCents,
-      processor: 'stripe',
-      processorRef: paymentIntentId,
-      type: 'charge',
-      status: 'succeeded',
-      idempotencyKey: `booking-${bookingId}`,
-      description: `Bay booking ${bookingId}`,
-    })
-    await tx.delete(bookingHolds).where(eq(bookingHolds.id, holdId))
-    await tx.insert(auditLog).values({
-      id: nanoid(),
-      actorType: 'user',
-      actorId: userId,
-      action: 'booking.created',
-      targetType: 'booking',
-      targetId: bookingId,
-      payloadJson: {
-        bayId: hold.bayId,
-        startsAt: hold.startsAt.toISOString(),
-        totalCents,
-        paymentIntentId,
-      },
-      at: new Date(),
-    })
+      paymentIntentId,
+    },
+    at: new Date(),
   })
 
   await inngest.send({
@@ -331,7 +335,7 @@ export async function confirmBookingAfterPayment(
   })
 
   revalidatePath('/account')
-  return { bookingId }
+  return { bookingId, partySize: hold.partySize }
 }
 
 // Release a hold (user clicked back)

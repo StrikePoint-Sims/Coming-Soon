@@ -460,6 +460,7 @@ export const bookingHolds = pgTable('booking_holds', {
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  partySize: integer('party_size').notNull().default(1),
   createdAt: createdAt(),
 })
 

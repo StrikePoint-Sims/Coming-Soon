@@ -1,0 +1,312 @@
+/* ── Memberships page ─────────────────────────────────────────────────────── */
+
+.mem-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 64px 40px 100px;
+}
+
+.mem-hero {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.mem-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.mem-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Founding banner ──────────────────────────────────────────────────────── */
+
+.mem-founding-banner {
+  background: rgba(212, 175, 55, 0.06);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.mem-founding-text {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+}
+
+.mem-founding-text strong {
+  color: #D4AF37;
+  font-weight: 700;
+}
+
+.mem-founding-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 20px;
+  border-radius: 100px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  color: #D4AF37;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.18s, border-color 0.18s;
+}
+
+.mem-founding-cta:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: rgba(212, 175, 55, 0.55);
+}
+
+/* ── Tier grid ────────────────────────────────────────────────────────────── */
+
+.mem-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+
+.mem-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  padding: 28px 24px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mem-card.is-featured {
+  background: rgba(27, 67, 50, 0.2);
+  border-color: rgba(212, 175, 55, 0.22);
+  position: relative;
+}
+
+.mem-card-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1a3d2b, #1B4332);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 100px;
+  padding: 3px 14px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #D4AF37;
+  white-space: nowrap;
+}
+
+.mem-card-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 14px;
+}
+
+.mem-card-price {
+  margin: 0 0 4px;
+}
+
+.mem-card-amount {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+}
+
+.mem-card-period {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin-left: 2px;
+}
+
+.mem-card-founder-price {
+  font-size: 0.78rem;
+  color: rgba(212, 175, 55, 0.7);
+  margin: 0 0 20px;
+  line-height: 1.4;
+}
+
+.mem-card-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 0 0 20px;
+}
+
+.mem-feature-list {
+  list-style: none;
+  margin: 0 0 28px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.mem-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.45;
+}
+
+.mem-feature-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(74, 110, 52, 0.18);
+  border: 1px solid rgba(74, 110, 52, 0.35);
+  color: #8fbc58;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.mem-card-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  border-radius: 11px;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.18s;
+  cursor: pointer;
+  border: none;
+}
+
+.mem-card-btn.primary {
+  background: linear-gradient(135deg, #1a3d2b 0%, #1B4332 100%);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  color: #D4AF37;
+}
+
+.mem-card-btn.primary:hover {
+  background: linear-gradient(135deg, #1f4e3b 0%, #22563e 100%);
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.mem-card-btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.mem-card-btn.ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Hours breakdown ──────────────────────────────────────────────────────── */
+
+.mem-hours {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 24px 28px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.mem-hours-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0 0 16px;
+}
+
+.mem-hours-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mem-hours-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.mem-hours-label {
+  width: 68px;
+  flex-shrink: 0;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.mem-hours-desc {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .mem-page {
+    padding: 40px 24px 80px;
+  }
+
+  .mem-grid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .mem-founding-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mem-page {
+    padding: 28px 20px 100px;
+  }
+
+  .mem-hero {
+    text-align: left;
+    margin-bottom: 32px;
+  }
+
+  .mem-founding-cta {
+    width: 100%;
+    justify-content: center;
+  }
+}
