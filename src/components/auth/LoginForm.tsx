@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState } from 'react'
+import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { checkUserExists } from '@/app/(auth)/login/actions'
@@ -9,13 +9,12 @@ type Mode = 'choose' | 'email' | 'phone' | 'terms' | 'otp'
 type Intent = 'signin' | 'signup'
 
 interface LoginFormProps {
-  searchParams: Promise<{ callbackUrl?: string; error?: string }>
+  callbackUrl?: string
 }
 
-export function LoginForm({ searchParams }: LoginFormProps) {
-  const { callbackUrl } = use(searchParams)
+export function LoginForm({ callbackUrl }: LoginFormProps) {
   const router = useRouter()
-  const redirectTo = callbackUrl ?? '/account'
+  const redirectTo = normalizeCallbackUrl(callbackUrl)
 
   const [mode, setMode] = useState<Mode>('choose')
   const [intent, setIntent] = useState<Intent>('signin')
@@ -408,6 +407,44 @@ export function LoginForm({ searchParams }: LoginFormProps) {
       </button>
     </form>
   )
+}
+
+function normalizeCallbackUrl(raw?: string): string {
+  if (!raw) return '/account'
+
+  try {
+    const currentOrigin = typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://www.strikepointsims.com'
+    const url = new URL(raw, currentOrigin)
+    const pathname = url.pathname.toLowerCase()
+
+    if (
+      pathname.startsWith('/management') ||
+      pathname.startsWith('/accounting') ||
+      pathname === '/dashboard' ||
+      pathname.startsWith('/dashboard/')
+    ) {
+      return '/account'
+    }
+
+    if (
+      pathname === '/booking' ||
+      pathname === '/booking.html' ||
+      pathname === '/book.html' ||
+      pathname.startsWith('/booking/')
+    ) {
+      return '/book'
+    }
+
+    if (url.origin !== currentOrigin && !url.hostname.endsWith('strikepointsims.com')) {
+      return '/account'
+    }
+
+    return `${url.pathname}${url.search}${url.hash}` || '/account'
+  } catch {
+    return '/account'
+  }
 }
 
 // ── OAuth button ──────────────────────────────────────────────────────────────

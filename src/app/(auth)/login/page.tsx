@@ -6,10 +6,11 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ callbackUrl?: string; error?: string }>
 }) {
-  return <LoginForm searchParams={searchParams} />
+  const params = await searchParams
+  return <LoginForm callbackUrl={params.callbackUrl} />
 }

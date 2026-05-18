@@ -111,7 +111,7 @@
 
 .rv-step.done .rv-step-num,
 .rv-step.active .rv-step-num {
-  border-color: rgba(169, 120, 69, 0.6);
+  border-color: rgba(126, 154, 92, 0.58);
   color: #A97845;
 }
 
@@ -121,13 +121,15 @@
 }
 
 .rv-step.active .rv-step-num {
-  background: rgba(169, 120, 69, 0.12);
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.12), transparent 58%),
+    rgba(169, 120, 69, 0.12);
 }
 
 .rv-step-line {
   width: 36px;
   height: 1.5px;
-  background: rgba(169, 120, 69, 0.4);
+  background: linear-gradient(90deg, rgba(169, 120, 69, 0.38), rgba(126, 154, 92, 0.34));
 }
 
 /* ── Body 2-column ────────────────────────────────────────────────────────── */
@@ -149,7 +151,9 @@
 /* ── Card (shared style) ──────────────────────────────────────────────────── */
 
 .rv-card {
-  background: rgba(255, 255, 255, 0.022);
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.035), transparent 45%),
+    rgba(255, 255, 255, 0.022);
   border: 1px solid rgba(74, 110, 52, 0.22);
   border-radius: 16px;
   padding: 22px 24px;

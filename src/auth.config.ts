@@ -24,6 +24,42 @@ export const authConfig: NextAuthConfig = {
       if (!user.email) return false
       return true
     },
+    async redirect({ url, baseUrl }) {
+      return normalizeAuthRedirect(url, baseUrl)
+    },
   },
   providers: [],
+}
+
+function normalizeAuthRedirect(raw: string, baseUrl: string): string {
+  try {
+    const url = new URL(raw, baseUrl)
+    const pathname = url.pathname.toLowerCase()
+
+    if (
+      pathname.startsWith('/management') ||
+      pathname.startsWith('/accounting') ||
+      pathname === '/dashboard' ||
+      pathname.startsWith('/dashboard/')
+    ) {
+      return `${baseUrl}/account`
+    }
+
+    if (
+      pathname === '/booking' ||
+      pathname === '/booking.html' ||
+      pathname === '/book.html' ||
+      pathname.startsWith('/booking/')
+    ) {
+      return `${baseUrl}/book`
+    }
+
+    if (url.origin === baseUrl || url.hostname.endsWith('strikepointsims.com')) {
+      return `${baseUrl}${url.pathname}${url.search}${url.hash}`
+    }
+
+    return `${baseUrl}/account`
+  } catch {
+    return `${baseUrl}/account`
+  }
 }
