@@ -75,12 +75,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           subject: 'Sign in to StrikePoint Sims',
           htmlContent: `
             <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-              <img src="${env.NEXT_PUBLIC_APP_URL}/logo.png" alt="StrikePoint Sims" height="36" style="margin-bottom:32px">
+              <img src="${env.NEXT_PUBLIC_APP_URL}/logo.png" alt="StrikePoint Sims" height="52" style="margin-bottom:32px">
               <h2 style="margin:0 0 16px;font-size:20px;color:#111">Sign in to your account</h2>
               <p style="color:#555;margin:0 0 28px;line-height:1.6">
                 Click the button below to sign in. This link expires in 24 hours and can only be used once.
               </p>
-              <a href="${url}" style="display:inline-block;background:#1B4332;color:#D4AF37;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px">
+              <a href="${url}" style="display:inline-block;background:#1B4332;color:#A97845;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px">
                 Sign in to StrikePoint Sims
               </a>
               <p style="margin:28px 0 0;font-size:13px;color:#999;line-height:1.5">

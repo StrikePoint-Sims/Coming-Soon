@@ -1,19 +1,32 @@
 import { getCurrentUser } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/db'
-import { bookings, bays, waiverSignings, memberships, membershipTiers } from '@/db/schema'
-import { eq, and, gt, gte, lt, desc, inArray } from 'drizzle-orm'
+import { bays, bookings, memberships, membershipTiers, waiverSignings } from '@/db/schema'
+import { and, desc, eq, gt, gte, inArray, lt } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
-import { summarizeUsage, findBestSavings } from '@/lib/booking/usage'
+import { findBestSavings, summarizeUsage } from '@/lib/booking/usage'
 import './account.css'
 
 export const metadata: Metadata = {
-  title: 'Account — StrikePoint Sims',
+  title: 'Account - StrikePoint Sims',
   robots: { index: false },
 }
 
 const FACILITY_TZ = 'America/New_York'
+const SAVINGS_THRESHOLD_CENTS = 2500
+
+type UsageSummary = ReturnType<typeof summarizeUsage>
+
+type BookingSummary = {
+  id: string
+  startsAt: Date
+  endsAt: Date
+  bayLabel: string
+  status: string
+  totalCents?: number
+  partySize?: number
+}
 
 function durationLabel(startsAt: Date, endsAt: Date): string {
   const min = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
@@ -28,6 +41,10 @@ function fmtHours(minutes: number): string {
 
 function fmtMoney(cents: number): string {
   return `$${(cents / 100).toFixed(0)}`
+}
+
+function firstName(user: { name?: string | null; email?: string | null }) {
+  return user.name?.split(' ')[0] ?? user.email?.split('@')[0] ?? 'there'
 }
 
 export default async function AccountDashboardPage() {
@@ -111,28 +128,20 @@ export default async function AccountDashboardPage() {
       )),
   ])
 
-  const waiverExpired = !latestWaiver
-  const nextBooking = upcomingBookings[0]
-  const isMember = !!membership
-
-  // ── Usage stats (always shown) ────────────────────────────────────────────
   const usage = summarizeUsage(last30Bookings)
-
-  // ── Savings recommendation (non-members only, if applicable) ──────────────
+  const nextBooking = upcomingBookings[0] ?? null
+  const isMember = !!membership
   const savings = !isMember ? findBestSavings(usage) : null
-  const SAVINGS_THRESHOLD_CENTS = 2500
   const showSavingsPitch = savings && savings.savingsCents >= SAVINGS_THRESHOLD_CENTS
 
   return (
-    <div className="dash-page">
-      {/* ── Header ────────────────────────────────────────────────────── */}
-      <div className="dash-header">
-        <h1 className="dash-title">Account Dashboard</h1>
-        <p className="dash-subtitle">Manage your bookings, membership, and preferences.</p>
-      </div>
+    <div className="dash-page dash-page-v2">
+      <header className="dash-greeting">
+        <p className="dash-greeting-date">{formatInTimeZone(now, FACILITY_TZ, 'EEEE, MMMM d')}</p>
+        <h1>Good {greetingFor(now)}, {firstName(user)}.</h1>
+      </header>
 
-      {/* ── Waiver alert ──────────────────────────────────────────────── */}
-      {waiverExpired && (
+      {!latestWaiver && (
         <a href="/waiver" className="dash-waiver-alert">
           <div className="dash-waiver-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -142,15 +151,17 @@ export default async function AccountDashboardPage() {
           </div>
           <div className="dash-waiver-text">
             <p className="dash-waiver-title">Waiver required</p>
-            <p className="dash-waiver-body">Sign your annual waiver before booking a bay.</p>
+            <p className="dash-waiver-body">Every visitor needs a waiver on file before using the facility.</p>
           </div>
           <span className="dash-chevron">›</span>
         </a>
       )}
 
-      {/* ── Top row ───────────────────────────────────────────────────── */}
-      <div className="dash-grid-2">
+      <SessionTicker nextBooking={nextBooking} now={now} />
+      <NextSessionCard nextBooking={nextBooking} />
+      <QuickRebook recentBookings={recentBookings} />
 
+      <div className="dash-grid-2 dash-main-grid">
         {isMember ? (
           <MembershipCard
             tierName={membership.tierName}
@@ -160,17 +171,11 @@ export default async function AccountDashboardPage() {
             peakMinutesIncluded={membership.includedPeakMinutes ?? 0}
           />
         ) : (
-          <UpcomingBookingCard nextBooking={nextBooking ?? null} />
+          <ExploreMembershipsCard hasUsage={usage.sessions > 0} />
         )}
-
-        {isMember ? (
-          <UpcomingBookingCard nextBooking={nextBooking ?? null} />
-        ) : (
-          <ActivityCard usage={usage} />
-        )}
+        <ActivityCard usage={usage} />
       </div>
 
-      {/* ── Savings pitch (only when calculated savings exceed threshold) ─ */}
       {showSavingsPitch && savings && (
         <a href="/memberships" className="dash-savings-pitch">
           <div className="dash-savings-icon">
@@ -184,123 +189,129 @@ export default async function AccountDashboardPage() {
               Based on your last 30 days, the <strong>{savings.bestTier.name}</strong> membership would have saved you <strong>{fmtMoney(savings.savingsCents)}</strong>.
             </p>
             <p className="dash-savings-body">
-              You played {fmtHours(usage.totalMinutes)} across {usage.sessions} session{usage.sessions !== 1 ? 's' : ''} and paid {fmtMoney(usage.paidCents)}. {savings.bestTier.name} is {fmtMoney(savings.bestTierCost)}/mo at your usage.
+              You played {fmtHours(usage.totalMinutes)} across {usage.sessions} session{usage.sessions !== 1 ? 's' : ''} and paid {fmtMoney(usage.paidCents)}.
             </p>
           </div>
           <span className="dash-savings-cta">View Plans ›</span>
         </a>
       )}
 
-      {/* ── Quick Actions ─────────────────────────────────────────────── */}
-      <div className="dash-section-card">
-        <div className="dash-section-header">
-          <span className="dash-section-label gold">QUICK ACTIONS</span>
-        </div>
-        <div className="dash-quick-grid">
-          <a href="/book" className="dash-quick-card">
-            <div className="dash-quick-icon">
-              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <rect x="3" y="5" width="16" height="14" rx="2"/>
-                <path d="M7 3v4M15 3v4M3 9.5h16"/>
-              </svg>
-            </div>
-            <p className="dash-quick-label">Book a Bay</p>
-            <p className="dash-quick-sub">Reserve your next session.</p>
-            <span className="dash-quick-chevron">›</span>
-          </a>
-          <a href="/account/bookings" className="dash-quick-card">
-            <div className="dash-quick-icon">
-              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <rect x="2.5" y="4" width="17" height="14" rx="2"/>
-                <path d="M2.5 9h17M7 11.5h3M7 14h6"/>
-              </svg>
-            </div>
-            <p className="dash-quick-label">My Bookings</p>
-            <p className="dash-quick-sub">View past and upcoming.</p>
-            <span className="dash-quick-chevron">›</span>
-          </a>
-          <a href="/account/guests" className="dash-quick-card">
-            <div className="dash-quick-icon">
-              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <circle cx="8" cy="8" r="3.5"/>
-                <path d="M2 19a6 6 0 0112 0"/>
-                <circle cx="16" cy="9" r="2.5"/>
-                <path d="M14 19a4 4 0 016 0"/>
-              </svg>
-            </div>
-            <p className="dash-quick-label">Guests &amp; Waivers</p>
-            <p className="dash-quick-sub">Manage your guest list.</p>
-            <span className="dash-quick-chevron">›</span>
-          </a>
-          <a href="/account/settings" className="dash-quick-card">
-            <div className="dash-quick-icon">
-              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <circle cx="11" cy="11" r="3"/>
-                <path d="M11 2v3M11 17v3M2 11h3M17 11h3M4.5 4.5l2 2M15.5 15.5l2 2M4.5 17.5l2-2M15.5 6.5l2-2"/>
-              </svg>
-            </div>
-            <p className="dash-quick-label">Settings</p>
-            <p className="dash-quick-sub">Profile and preferences.</p>
-            <span className="dash-quick-chevron">›</span>
-          </a>
-        </div>
-      </div>
-
-      {/* ── Bottom row: Recent + Activity-for-members (or just Recent) ── */}
-      <div className="dash-grid-2">
-
-        {/* Recent Reservations */}
-        <div className="dash-section-card">
-          <div className="dash-section-header">
-            <span className="dash-section-label gold">RECENT RESERVATIONS</span>
-            <a href="/account/bookings" className="dash-section-link">View All</a>
-          </div>
-
-          {recentBookings.length === 0 ? (
-            <p className="dash-empty-line">No reservations yet.</p>
-          ) : (
-            <div className="dash-recent-list">
-              {recentBookings.map(b => (
-                <a key={b.id} href={`/account/bookings/${b.id}`} className="dash-recent-row">
-                  <div className="dash-recent-info">
-                    <p className="dash-recent-date">
-                      {formatInTimeZone(b.startsAt, FACILITY_TZ, 'EEE, MMM d, yyyy')}
-                    </p>
-                    <p className="dash-recent-time">
-                      {formatInTimeZone(b.startsAt, FACILITY_TZ, 'h:mm a')} –{' '}
-                      {formatInTimeZone(b.endsAt, FACILITY_TZ, 'h:mm a')}
-                      {' · '}{b.bayLabel}
-                    </p>
-                  </div>
-                  <div className="dash-recent-meta">
-                    {b.totalCents > 0 && (
-                      <span className="dash-recent-price">${(b.totalCents / 100).toFixed(2)}</span>
-                    )}
-                    <span className={`dash-status ${badgeClass(b.status)}`}>
-                      {statusLabel(b.status)}
-                    </span>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* For members: their booking is in the top row, so put Activity here.
-            For non-members: their activity is already in the top row, so put
-            something more useful: an activity-over-time summary or a quiet
-            "Explore Memberships" tile. */}
-        {isMember ? (
-          <ActivityCard usage={usage} compact />
-        ) : (
-          <ExploreMembershipsCard hasUsage={usage.sessions > 0} />
-        )}
-      </div>
+      <QuickActions />
+      <RecentReservations bookings={recentBookings} />
     </div>
   )
 }
 
-// ── Components ──────────────────────────────────────────────────────────────
+function greetingFor(now: Date): string {
+  const hour = Number(formatInTimeZone(now, FACILITY_TZ, 'H'))
+  if (hour < 12) return 'morning'
+  if (hour < 17) return 'afternoon'
+  return 'evening'
+}
+
+function SessionTicker({ nextBooking, now }: { nextBooking: BookingSummary | null; now: Date }) {
+  if (!nextBooking) return null
+  const minutesUntil = Math.round((nextBooking.startsAt.getTime() - now.getTime()) / 60_000)
+  if (minutesUntil < 0 || minutesUntil > 60) return null
+  const unlockTime = new Date(nextBooking.startsAt.getTime() - 60 * 60_000)
+
+  return (
+    <a href={`/account/bookings/${nextBooking.id}`} className="dash-session-ticker">
+      <span className="dash-session-dot" />
+      <span className="dash-session-text">
+        Your bay opens in <strong>{minutesUntil} minute{minutesUntil !== 1 ? 's' : ''}</strong>. Access details unlock at {formatInTimeZone(unlockTime, FACILITY_TZ, 'h:mm a')}.
+      </span>
+      <span className="dash-session-cta">View ›</span>
+    </a>
+  )
+}
+
+function NextSessionCard({ nextBooking }: { nextBooking: BookingSummary | null }) {
+  if (!nextBooking) {
+    return (
+      <section className="dash-next-card is-empty">
+        <div>
+          <span className="dash-section-label gold">NEXT SESSION</span>
+          <h2>No upcoming sessions.</h2>
+          <p>Reserve your next bay and keep the swing loose.</p>
+        </div>
+        <a href="/book" className="dash-btn primary">Book a Bay</a>
+      </section>
+    )
+  }
+
+  const unlockTime = new Date(nextBooking.startsAt.getTime() - 60 * 60_000)
+
+  return (
+    <section className="dash-next-card">
+      <div className="dash-next-top">
+        <div className="dash-next-left">
+          <div className="dash-date-badge">
+            <span className="dash-date-month">{formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'EEE').toUpperCase()}</span>
+            <span className="dash-date-day">{formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'd')}</span>
+          </div>
+          <div>
+            <span className="dash-section-label gold">NEXT SESSION</span>
+            <h2>
+              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')} · {nextBooking.bayLabel}
+            </h2>
+            <p>
+              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'MMMM d, yyyy')} · {durationLabel(nextBooking.startsAt, nextBooking.endsAt)}
+              {nextBooking.partySize ? ` · ${nextBooking.partySize} player${nextBooking.partySize !== 1 ? 's' : ''}` : ''}
+            </p>
+          </div>
+        </div>
+        <span className={`dash-status ${badgeClass(nextBooking.status)}`}>{statusLabel(nextBooking.status)}</span>
+      </div>
+
+      <div className="dash-access-panel">
+        <div className="dash-access-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="5" y="11" width="14" height="10" rx="2"/>
+            <path d="M8 11V7a4 4 0 018 0v4"/>
+          </svg>
+        </div>
+        <div>
+          <p className="dash-access-label">Access details</p>
+          <p className="dash-access-copy">Your one-time access code is sent by SMS 1 hour before your session, around <strong>{formatInTimeZone(unlockTime, FACILITY_TZ, 'h:mm a')}</strong>.</p>
+        </div>
+      </div>
+
+      <div className="dash-next-actions">
+        <a href={`/api/book/${nextBooking.id}/ics`} className="dash-btn ghost">Add to Calendar</a>
+        <a href={`/book/${nextBooking.id}/guests`} className="dash-btn ghost">Add Guests</a>
+        <a href="/book" className="dash-btn ghost">Book Again</a>
+        <a href={`/account/bookings/${nextBooking.id}`} className="dash-btn primary">View Details</a>
+      </div>
+    </section>
+  )
+}
+
+function QuickRebook({ recentBookings }: { recentBookings: BookingSummary[] }) {
+  const suggestions = recentBookings.slice(0, 2)
+  if (suggestions.length === 0) return null
+
+  return (
+    <section className="dash-regular">
+      <div className="dash-section-header slim">
+        <span className="dash-section-label gold">YOUR REGULAR SLOTS</span>
+        <a href="/book" className="dash-section-link">Open calendar ›</a>
+      </div>
+      <div className="dash-regular-grid">
+        {suggestions.map((booking, index) => (
+          <a href="/book" className="dash-regular-card" key={`${booking.id}-${index}`}>
+            <span className="dash-regular-kicker">{index === 0 ? 'Same rhythm' : 'Recent favorite'}</span>
+            <span className="dash-regular-title">
+              {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE')} · {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}
+            </span>
+            <span className="dash-regular-sub">{booking.bayLabel} · {durationLabel(booking.startsAt, booking.endsAt)}</span>
+            <span className="dash-regular-arrow">›</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
 
 function MembershipCard({
   tierName,
@@ -320,10 +331,10 @@ function MembershipCard({
   const peakHoursRemaining = Math.max(0, peakHoursIncluded - peakHoursUsed)
 
   return (
-    <div className="dash-section-card">
+    <section className="dash-section-card dash-member-card">
       <div className="dash-section-header">
         <span className="dash-section-label gold">MEMBERSHIP</span>
-        <span className="dash-pill active">Active</span>
+        <a href="/account/membership-billing" className="dash-section-link">Manage ›</a>
       </div>
       <div className="dash-member-hero">
         <div className="dash-member-icon">
@@ -334,170 +345,141 @@ function MembershipCard({
         </div>
         <div>
           <p className="dash-member-tier">{tierName} Member</p>
-          <p className="dash-member-since">
-            Member since {formatInTimeZone(startedAt, FACILITY_TZ, 'MMM d, yyyy')}
-          </p>
+          <p className="dash-member-since">Member since {formatInTimeZone(startedAt, FACILITY_TZ, 'MMM d, yyyy')}</p>
         </div>
       </div>
 
       {peakHoursIncluded > 0 ? (
         <div className="dash-peak-tracker">
           <div className="dash-peak-row">
-            <span className="dash-peak-label">Peak Hours Used</span>
-            <span className="dash-peak-value">
-              {peakHoursUsed} / {peakHoursIncluded}
-            </span>
+            <span className="dash-peak-label">Peak hours this month</span>
+            <span className="dash-peak-value">{peakHoursUsed} <span>of {peakHoursIncluded}</span></span>
           </div>
           <div className="dash-peak-bar">
-            <div
-              className="dash-peak-bar-fill"
-              style={{ width: `${peakHoursIncluded === 0 ? 0 : Math.min(100, (peakHoursUsed / peakHoursIncluded) * 100)}%` }}
-            />
+            <div className="dash-peak-bar-fill" style={{ width: `${Math.min(100, (peakHoursUsed / peakHoursIncluded) * 100)}%` }} />
           </div>
-          <p className="dash-peak-sub">
-            {peakHoursRemaining} hour{peakHoursRemaining !== 1 ? 's' : ''} remaining ·
-            Resets {formatInTimeZone(currentPeriodEnd, FACILITY_TZ, 'MMM d')}
-          </p>
+          <p className="dash-peak-sub">{peakHoursRemaining} hour{peakHoursRemaining !== 1 ? 's' : ''} remaining · Renews {formatInTimeZone(currentPeriodEnd, FACILITY_TZ, 'MMM d')}</p>
         </div>
       ) : (
-        <p className="dash-peak-sub" style={{ marginTop: 4 }}>
-          Unlimited off-peak access. Renews {formatInTimeZone(currentPeriodEnd, FACILITY_TZ, 'MMM d, yyyy')}.
-        </p>
+        <p className="dash-peak-sub">Unlimited off-peak access. Renews {formatInTimeZone(currentPeriodEnd, FACILITY_TZ, 'MMM d, yyyy')}.</p>
       )}
-
-      <a href="/account/membership-billing" className="dash-btn ghost dash-btn-full">
-        Manage Membership
-      </a>
-    </div>
+    </section>
   )
 }
 
-function UpcomingBookingCard({
-  nextBooking,
-}: {
-  nextBooking: null | {
-    id: string
-    startsAt: Date
-    endsAt: Date
-    bayLabel: string
-    status: string
-    partySize: number
-  }
-}) {
-  return (
-    <div className="dash-section-card">
-      <div className="dash-section-header">
-        <span className="dash-section-label gold">UPCOMING BOOKING</span>
-        <a href="/account/bookings" className="dash-section-link">View All</a>
-      </div>
+function ActivityCard({ usage }: { usage: UsageSummary }) {
+  const total = Math.max(usage.totalMinutes, 1)
+  const peakPct = (usage.peakMinutes / total) * 100
+  const offPct = (usage.offPeakMinutes / total) * 100
+  const nightPct = (usage.nightMinutes / total) * 100
 
-      {nextBooking ? (
-        <>
-          <div className="dash-upcoming-row">
-            <div className="dash-date-badge">
-              <span className="dash-date-month">
-                {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'MMM').toUpperCase()}
-              </span>
-              <span className="dash-date-day">
-                {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'd')}
-              </span>
-            </div>
-            <div className="dash-upcoming-detail">
-              <p className="dash-upcoming-date">
-                {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'EEE, MMM d, yyyy')}
-              </p>
-              <p className="dash-upcoming-time">
-                {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} –{' '}
-                {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')}
-                {' '}<span className="dash-muted">({durationLabel(nextBooking.startsAt, nextBooking.endsAt)})</span>
-              </p>
-              <p className="dash-upcoming-meta">
-                {nextBooking.bayLabel}
-                {nextBooking.partySize > 0 ? ` · ${nextBooking.partySize} Player${nextBooking.partySize !== 1 ? 's' : ''}` : ''}
-              </p>
-            </div>
-          </div>
-          <a href={`/account/bookings/${nextBooking.id}`} className="dash-btn primary dash-btn-full">
-            Manage Booking
-          </a>
-          <a href="/book" className="dash-btn ghost dash-btn-full">
-            Book Another Bay
-          </a>
-        </>
-      ) : (
-        <div className="dash-empty-block">
-          <p className="dash-empty-heading">No upcoming sessions</p>
-          <p className="dash-empty-body">Reserve your bay and get back in the game.</p>
-          <a href="/book" className="dash-btn primary dash-btn-full">
-            Book a Bay
-          </a>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function ActivityCard({
-  usage,
-  compact = false,
-}: {
-  usage: ReturnType<typeof summarizeUsage>
-  compact?: boolean
-}) {
   return (
-    <div className="dash-section-card">
+    <section className="dash-section-card">
       <div className="dash-section-header">
         <span className="dash-section-label gold">LAST 30 DAYS</span>
       </div>
-
       {usage.sessions === 0 ? (
-        <p className="dash-empty-line">
-          {compact ? 'No sessions yet this month.' : 'No sessions yet in the last 30 days.'}
-        </p>
+        <p className="dash-empty-line">No sessions yet in the last 30 days.</p>
       ) : (
         <>
           <div className="dash-activity-stats">
-            <div className="dash-activity-stat">
-              <p className="dash-activity-value">{usage.sessions}</p>
-              <p className="dash-activity-label">Session{usage.sessions !== 1 ? 's' : ''}</p>
-            </div>
-            <div className="dash-activity-stat">
-              <p className="dash-activity-value">{fmtHours(usage.totalMinutes)}</p>
-              <p className="dash-activity-label">Played</p>
-            </div>
-            <div className="dash-activity-stat">
-              <p className="dash-activity-value">{fmtMoney(usage.paidCents)}</p>
-              <p className="dash-activity-label">{compact ? 'Spent' : 'Spent on Bay Time'}</p>
-            </div>
+            <div className="dash-activity-stat"><p className="dash-activity-value">{usage.sessions}</p><p className="dash-activity-label">Sessions</p></div>
+            <div className="dash-activity-stat"><p className="dash-activity-value">{fmtHours(usage.totalMinutes)}</p><p className="dash-activity-label">Played</p></div>
+            <div className="dash-activity-stat"><p className="dash-activity-value">{fmtMoney(usage.paidCents)}</p><p className="dash-activity-label">Spent</p></div>
           </div>
-
-          {!compact && (
-            <div className="dash-activity-breakdown">
-              <span className="dash-activity-chip">
-                <span className="dash-chip-dot peak" />
-                {fmtHours(usage.peakMinutes)} peak
-              </span>
-              <span className="dash-activity-chip">
-                <span className="dash-chip-dot offpeak" />
-                {fmtHours(usage.offPeakMinutes)} off-peak
-              </span>
-              {usage.nightMinutes > 0 && (
-                <span className="dash-activity-chip">
-                  <span className="dash-chip-dot night" />
-                  {fmtHours(usage.nightMinutes)} night
-                </span>
-              )}
-            </div>
-          )}
+          <div className="dash-split-bar" aria-hidden="true">
+            <span className="peak" style={{ width: `${peakPct}%` }} />
+            <span className="offpeak" style={{ width: `${offPct}%` }} />
+            <span className="night" style={{ width: `${nightPct}%` }} />
+          </div>
+          <div className="dash-activity-breakdown">
+            <span className="dash-activity-chip"><span className="dash-chip-dot peak" />{fmtHours(usage.peakMinutes)} peak</span>
+            <span className="dash-activity-chip"><span className="dash-chip-dot offpeak" />{fmtHours(usage.offPeakMinutes)} off-peak</span>
+            {usage.nightMinutes > 0 && <span className="dash-activity-chip"><span className="dash-chip-dot night" />{fmtHours(usage.nightMinutes)} night</span>}
+          </div>
         </>
       )}
-    </div>
+    </section>
+  )
+}
+
+function QuickActions() {
+  const actions = [
+    ['Book a bay', 'Reserve your next session', '/book', 'calendar'],
+    ['My bookings', 'Past and upcoming', '/account/bookings', 'bookings'],
+    ['Guests and waivers', 'Manage your guest list', '/account/guests', 'guests'],
+    ['Settings', 'Profile and preferences', '/account/settings', 'settings'],
+  ] as const
+
+  return (
+    <section className="dash-section-card">
+      <div className="dash-section-header">
+        <span className="dash-section-label gold">QUICK ACTIONS</span>
+      </div>
+      <div className="dash-quick-grid">
+        {actions.map(([label, sub, href, icon]) => (
+          <a href={href} className="dash-quick-card" key={label}>
+            <div className="dash-quick-icon"><ActionIcon name={icon} /></div>
+            <p className="dash-quick-label">{label}</p>
+            <p className="dash-quick-sub">{sub}</p>
+            <span className="dash-quick-chevron">›</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ActionIcon({ name }: { name: 'calendar' | 'bookings' | 'guests' | 'settings' }) {
+  if (name === 'guests') {
+    return <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="8" cy="8" r="3.5"/><path d="M2 19a6 6 0 0112 0"/><circle cx="16" cy="9" r="2.5"/><path d="M14 19a4 4 0 016 0"/></svg>
+  }
+  if (name === 'bookings') {
+    return <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><rect x="2.5" y="4" width="17" height="14" rx="2"/><path d="M2.5 9h17M7 11.5h3M7 14h6"/></svg>
+  }
+  if (name === 'settings') {
+    return <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><circle cx="11" cy="11" r="3"/><path d="M11 2v3M11 17v3M2 11h3M17 11h3M4.5 4.5l2 2M15.5 15.5l2 2M4.5 17.5l2-2M15.5 6.5l2-2"/></svg>
+  }
+  return <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><rect x="3" y="5" width="16" height="14" rx="2"/><path d="M7 3v4M15 3v4M3 9.5h16"/></svg>
+}
+
+function RecentReservations({ bookings }: { bookings: BookingSummary[] }) {
+  return (
+    <section className="dash-section-card">
+      <div className="dash-section-header">
+        <span className="dash-section-label gold">RECENT RESERVATIONS</span>
+        <a href="/account/bookings" className="dash-section-link">View All ›</a>
+      </div>
+      {bookings.length === 0 ? (
+        <p className="dash-empty-line">No reservations yet.</p>
+      ) : (
+        <div className="dash-recent-list">
+          {bookings.map(b => (
+            <a key={b.id} href={`/account/bookings/${b.id}`} className="dash-recent-row">
+              <div className="dash-recent-badge">
+                <span>{formatInTimeZone(b.startsAt, FACILITY_TZ, 'EEE').toUpperCase()}</span>
+                <strong>{formatInTimeZone(b.startsAt, FACILITY_TZ, 'd')}</strong>
+              </div>
+              <div className="dash-recent-info">
+                <p className="dash-recent-date">{formatInTimeZone(b.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(b.endsAt, FACILITY_TZ, 'h:mm a')}</p>
+                <p className="dash-recent-time">{b.bayLabel} · {durationLabel(b.startsAt, b.endsAt)}</p>
+              </div>
+              <div className="dash-recent-meta">
+                {(b.totalCents ?? 0) > 0 && <span className="dash-recent-price">${((b.totalCents ?? 0) / 100).toFixed(2)}</span>}
+                <span className={`dash-status ${badgeClass(b.status)}`}>{statusLabel(b.status)}</span>
+              </div>
+              <span className="dash-recent-chevron">›</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }
 
 function ExploreMembershipsCard({ hasUsage }: { hasUsage: boolean }) {
   return (
-    <div className="dash-section-card dash-explore">
+    <section className="dash-section-card dash-explore">
       <div className="dash-section-header">
         <span className="dash-section-label gold">MEMBERSHIPS</span>
       </div>
@@ -506,10 +488,8 @@ function ExploreMembershipsCard({ hasUsage }: { hasUsage: boolean }) {
           ? 'See if a membership fits how you actually play.'
           : 'Members get unlimited off-peak access plus included peak hours.'}
       </p>
-      <a href="/memberships" className="dash-btn ghost dash-btn-full" style={{ marginTop: 12 }}>
-        Explore Plans
-      </a>
-    </div>
+      <a href="/memberships" className="dash-btn ghost dash-btn-full">Explore Plans</a>
+    </section>
   )
 }
 

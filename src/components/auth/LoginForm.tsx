@@ -338,7 +338,7 @@ export function LoginForm({ searchParams }: LoginFormProps) {
             <div className={`auth-checkbox-box${termsAccepted ? ' is-checked' : ''}`}>
               {termsAccepted && (
                 <svg width="11" height="9" viewBox="0 0 11 9" fill="none">
-                  <path d="M1 4L4.5 7.5L10 1" stroke="#D4AF37" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M1 4L4.5 7.5L10 1" stroke="#A97845" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               )}
             </div>

@@ -7,6 +7,7 @@ import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
 import { updateProfile } from '../actions'
 import { SettingsSignOut } from './SettingsSignOut'
+import { SupportActions } from './SupportActions'
 import '../account.css'
 
 export const metadata: Metadata = {
@@ -70,6 +71,7 @@ export default async function SettingsPage() {
                     <option value="">Not specified</option>
                     <option value="right">Right</option>
                     <option value="left">Left</option>
+                    <option value="ambidextrous">Ambidextrous</option>
                   </select>
                 </div>
               </div>
@@ -97,7 +99,8 @@ export default async function SettingsPage() {
                     defaultValue={user.phone ?? ''}
                     placeholder="(203) 555-0100"
                   />
-                  <p className="st-form-hint">For booking reminders and access codes.</p>
+                  <p className="st-form-hint">Used for account verification and transactional messages.</p>
+                  <p className="st-form-hint">Access codes are transactional and are always sent when required.</p>
                 </div>
               </div>
 
@@ -132,10 +135,10 @@ export default async function SettingsPage() {
               </label>
 
               <label className="st-toggle">
-                <span className="st-toggle-text">
-                  <span className="st-toggle-label">SMS notifications</span>
-                  <span className="st-toggle-sub">Booking reminders and access codes.</span>
-                </span>
+                  <span className="st-toggle-text">
+                    <span className="st-toggle-label">SMS notifications</span>
+                  <span className="st-toggle-sub">Optional reminders and account updates.</span>
+                  </span>
                 <input
                   type="checkbox"
                   name="smsConsent"
@@ -146,7 +149,7 @@ export default async function SettingsPage() {
               </label>
 
               <p className="st-info-note">
-                Transactional messages (access codes, receipts) are always sent regardless of preferences.
+                Transactional messages, including access codes and receipts, are always sent regardless of preferences.
               </p>
 
               <button type="submit" className="dash-btn ghost dash-btn-full">
@@ -231,9 +234,11 @@ export default async function SettingsPage() {
             <p className="st-info-body">
               Reach us anytime. Members get priority response.
             </p>
-            <a href="mailto:operations@strikepointsims.com" className="dash-btn ghost dash-btn-full">
-              Contact Support
-            </a>
+            <SupportActions
+              name={user.name ?? ''}
+              email={user.email ?? ''}
+              phone={user.phone ?? ''}
+            />
           </div>
         </aside>
       </div>

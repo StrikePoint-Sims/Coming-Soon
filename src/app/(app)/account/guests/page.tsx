@@ -115,9 +115,9 @@ export default async function GuestsWaiversPage() {
               </svg>
             </div>
             <p className="gw-policy-title">GUEST POLICY</p>
-            <p className="gw-policy-tagline">Each bay allows up to</p>
-            <p className="gw-policy-headline">4 People Total</p>
-            <p className="gw-policy-sub">1 Member + Up to 3 Guests</p>
+            <p className="gw-policy-tagline">Each booking includes</p>
+            <p className="gw-policy-headline">Up to 3 Guests</p>
+            <p className="gw-policy-sub">Member or booking holder plus guests</p>
 
             <div className="gw-policy-divider" />
 

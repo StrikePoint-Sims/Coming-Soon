@@ -1,5 +1,6 @@
 import './DesktopHeader.css'
 import { auth } from '@/auth'
+import { DesktopUserMenu } from './DesktopUserMenu'
 
 interface DesktopHeaderProps {
   activePath?: string
@@ -37,10 +38,7 @@ export async function DesktopHeader({ activePath }: DesktopHeaderProps) {
         {/* Right actions */}
         <div className="dh-actions">
           {user ? (
-            <a href="/account" className="dh-user-pill">
-              <span className="dh-user-avatar" aria-hidden="true">{initial}</span>
-              {user.name?.split(' ')[0] ?? 'Account'}
-            </a>
+            <DesktopUserMenu initial={initial} label={user.name?.split(' ')[0] ?? 'Account'} />
           ) : (
             <>
               <a href="/book" className="dh-book-btn">Book a bay</a>

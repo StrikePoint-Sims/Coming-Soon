@@ -20,14 +20,14 @@
   gap: 8px;
   font-size: 0.78rem;
   font-weight: 600;
-  color: rgba(212, 175, 55, 0.55);
+  color: rgba(169, 120, 69, 0.55);
   text-decoration: none;
   letter-spacing: 0.02em;
   transition: color 0.15s;
 }
 
 .site-footer-item:hover {
-  color: rgba(212, 175, 55, 0.85);
+  color: rgba(169, 120, 69, 0.85);
 }
 
 .site-footer-item svg {

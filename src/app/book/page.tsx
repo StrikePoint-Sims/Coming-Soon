@@ -36,6 +36,22 @@ interface DraftState {
   slot: SelectedSlot | null
 }
 
+interface BookingWindow {
+  maxDays: number
+  tierName: string | null
+}
+
+const NEXT_TIER_UP: Record<string, { name: string; days: number }> = {
+  Practice: { name: 'Standard', days: 10 },
+  Standard: { name: 'Elite', days: 14 },
+}
+
+function daysBetween(todayISO: string, targetISO: string): number {
+  const t1 = new Date(todayISO + 'T00:00:00').getTime()
+  const t2 = new Date(targetISO + 'T00:00:00').getTime()
+  return Math.round((t2 - t1) / 86400000)
+}
+
 function buildDateList(offset: number) {
   const today = new Date()
   return Array.from({ length: 7 }, (_, i) => {
@@ -63,10 +79,13 @@ export default function BookPage() {
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<SelectedSlot | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [window_, setWindowInfo] = useState<BookingWindow>({ maxDays: 3, tierName: null })
   const resumedRef = useRef(false)
   const calInputRef = useRef<HTMLInputElement>(null)
 
   const dates = buildDateList(dateOffset)
+  const daysOut = daysBetween(today, selectedDate)
+  const isPastWindow = daysOut > window_.maxDays
 
   const fetchGrid = useCallback(async (date: string, dur: number) => {
     setLoading(true)
@@ -87,8 +106,24 @@ export default function BookPage() {
   }, [])
 
   useEffect(() => {
+    if (isPastWindow) {
+      setRows([])
+      setLoading(false)
+      return
+    }
     void fetchGrid(selectedDate, duration)
-  }, [selectedDate, duration, fetchGrid])
+  }, [selectedDate, duration, fetchGrid, isPastWindow])
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/me/booking-window')
+        if (!res.ok) return
+        const data = (await res.json()) as BookingWindow
+        setWindowInfo(data)
+      } catch { /* ignore — defaults to 3-day non-member window */ }
+    })()
+  }, [session?.user?.id])
 
   useEffect(() => {
     if (!session?.user?.id || resumedRef.current) return
@@ -176,6 +211,8 @@ export default function BookPage() {
 
   const durationLabel = `${duration / 60} hr`
 
+  const upsell = buildWindowUpsell(window_, daysOut)
+
   return (
     <div className="book-page">
       <div className="book-content">
@@ -218,18 +255,34 @@ export default function BookPage() {
 
           {/* Controls */}
           <div className="book-controls-row">
-            <div className="book-duration-pills">
-              {DURATIONS.map(d => (
-                <button key={d.minutes} className={`book-dur-pill${duration === d.minutes ? ' is-active' : ''}`} onClick={() => handleDurationChange(d.minutes)}>
-                  {d.label}
+            <div className="book-control-stepper">
+              <span className="book-control-label">Duration</span>
+              <button
+                className="book-step-btn"
+                onClick={() => stepDuration(-30)}
+                disabled={duration <= 60}
+                aria-label="Decrease duration"
+              >−</button>
+              <span className="book-control-value">{durationLabel}</span>
+              <button
+                className="book-step-btn"
+                onClick={() => stepDuration(30)}
+                disabled={duration >= 240}
+                aria-label="Increase duration"
+              >+</button>
+            </div>
+            <div className="book-control-pills">
+              <span className="book-control-label">Players</span>
+              {PLAYER_COUNTS.map(n => (
+                <button
+                  key={n}
+                  className={`book-pill${players === n ? ' is-active' : ''}`}
+                  onClick={() => setPlayers(n)}
+                  aria-label={`${n} player${n !== 1 ? 's' : ''}`}
+                >
+                  {n}
                 </button>
               ))}
-            </div>
-            <div className="book-players-stepper">
-              <span className="book-players-label">Players</span>
-              <button className="book-step-btn" onClick={() => setPlayers(p => Math.max(1, p - 1))} disabled={players <= 1} aria-label="Decrease">−</button>
-              <span className="book-players-count">{players}</span>
-              <button className="book-step-btn" onClick={() => setPlayers(p => Math.min(4, p + 1))} disabled={players >= 4} aria-label="Increase">+</button>
             </div>
           </div>
 
@@ -245,9 +298,11 @@ export default function BookPage() {
             <div className="book-grid-col">
               <div className="book-avail-header">
                 <span className="book-avail-title">Available Times</span>
-                {!loading && rows.length > 0 && <span className="book-avail-count">{availableSlotCount} times open</span>}
+                {!loading && !isPastWindow && rows.length > 0 && <span className="book-avail-count">{availableSlotCount} times open</span>}
               </div>
-              {loading ? (
+              {isPastWindow ? (
+                <WindowUpsellCard {...upsell} />
+              ) : loading ? (
                 <div className="book-loading-row"><div className="book-spinner" /><span>Loading availability…</span></div>
               ) : rows.length === 0 ? (
                 <p className="book-no-slots">No times available. Try a different date or duration.</p>
@@ -401,7 +456,7 @@ export default function BookPage() {
           {/* ── Available times ─────────────────────────────────────────── */}
           <div className="book-m-times-hdr">
             <span className="book-m-ctrl-label" style={{ margin: 0 }}>AVAILABLE TIMES</span>
-            {!loading && rows.length > 0 && (
+            {!loading && !isPastWindow && rows.length > 0 && (
               <span className="book-m-slots-count">{availableSlotCount} times open</span>
             )}
           </div>
@@ -415,7 +470,9 @@ export default function BookPage() {
             </p>
           )}
 
-          {loading ? (
+          {isPastWindow ? (
+            <WindowUpsellCard {...upsell} />
+          ) : loading ? (
             <div className="book-loading-row">
               <div className="book-spinner" />
               <span>Loading availability…</span>
@@ -501,6 +558,69 @@ export default function BookPage() {
         {/* end .book-mobile-ui */}
 
       </div>
+    </div>
+  )
+}
+
+// ── Window upsell ──────────────────────────────────────────────────────────
+
+interface UpsellContent {
+  eyebrow: string
+  title: string
+  body: string
+  ctaLabel: string | null
+  ctaHref: string | null
+}
+
+function buildWindowUpsell(win: BookingWindow, daysOut: number): UpsellContent {
+  if (!win.tierName) {
+    return {
+      eyebrow: `${win.maxDays}-DAY BOOKING WINDOW`,
+      title: 'This date is past the booking window for non-members.',
+      body: `Members can book up to 14 days ahead. You picked a date ${daysOut} days out — pick a date within the next ${win.maxDays} day${win.maxDays !== 1 ? 's' : ''}, or take a look at memberships.`,
+      ctaLabel: 'See Memberships',
+      ctaHref: '/memberships',
+    }
+  }
+
+  const upgrade = NEXT_TIER_UP[win.tierName]
+  if (upgrade) {
+    return {
+      eyebrow: `${win.tierName.toUpperCase()} BOOKING WINDOW`,
+      title: `This date is past your ${win.maxDays}-day window.`,
+      body: `${upgrade.name} members can book up to ${upgrade.days} days ahead. Upgrade to ${upgrade.name} to lock in this date.`,
+      ctaLabel: `Upgrade to ${upgrade.name}`,
+      ctaHref: '/memberships',
+    }
+  }
+
+  // Elite or unknown — at the ceiling.
+  return {
+    eyebrow: `${win.maxDays}-DAY BOOKING WINDOW`,
+    title: `Booking is open up to ${win.maxDays} days out.`,
+    body: 'Pick a date within your booking window.',
+    ctaLabel: null,
+    ctaHref: null,
+  }
+}
+
+function WindowUpsellCard({ eyebrow, title, body, ctaLabel, ctaHref }: UpsellContent) {
+  return (
+    <div className="book-upsell">
+      <div className="book-upsell-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M8 12l3 3 5-6"/>
+        </svg>
+      </div>
+      <p className="book-upsell-eyebrow">{eyebrow}</p>
+      <h3 className="book-upsell-title">{title}</h3>
+      <p className="book-upsell-body">{body}</p>
+      {ctaLabel && ctaHref && (
+        <a href={ctaHref} className="book-upsell-cta">
+          {ctaLabel} <span aria-hidden="true">›</span>
+        </a>
+      )}
     </div>
   )
 }

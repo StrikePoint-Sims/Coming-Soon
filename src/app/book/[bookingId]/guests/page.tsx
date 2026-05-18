@@ -36,8 +36,7 @@ export default function AddGuestsPage() {
       }
       const data = (await res.json()) as BookingMeta
       setMeta(data)
-      const guestCount = Math.max(0, data.partySize - 1)
-      setGuestRows(Array.from({ length: guestCount }, () => ({ name: '', phone: '' })))
+      setGuestRows([{ name: '', phone: '' }])
     }
     void loadMeta()
   }, [bookingId, router])
@@ -67,6 +66,10 @@ export default function AddGuestsPage() {
     window.location.href = `/book/${bookingId}`
   }
 
+  function addGuestRow() {
+    setGuestRows(rows => rows.length >= 3 ? rows : [...rows, { name: '', phone: '' }])
+  }
+
   function handleSkip() {
     window.location.href = `/book/${bookingId}`
   }
@@ -81,7 +84,7 @@ export default function AddGuestsPage() {
     )
   }
 
-  const guestCount = Math.max(0, meta.partySize - 1)
+  const guestCapacity = 3
 
   return (
     <div className="ag-page">
@@ -99,7 +102,7 @@ export default function AddGuestsPage() {
           <p className="ag-intro">
             You booked {meta.bayLabel} for {meta.partySize} player{meta.partySize !== 1 ? 's' : ''} on {meta.dateLabel}, {meta.timeRange}.
             <br/>
-            Add your {guestCount} guest{guestCount !== 1 ? 's' : ''} below so we can check waivers and send links if needed.
+            Add up to {guestCapacity} guests below so we can check waivers and send links if needed.
           </p>
         </div>
 
@@ -137,6 +140,12 @@ export default function AddGuestsPage() {
               </div>
             </div>
           ))}
+
+          {guestRows.length < guestCapacity && (
+            <button type="button" className="ag-skip" onClick={addGuestRow} disabled={submitting}>
+              Add another guest
+            </button>
+          )}
 
           {error && <p className="ag-error">{error}</p>}
 

@@ -26,7 +26,7 @@
       --bg: #0a0a0a; --bg-alt: #0f0f0f; --bg-green: #1e2e12;
       --text: #fff; --text-soft: rgba(255,255,255,0.92); --text-muted: rgba(255,255,255,0.75);
       --accent: #4a6e34; --accent-hover: #5a8040; --accent-dark: #3a5a28;
-      --accent-light: #8fa65e; --gold: #c9a84c;
+      --accent-light: #8fa65e; --gold: #A97845;
       --border: rgba(255,255,255,0.1);
       --error: #e8735a;
       --font-serif: 'Playfair Display', Georgia, serif;
@@ -48,7 +48,7 @@
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
-    .topbar-logo { height: 36px; width: auto; opacity: 0.92; }
+    .topbar-logo { height: 50px; width: auto; opacity: 0.92; }
     .topbar-back { font-size: 0.82rem; color: var(--text-muted); text-decoration: none; letter-spacing: 0.04em; transition: color 0.25s; }
     .topbar-back:hover { color: var(--text); }
 
@@ -147,8 +147,8 @@
       position: relative;
     }
     .tier--elite {
-      border-color: rgba(201,168,76,0.5);
-      background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.02));
+      border-color: rgba(169, 120, 69,0.5);
+      background: linear-gradient(180deg, rgba(169, 120, 69,0.08), rgba(169, 120, 69,0.02));
     }
     .tier-selectable {
       cursor: pointer;
@@ -165,8 +165,8 @@
     }
     .tier-selectable.tier--elite.is-selected {
       border-color: var(--gold);
-      background: linear-gradient(180deg, rgba(201,168,76,0.14), rgba(201,168,76,0.04));
-      box-shadow: 0 0 0 1px rgba(201,168,76,0.25);
+      background: linear-gradient(180deg, rgba(169, 120, 69,0.14), rgba(169, 120, 69,0.04));
+      box-shadow: 0 0 0 1px rgba(169, 120, 69,0.25);
     }
     .tier-selected-pill {
       display: none;
@@ -240,7 +240,7 @@
       padding-top: 10px; margin-top: 4px;
       border-top: 1px solid var(--border);
     }
-    .tier--elite .tier-tagline { color: rgba(201,168,76,0.6); }
+    .tier--elite .tier-tagline { color: rgba(169, 120, 69,0.6); }
     .tier-footnote {
       font-size: 0.78rem; color: rgba(255,255,255,0.38);
       margin: -20px 0 36px; letter-spacing: 0.02em;
@@ -252,9 +252,9 @@
       max-width: 640px;
       margin: -10px 0 32px;
       padding: 18px 20px;
-      border: 1px solid rgba(201,168,76,0.24);
+      border: 1px solid rgba(169, 120, 69,0.24);
       border-radius: 12px;
-      background: rgba(201,168,76,0.055);
+      background: rgba(169, 120, 69,0.055);
     }
     .reservation-next.is-visible { display: block; }
     .reservation-next-title {
@@ -386,8 +386,8 @@
     /* ── Founding notice banner in slide 1 ── */
     .founding-notice {
       display: flex; align-items: flex-start; gap: 10px;
-      background: rgba(201,168,76,0.08);
-      border: 1px solid rgba(201,168,76,0.3);
+      background: rgba(169, 120, 69,0.08);
+      border: 1px solid rgba(169, 120, 69,0.3);
       border-radius: 8px;
       padding: 12px 14px;
       margin-bottom: 24px;
@@ -397,7 +397,7 @@
     }
     .founding-notice-text {
       font-size: 0.85rem; font-weight: 400;
-      color: rgba(201,168,76,0.9);
+      color: rgba(169, 120, 69,0.9);
       line-height: 1.55;
     }
 
@@ -470,7 +470,7 @@
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
-    .form-topbar-logo { height: 30px; width: auto; opacity: 0.85; }
+    .form-topbar-logo { height: 44px; width: auto; opacity: 0.85; }
     .form-close-btn {
       background: none; border: none; cursor: pointer;
       color: var(--text-muted); font-size: 1.5rem; line-height: 1;
@@ -674,7 +674,7 @@
     }
     .stripe-tier--elite.is-selected {
       border-color: var(--gold);
-      background: rgba(201,168,76,0.08);
+      background: rgba(169, 120, 69,0.08);
     }
 
     .stripe-tier-key {
@@ -703,7 +703,7 @@
     .stripe-tier-name { font-size: 0.98rem; font-weight: 400; color: var(--text-soft); display: block; line-height: 1.4; }
     .stripe-tier.is-selected .stripe-tier-name { color: var(--text); }
     .stripe-tier-meta { font-size: 0.82rem; font-weight: 400; color: var(--text-muted); }
-    .stripe-tier--elite .stripe-tier-meta { color: rgba(201,168,76,0.8); }
+    .stripe-tier--elite .stripe-tier-meta { color: rgba(169, 120, 69,0.8); }
 
     .stripe-card-section { margin-top: 28px; display: none; }
 
@@ -736,8 +736,8 @@
     .terms-agree-text a:hover { color: #fff; }
 
     .selected-plan-summary {
-      border: 1px solid rgba(201,168,76,0.36);
-      background: linear-gradient(180deg, rgba(201,168,76,0.08), rgba(201,168,76,0.025));
+      border: 1px solid rgba(169, 120, 69,0.36);
+      background: linear-gradient(180deg, rgba(169, 120, 69,0.08), rgba(169, 120, 69,0.025));
       border-radius: 14px;
       padding: 22px 24px;
       margin: 24px 0 18px;
@@ -992,7 +992,7 @@
     }
 
     @media (max-width: 480px) {
-      .topbar-logo { height: 30px; }
+      .topbar-logo { height: 42px; }
       .offer-btn { padding: 17px 40px; }
       .slide-q { font-size: 1.35rem; }
       .choices { gap: 8px; }

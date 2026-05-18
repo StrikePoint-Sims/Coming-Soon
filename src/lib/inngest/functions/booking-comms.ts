@@ -1,6 +1,6 @@
 import { inngest } from '@/lib/inngest/client'
 import { db } from '@/db'
-import { bookings, bays, users, accessCodes } from '@/db/schema'
+import { auditLog, bookings, bays, users, accessCodes } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { nanoid } from '@/lib/utils'
 import { sendUserEmail, sendUserSms } from '@/lib/comms'
@@ -134,6 +134,17 @@ export const bookingReminder = inngest.createFunction(
       .update(accessCodes)
       .set({ sentAt: new Date() })
       .where(eq(accessCodes.id, accessCode.id))
+
+    await db.insert(auditLog).values({
+      id: nanoid(),
+      actorType: 'system',
+      actorId: 'inngest:booking-reminder',
+      action: 'access_code.sms_sent',
+      targetType: 'booking',
+      targetId: bookingId,
+      payloadJson: { accessCodeId: accessCode.id },
+      at: new Date(),
+    })
 
     return { sent: true, code: accessCode.code }
   },

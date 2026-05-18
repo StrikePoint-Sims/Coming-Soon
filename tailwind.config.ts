@@ -12,7 +12,7 @@ const config: Config = {
       colors: {
         brand: {
           green: '#1B4332',
-          gold: '#D4AF37',
+          gold: '#A97845',
           cream: '#FAF8F2',
         },
       },

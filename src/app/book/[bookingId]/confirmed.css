@@ -69,7 +69,7 @@
   font-size: 0.62rem;
   font-weight: 700;
   letter-spacing: 0.14em;
-  color: rgba(212, 175, 55, 0.7);
+  color: rgba(169, 120, 69, 0.7);
   margin: 0 0 3px;
 }
 
@@ -86,9 +86,9 @@
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(169, 120, 69, 0.05);
   border: 1px solid rgba(74, 110, 52, 0.3);
-  color: rgba(212, 175, 55, 0.75);
+  color: rgba(169, 120, 69, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,8 +97,8 @@
 }
 
 .conf-copy:hover {
-  background: rgba(212, 175, 55, 0.12);
-  color: #D4AF37;
+  background: rgba(169, 120, 69, 0.12);
+  color: #A97845;
 }
 
 .conf-copy svg {
@@ -113,7 +113,7 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(212, 175, 55, 0.7);
+  color: rgba(169, 120, 69, 0.7);
   margin: 0 0 16px;
 }
 
@@ -147,7 +147,7 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  color: rgba(212, 175, 55, 0.7);
+  color: rgba(169, 120, 69, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,7 +203,7 @@
 .conf-summary-icon {
   width: 24px;
   height: 24px;
-  color: rgba(212, 175, 55, 0.6);
+  color: rgba(169, 120, 69, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -250,7 +250,7 @@
   font-family: var(--font-serif);
   font-size: 1.4rem;
   font-weight: 600;
-  color: #D4AF37;
+  color: #A97845;
 }
 
 /* ── Actions ──────────────────────────────────────────────────────────────── */

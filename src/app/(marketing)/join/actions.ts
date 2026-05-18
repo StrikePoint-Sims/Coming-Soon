@@ -232,8 +232,8 @@ export async function submitFounderData(input: {
       htmlContent: d.isFounder
         ? `
           <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#0a0a0a;color:#fff">
-            <img src="${env.NEXT_PUBLIC_APP_URL ?? 'https://strikepointsims.com'}/logohorizontal.png" alt="StrikePoint Sims" height="30" style="margin-bottom:28px">
-            <h2 style="color:#c9a84c;margin:0 0 16px;font-size:22px">You're in, ${d.firstName}.</h2>
+            <img src="${env.NEXT_PUBLIC_APP_URL ?? 'https://strikepointsims.com'}/logohorizontal.png" alt="StrikePoint Sims" height="46" style="margin-bottom:28px">
+            <h2 style="color:#A97845;margin:0 0 16px;font-size:22px">You're in, ${d.firstName}.</h2>
             <p style="color:rgba(255,255,255,0.75);margin:0 0 16px;line-height:1.7">
               Your ${d.interestedTier} Founding spot is reserved. When we open in Fall 2026,
               you'll hear from us first — and your founding pricing is locked for life.
@@ -249,7 +249,7 @@ export async function submitFounderData(input: {
         `
         : `
           <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:32px;background:#0a0a0a;color:#fff">
-            <img src="${env.NEXT_PUBLIC_APP_URL ?? 'https://strikepointsims.com'}/logohorizontal.png" alt="StrikePoint Sims" height="30" style="margin-bottom:28px">
+            <img src="${env.NEXT_PUBLIC_APP_URL ?? 'https://strikepointsims.com'}/logohorizontal.png" alt="StrikePoint Sims" height="46" style="margin-bottom:28px">
             <h2 style="color:#8fa65e;margin:0 0 16px;font-size:22px">You're on the list, ${d.firstName}.</h2>
             <p style="color:rgba(255,255,255,0.75);margin:0 0 16px;line-height:1.7">
               You'll get build updates, opening news, and a heads-up when bookings go live.

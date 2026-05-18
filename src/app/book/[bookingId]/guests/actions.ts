@@ -2,7 +2,7 @@
 
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { bookings, bookingGuests, waiverSignings } from '@/db/schema'
+import { auditLog, bookings, bookingGuests } from '@/db/schema'
 import { and, eq, gt } from 'drizzle-orm'
 import { nanoid } from '@/lib/utils'
 import { redirect } from 'next/navigation'
@@ -29,7 +29,11 @@ export async function addGuestsToBooking(
   const [booking] = await db
     .select({ id: bookings.id })
     .from(bookings)
-    .where(and(eq(bookings.id, bookingId), eq(bookings.userId, session.user.id)))
+    .where(and(
+      eq(bookings.id, bookingId),
+      eq(bookings.userId, session.user.id),
+      gt(bookings.startsAt, new Date()),
+    ))
     .limit(1)
 
   if (!booking) return { error: 'Booking not found.' }
@@ -40,42 +44,47 @@ export async function addGuestsToBooking(
 
   if (guests.length === 0) return { error: 'Please provide at least one guest.' }
 
-  const now = new Date()
-  let waiverMissing = 0
+  const existingGuests = await db
+    .select({ id: bookingGuests.id })
+    .from(bookingGuests)
+    .where(eq(bookingGuests.bookingId, bookingId))
 
-  // For each guest: insert booking_guest row. We look up an existing valid waiver
-  // by phone match (guests sign with name; phone match is best-effort).
-  // If no waiver on file, we'll send a waiver text on the booking confirmation flow.
+  const openGuestSlots = Math.max(0, 3 - existingGuests.length)
+  if (openGuestSlots === 0) return { error: 'This bay already has the maximum guest count.' }
+  if (guests.length > openGuestSlots) {
+    return { error: `You can add ${openGuestSlots} more guest${openGuestSlots === 1 ? '' : 's'} to this booking.` }
+  }
+
   for (const g of guests) {
-    // Best-effort: see if a user with this phone has a valid waiver
-    const [existingWaiver] = await db
-      .select({ id: waiverSignings.id })
-      .from(waiverSignings)
-      .where(and(
-        gt(waiverSignings.expiresAt, now),
-        // We cannot directly look up by phone — waiverSignings ties to userId or guestEmail.
-        // For now, fall back to "no match" and trigger a waiver send.
-      ))
-      .limit(1)
-      .catch(() => [])
-
-    const hasWaiver = !!existingWaiver
-    if (!hasWaiver) waiverMissing++
-
     await db.insert(bookingGuests).values({
       id: nanoid(),
       bookingId,
       name: g.name,
       phone: g.phone,
-      waiverSigningId: hasWaiver ? existingWaiver.id : null,
-      codeSentAt: hasWaiver ? null : new Date(),
+      waiverSigningId: null,
     })
 
-    // TODO: integrate SMS provider here to text the waiver link to the guest
-    // if waiverMissing > 0. For now we just record the booking_guest row.
+    // TODO: integrate SMS provider here to text the waiver link to the guest.
   }
 
-  return { ok: true, waiverMissing }
+  const newPartySize = Math.min(4, 1 + existingGuests.length + guests.length)
+  await db
+    .update(bookings)
+    .set({ partySize: newPartySize, updatedAt: new Date() })
+    .where(eq(bookings.id, bookingId))
+
+  await db.insert(auditLog).values({
+    id: nanoid(),
+    actorType: 'user',
+    actorId: session.user.id,
+    action: 'booking.guests.added',
+    targetType: 'booking',
+    targetId: bookingId,
+    payloadJson: { addedGuests: guests.length, partySize: newPartySize },
+    at: new Date(),
+  })
+
+  return { ok: true, waiverMissing: guests.length }
 }
 
 export async function skipGuestsAndContinue(bookingId: string): Promise<never> {

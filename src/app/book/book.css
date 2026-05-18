@@ -99,9 +99,9 @@
 }
 
 .book-date-btn.is-selected {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.5);
-  color: #D4AF37;
+  background: rgba(169, 120, 69, 0.08);
+  border-color: rgba(169, 120, 69, 0.5);
+  color: #A97845;
 }
 
 .book-date-name {
@@ -163,40 +163,9 @@
   flex-wrap: wrap;
 }
 
-.book-duration-pills {
-  display: flex;
-  gap: 6px;
-}
+/* ── Stepper (Duration) ──────────────────────────────────────────────────── */
 
-.book-dur-pill {
-  height: 40px;
-  padding: 0 18px;
-  border-radius: 100px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.4);
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-}
-
-.book-dur-pill:hover {
-  border-color: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.book-dur-pill.is-active {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.5);
-  color: #D4AF37;
-}
-
-.book-players-stepper {
+.book-control-stepper {
   display: flex;
   align-items: center;
   gap: 0;
@@ -206,18 +175,18 @@
   overflow: hidden;
 }
 
-.book-players-label {
+.book-control-label {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(255, 255, 255, 0.28);
-  padding: 0 12px;
+  padding: 0 14px;
   white-space: nowrap;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
   height: 100%;
   display: flex;
   align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .book-step-btn {
@@ -245,18 +214,63 @@
   cursor: not-allowed;
 }
 
-.book-players-count {
-  min-width: 28px;
+.book-control-value {
+  min-width: 56px;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.9);
   border-left: 1px solid rgba(255, 255, 255, 0.07);
   border-right: 1px solid rgba(255, 255, 255, 0.07);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 6px;
+}
+
+/* ── Pills (Players) ─────────────────────────────────────────────────────── */
+
+.book-control-pills {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 100px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.book-control-pills .book-control-label {
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.book-pill {
+  width: 40px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.book-pill:last-of-type {
+  border-right: none;
+}
+
+.book-pill:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.book-pill.is-active {
+  background: rgba(169, 120, 69, 0.1);
+  color: #A97845;
 }
 
 /* ── Error banner ─────────────────────────────────────────────────────────── */
@@ -273,7 +287,7 @@
 }
 
 .book-error-link {
-  color: #D4AF37;
+  color: #A97845;
   text-decoration: underline;
 }
 
@@ -312,7 +326,7 @@
 .book-avail-count {
   font-size: 0.65rem;
   font-weight: 600;
-  color: rgba(212, 175, 55, 0.55);
+  color: rgba(169, 120, 69, 0.55);
   letter-spacing: 0.04em;
 }
 
@@ -332,8 +346,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid rgba(212, 175, 55, 0.12);
-  border-top-color: rgba(212, 175, 55, 0.55);
+  border: 2px solid rgba(169, 120, 69, 0.12);
+  border-top-color: rgba(169, 120, 69, 0.55);
   animation: book-spin 0.75s linear infinite;
   flex-shrink: 0;
 }
@@ -430,8 +444,8 @@
 }
 
 .book-slot.is-selected {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.45);
+  background: rgba(169, 120, 69, 0.08);
+  border-color: rgba(169, 120, 69, 0.45);
 }
 
 .book-slot.is-unavail {
@@ -448,7 +462,7 @@
 }
 
 .book-slot.is-selected .book-slot-time {
-  color: #D4AF37;
+  color: #A97845;
 }
 
 .book-slot-avail {
@@ -468,7 +482,7 @@
 }
 
 .book-slot-dot.is-avail   { background: #5CA910; }
-.book-slot-dot.is-limited { background: #D4AF37; }
+.book-slot-dot.is-limited { background: #A97845; }
 .book-slot-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
 
 .book-slot-price {
@@ -479,7 +493,7 @@
 }
 
 .book-slot.is-selected .book-slot-price {
-  color: #D4AF37;
+  color: #A97845;
 }
 
 .book-slot-action {
@@ -492,7 +506,7 @@
 }
 
 .book-slot.is-selected .book-slot-action {
-  color: #D4AF37;
+  color: #A97845;
 }
 
 /* ── Availability cells ───────────────────────────────────────────────────── */
@@ -530,10 +544,10 @@
 }
 
 .book-cell-btn.is-selected {
-  background: rgba(212, 175, 55, 0.12);
-  border-color: rgba(212, 175, 55, 0.65);
-  color: #D4AF37;
-  box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.15), 0 2px 12px rgba(212, 175, 55, 0.08);
+  background: rgba(169, 120, 69, 0.12);
+  border-color: rgba(169, 120, 69, 0.65);
+  color: #A97845;
+  box-shadow: 0 0 0 1px rgba(169, 120, 69, 0.15), 0 2px 12px rgba(169, 120, 69, 0.08);
   transform: translateY(-1px);
 }
 
@@ -585,8 +599,8 @@
   background: linear-gradient(
     90deg,
     transparent 5%,
-    rgba(212, 175, 55, 0.35) 40%,
-    rgba(212, 175, 55, 0.35) 60%,
+    rgba(169, 120, 69, 0.35) 40%,
+    rgba(169, 120, 69, 0.35) 60%,
     transparent 95%
   );
 }
@@ -640,7 +654,7 @@
 .book-rail-bay {
   font-size: 0.82rem;
   font-weight: 600;
-  color: rgba(212, 175, 55, 0.7);
+  color: rgba(169, 120, 69, 0.7);
   margin: 0 24px 16px;
   letter-spacing: 0.02em;
 }
@@ -725,14 +739,24 @@
     padding: 0 8px;
   }
 
-  .book-dur-pill {
-    padding: 0 12px;
-    font-size: 0.76rem;
+  .book-pill {
+    width: 36px;
+    font-size: 0.84rem;
+  }
+
+  .book-control-stepper,
+  .book-control-pills {
     height: 36px;
   }
 
-  .book-players-stepper {
+  .book-step-btn {
+    width: 36px;
     height: 36px;
+  }
+
+  .book-control-value {
+    min-width: 50px;
+    font-size: 0.82rem;
   }
 
   .book-step-btn {
@@ -834,9 +858,9 @@
 }
 
 .book-m-date-pill.is-selected {
-  background: rgba(201, 168, 76, 0.1);
-  border-color: rgba(201, 168, 76, 0.55);
-  color: #C9A84C;
+  background: rgba(169, 120, 69, 0.1);
+  border-color: rgba(169, 120, 69, 0.55);
+  color: #A97845;
 }
 
 .book-m-date-pill-name {
@@ -926,8 +950,8 @@
 }
 
 .book-m-pill.is-active {
-  background: #C9A84C;
-  border-color: #C9A84C;
+  background: #A97845;
+  border-color: #A97845;
   color: #0d0a00;
   font-weight: 700;
 }
@@ -996,7 +1020,7 @@
 .book-m-slots-count {
   font-size: 0.65rem;
   font-weight: 600;
-  color: rgba(201, 168, 76, 0.55);
+  color: rgba(169, 120, 69, 0.55);
 }
 
 /* ── Time slot list ───────────────────────────────────────────────────────── */
@@ -1028,8 +1052,8 @@
 }
 
 .book-m-slot.is-selected {
-  background: rgba(201, 168, 76, 0.1);
-  border-color: rgba(201, 168, 76, 0.4);
+  background: rgba(169, 120, 69, 0.1);
+  border-color: rgba(169, 120, 69, 0.4);
 }
 
 .book-m-slot.is-unavail {
@@ -1046,7 +1070,7 @@
 }
 
 .book-m-slot.is-selected .book-m-slot-time {
-  color: #C9A84C;
+  color: #A97845;
 }
 
 .book-m-slot-price {
@@ -1059,7 +1083,7 @@
 }
 
 .book-m-slot.is-selected .book-m-slot-price {
-  color: #C9A84C;
+  color: #A97845;
 }
 
 .book-m-slot-avail {
@@ -1080,7 +1104,7 @@
 }
 
 .book-m-dot.is-avail   { background: #5CA910; }
-.book-m-dot.is-limited { background: #C9A84C; }
+.book-m-dot.is-limited { background: #A97845; }
 .book-m-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
 
 .book-m-slot-end {
@@ -1091,7 +1115,7 @@
 }
 
 .book-m-slot.is-selected .book-m-slot-end {
-  color: #C9A84C;
+  color: #A97845;
   font-weight: 700;
 }
 
@@ -1172,4 +1196,83 @@
 .book-m-reserve:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+/* ── Window upsell card ───────────────────────────────────────────────────── */
+
+.book-upsell {
+  background: linear-gradient(135deg, rgba(74, 110, 52, 0.07), rgba(169, 120, 69, 0.05));
+  border: 1px solid rgba(169, 120, 69, 0.28);
+  border-radius: 16px;
+  padding: 28px 26px;
+  text-align: center;
+  max-width: 480px;
+  margin: 8px auto;
+}
+
+.book-upsell-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(169, 120, 69, 0.08);
+  border: 1px solid rgba(169, 120, 69, 0.28);
+  color: rgba(169, 120, 69, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.book-upsell-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.book-upsell-eyebrow {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(169, 120, 69, 0.7);
+  margin: 0 0 10px;
+}
+
+.book-upsell-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.book-upsell-body {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+
+.book-upsell-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 10px;
+  background: rgba(169, 120, 69, 0.06);
+  border: 1px solid rgba(169, 120, 69, 0.4);
+  color: #A97845;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.book-upsell-cta:hover {
+  background: rgba(169, 120, 69, 0.12);
+  border-color: rgba(169, 120, 69, 0.6);
 }

@@ -202,7 +202,7 @@ export default async function BookingsPage({
                     </svg>
                     Change Time
                   </a>
-                  <a href={`/account/guests`} className="dash-btn ghost bk-action-btn">
+                  <a href={`/book/${nextBooking.id}/guests`} className="dash-btn ghost bk-action-btn">
                     <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
                       <circle cx="7" cy="6" r="3"/>
                       <path d="M2 16a5 5 0 0110 0"/>
@@ -258,7 +258,7 @@ export default async function BookingsPage({
               <h2 className="bk-subheading">Past Bookings</h2>
               <div className="bk-list">
                 {pastRows.map(b => (
-                  <BookingRow key={b.id} b={b} />
+                  <BookingRow key={b.id} b={b} past />
                 ))}
               </div>
             </>
@@ -269,7 +269,7 @@ export default async function BookingsPage({
   )
 }
 
-function BookingRow({ b }: {
+function BookingRow({ b, past = false }: {
   b: {
     id: string
     startsAt: Date
@@ -279,6 +279,7 @@ function BookingRow({ b }: {
     totalCents: number
     partySize: number
   }
+  past?: boolean
 }) {
   return (
     <a href={`/account/bookings/${b.id}`} className="bk-row">
@@ -308,6 +309,7 @@ function BookingRow({ b }: {
           {statusLabel(b.status)}
         </span>
       </div>
+      <span className="bk-row-action-label">{past ? 'View' : 'Manage'}</span>
       <span className="dash-chevron">›</span>
     </a>
   )

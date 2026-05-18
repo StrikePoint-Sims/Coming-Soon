@@ -15,7 +15,7 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 0 40px;
-  height: 72px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,7 +32,7 @@
 }
 
 .dh-logo {
-  height: 44px;
+  height: 58px;
   width: auto;
   display: block;
   opacity: 0.92;
@@ -79,6 +79,10 @@
   flex-shrink: 0;
 }
 
+.dh-user-menu {
+  position: relative;
+}
+
 .dh-login-btn {
   display: inline-flex;
   align-items: center;
@@ -107,9 +111,9 @@
   height: 36px;
   padding: 0 18px;
   border-radius: 100px;
-  border: 1px solid rgba(212, 175, 55, 0.45);
+  border: 1px solid rgba(169, 120, 69, 0.45);
   background: rgba(27, 67, 50, 0.5);
-  color: #D4AF37;
+  color: #A97845;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -119,7 +123,7 @@
 
 .dh-book-btn:hover {
   background: rgba(27, 67, 50, 0.75);
-  border-color: rgba(212, 175, 55, 0.7);
+  border-color: rgba(169, 120, 69, 0.7);
 }
 
 .dh-user-pill {
@@ -132,9 +136,11 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
   color: rgba(255, 255, 255, 0.7);
+  font-family: inherit;
   font-size: 0.82rem;
   font-weight: 500;
   text-decoration: none;
+  cursor: pointer;
   transition: background 0.18s, border-color 0.18s, color 0.18s;
 }
 
@@ -149,15 +155,70 @@
   height: 22px;
   border-radius: 50%;
   background: linear-gradient(135deg, #1a3d2b, #1B4332);
-  border: 1px solid rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(169, 120, 69, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
   font-weight: 700;
-  color: #D4AF37;
+  color: #A97845;
   flex-shrink: 0;
   text-transform: uppercase;
+}
+
+.dh-user-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 220px;
+  padding: 8px;
+  background: rgba(18, 18, 18, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
+  z-index: 80;
+}
+
+.dh-user-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 24px;
+  width: 10px;
+  height: 10px;
+  background: rgba(18, 18, 18, 0.98);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+}
+
+.dh-user-menu-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+
+.dh-user-menu-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.dh-user-menu-item.is-danger {
+  color: #e8735a;
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────────── */

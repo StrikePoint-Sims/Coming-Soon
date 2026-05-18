@@ -19,9 +19,10 @@ import {
   type PaymentIntentResult,
 } from '../actions'
 
-const stripePromise = loadStripe(
-  process.env['NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'] ?? ''
-)
+const stripePublishableKey = process.env['NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'] ?? ''
+const stripePromise = stripePublishableKey
+  ? loadStripe(stripePublishableKey)
+  : Promise.resolve(null)
 
 interface CheckoutFormProps {
   holdId: string
@@ -44,6 +45,9 @@ function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       redirect: 'if_required',
+      confirmParams: {
+        return_url: `${window.location.origin}/book/review?holdId=${encodeURIComponent(holdId)}`,
+      },
     })
 
     if (error) {
@@ -98,6 +102,12 @@ export default function ReviewPage() {
     initRef.current = true
 
     async function init() {
+      if (!stripePublishableKey) {
+        setPageError('Stripe is not configured. Add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY and try again.')
+        setLoading(false)
+        return
+      }
+
       const [detailsRes, piRes] = await Promise.all([
         getHoldDetails(holdId),
         createPaymentIntent(holdId),
@@ -269,13 +279,13 @@ export default function ReviewPage() {
                     appearance: {
                       theme: 'night',
                       variables: {
-                        colorPrimary: '#D4AF37',
+                        colorPrimary: '#A97845',
                         colorBackground: '#0f0f0f',
                         colorText: '#ffffff',
                         colorTextSecondary: 'rgba(255,255,255,0.5)',
                         colorTextPlaceholder: 'rgba(255,255,255,0.3)',
                         colorDanger: '#e8735a',
-                        colorIcon: '#D4AF37',
+                        colorIcon: '#A97845',
                         borderRadius: '10px',
                         fontFamily: 'var(--font-sans)',
                         fontSizeBase: '15px',
@@ -283,20 +293,20 @@ export default function ReviewPage() {
                       },
                       rules: {
                         '.Input': {
-                          border: '1px solid rgba(212, 175, 55, 0.18)',
+                          border: '1px solid rgba(169, 120, 69, 0.18)',
                           backgroundColor: 'rgba(255, 255, 255, 0.02)',
                         },
                         '.Input:focus': {
-                          border: '1px solid rgba(212, 175, 55, 0.5)',
-                          boxShadow: '0 0 0 3px rgba(212, 175, 55, 0.08)',
+                          border: '1px solid rgba(169, 120, 69, 0.5)',
+                          boxShadow: '0 0 0 3px rgba(169, 120, 69, 0.08)',
                         },
                         '.Tab': {
-                          border: '1px solid rgba(212, 175, 55, 0.14)',
+                          border: '1px solid rgba(169, 120, 69, 0.14)',
                           backgroundColor: 'rgba(255, 255, 255, 0.02)',
                         },
                         '.Tab--selected': {
-                          border: '1px solid rgba(212, 175, 55, 0.4)',
-                          backgroundColor: 'rgba(212, 175, 55, 0.06)',
+                          border: '1px solid rgba(169, 120, 69, 0.4)',
+                          backgroundColor: 'rgba(169, 120, 69, 0.06)',
                         },
                       },
                     },

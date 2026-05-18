@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { bookings, bays } from '@/db/schema'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, gt } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 
 const FACILITY_TZ = 'America/New_York'
@@ -24,7 +24,11 @@ export async function GET(
     })
     .from(bookings)
     .innerJoin(bays, eq(bookings.bayId, bays.id))
-    .where(and(eq(bookings.id, bookingId), eq(bookings.userId, session.user.id)))
+    .where(and(
+      eq(bookings.id, bookingId),
+      eq(bookings.userId, session.user.id),
+      gt(bookings.startsAt, new Date()),
+    ))
     .limit(1)
 
   if (!booking) return NextResponse.json({ error: 'not found' }, { status: 404 })
