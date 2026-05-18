@@ -70,24 +70,62 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       server: { host: 'localhost', port: 25, auth: { user: '', pass: '' } },
       from: env.BREVO_TRANSACTIONAL_SENDER_EMAIL ?? '',
       sendVerificationRequest: async ({ identifier: email, url }) => {
+        const safeUrl = url.replace(/"/g, '&quot;')
         await brevo.sendEmail({
           to: [{ email }],
           subject: 'Sign in to StrikePoint Sims',
           htmlContent: `
-            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-              <img src="${env.NEXT_PUBLIC_APP_URL}/logo.png" alt="StrikePoint Sims" height="52" style="margin-bottom:32px">
-              <h2 style="margin:0 0 16px;font-size:20px;color:#111">Sign in to your account</h2>
-              <p style="color:#555;margin:0 0 28px;line-height:1.6">
-                Click the button below to sign in. This link expires in 24 hours and can only be used once.
-              </p>
-              <a href="${url}" style="display:inline-block;background:#1B4332;color:#A97845;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px">
-                Sign in to StrikePoint Sims
-              </a>
-              <p style="margin:28px 0 0;font-size:13px;color:#999;line-height:1.5">
-                If you didn't request this, you can safely ignore this email.
-              </p>
+            <div style="display:none;max-height:0;overflow:hidden;color:transparent;opacity:0">
+              Your secure StrikePoint Sims sign-in link expires in 24 hours.
             </div>
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin:0;padding:0;background:#0a0a0a;font-family:Inter,Arial,sans-serif;color:#f5f1e8">
+              <tr>
+                <td align="center" style="padding:56px 20px">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border-collapse:separate;border-spacing:0">
+                    <tr>
+                      <td style="padding:0 0 22px">
+                        <table role="presentation" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td style="width:42px;height:42px;border:1px solid rgba(169,120,69,0.45);border-radius:999px;background:rgba(61,90,42,0.28);color:#A6BA78;font-family:Georgia,serif;font-size:18px;font-weight:700;text-align:center;vertical-align:middle">
+                              SP
+                            </td>
+                            <td style="padding-left:12px;color:#f5f1e8;font-size:18px;font-weight:700;letter-spacing:-0.01em">
+                              StrikePoint<br><span style="color:rgba(245,241,232,0.72);font-weight:500">Sims</span>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="border:1px solid rgba(169,120,69,0.22);border-radius:10px;background:linear-gradient(135deg,rgba(61,90,42,0.16),rgba(169,120,69,0.08));padding:34px">
+                        <div style="color:#A97845;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:18px">
+                          Secure sign in
+                        </div>
+                        <h1 style="margin:0 0 14px;font-family:Georgia,'Times New Roman',serif;font-size:36px;line-height:0.98;font-weight:700;color:#fff">
+                          Sign in to your account
+                        </h1>
+                        <p style="margin:0 0 28px;color:rgba(255,255,255,0.68);font-size:15px;line-height:1.65">
+                          Use the secure link below to access your StrikePoint account. This link expires in 24 hours and can only be used once.
+                        </p>
+                        <a href="${safeUrl}" style="display:block;background:#4A6E34;border:1px solid rgba(166,186,120,0.55);border-radius:8px;color:#fff;text-decoration:none;text-align:center;padding:16px 22px;font-size:14px;font-weight:800;letter-spacing:0.02em">
+                          Sign in to StrikePoint Sims
+                        </a>
+                        <p style="margin:24px 0 0;color:rgba(255,255,255,0.42);font-size:12px;line-height:1.55">
+                          If you did not request this, you can safely ignore this email.
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:18px 4px 0;color:rgba(255,255,255,0.36);font-size:12px;line-height:1.5">
+                        StrikePoint Sims account access
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           `,
+          textContent: `Sign in to StrikePoint Sims: ${url}\n\nThis link expires in 24 hours and can only be used once. If you did not request this, you can ignore this email.`,
           tags: ['magic-link'],
         })
       },

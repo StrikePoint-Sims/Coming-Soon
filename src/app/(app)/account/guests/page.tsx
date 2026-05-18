@@ -1,21 +1,21 @@
 import { getCurrentUser } from '@/auth'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
+import { db } from '@/db'
+import { bays, bookingGuests, bookings, waiverSignings } from '@/db/schema'
+import { and, desc, eq, gt } from 'drizzle-orm'
+import { formatInTimeZone } from 'date-fns-tz'
+import { addAccountGuest, sendAllGuestWaiverLinks, sendGuestWaiverLinkAction } from './actions'
 import '../account.css'
 
 export const metadata: Metadata = {
-  title: 'Guests & Waivers — StrikePoint Sims',
+  title: 'Guests & Waivers - StrikePoint Sims',
   robots: { index: false },
 }
 
-// Mock guests until backend is wired up. Replace with real data source.
-const MOCK_GUESTS: Array<{
-  id: string
-  name: string
-  email: string
-  status: 'signed' | 'pending' | 'expired'
-  date: string
-}> = []
+const FACILITY_TZ = 'America/New_York'
+
+type GuestStatus = 'signed' | 'pending' | 'expired'
 
 function initials(name: string): string {
   const parts = name.trim().split(/\s+/)
@@ -24,11 +24,66 @@ function initials(name: string): string {
   return (first + (parts.length > 1 ? last : '')).toUpperCase()
 }
 
-export default async function GuestsWaiversPage() {
+function statusFor(expiresAt?: Date | null): GuestStatus {
+  if (!expiresAt) return 'pending'
+  return expiresAt > new Date() ? 'signed' : 'expired'
+}
+
+function messageFor(searchParams: { added?: string; sent?: string; error?: string }) {
+  if (searchParams.added) return { type: 'success', text: 'Guest added and waiver link sent.' }
+  if (searchParams.sent) return { type: 'success', text: `${searchParams.sent} waiver link${searchParams.sent === '1' ? '' : 's'} sent.` }
+  if (searchParams.error === 'capacity') return { type: 'error', text: 'That booking already has 3 guests.' }
+  if (searchParams.error === 'booking') return { type: 'error', text: 'Choose an upcoming booking before adding a guest.' }
+  if (searchParams.error) return { type: 'error', text: 'Please add a guest name and at least one contact method.' }
+  return null
+}
+
+export default async function GuestsWaiversPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ added?: string; sent?: string; error?: string }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
-  const guests = MOCK_GUESTS
+  const now = new Date()
+  const params = await searchParams
+
+  const [guestRows, upcomingBookings] = await Promise.all([
+    db
+      .select({
+        id: bookingGuests.id,
+        bookingId: bookingGuests.bookingId,
+        name: bookingGuests.name,
+        email: bookingGuests.email,
+        phone: bookingGuests.phone,
+        startsAt: bookings.startsAt,
+        endsAt: bookings.endsAt,
+        bayLabel: bays.label,
+        waiverExpiresAt: waiverSignings.expiresAt,
+      })
+      .from(bookingGuests)
+      .innerJoin(bookings, eq(bookingGuests.bookingId, bookings.id))
+      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(waiverSignings, eq(bookingGuests.waiverSigningId, waiverSignings.id))
+      .where(eq(bookings.userId, user.id))
+      .orderBy(desc(bookings.startsAt)),
+
+    db
+      .select({
+        id: bookings.id,
+        startsAt: bookings.startsAt,
+        endsAt: bookings.endsAt,
+        bayLabel: bays.label,
+      })
+      .from(bookings)
+      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .where(and(eq(bookings.userId, user.id), gt(bookings.startsAt, now)))
+      .orderBy(bookings.startsAt),
+  ])
+
+  const message = messageFor(params)
+  const canSendAny = guestRows.some(g => statusFor(g.waiverExpiresAt) !== 'signed' && (g.email || g.phone))
 
   return (
     <div className="dash-page">
@@ -41,7 +96,12 @@ export default async function GuestsWaiversPage() {
 
       <div className="gw-layout">
         <div className="gw-main">
-          {/* Info banner */}
+          {message && (
+            <div className={`gw-message ${message.type}`}>
+              {message.text}
+            </div>
+          )}
+
           <div className="gw-banner">
             <div className="gw-banner-icon">
               <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
@@ -51,59 +111,112 @@ export default async function GuestsWaiversPage() {
             </div>
             <div>
               <p className="gw-banner-title">Waivers are handled automatically.</p>
-              <p className="gw-banner-body">Add a guest by name and phone — we&apos;ll check if their waiver is on file and text them a link if not.</p>
+              <p className="gw-banner-body">Add a guest by name and phone or email. We check their waiver status and send a personal signing link when needed.</p>
             </div>
           </div>
 
-          {/* Guests card */}
+          <div className="dash-section-card gw-add-card">
+            <div className="dash-section-header">
+              <span className="dash-section-label gold">ADD A GUEST</span>
+            </div>
+
+            {upcomingBookings.length === 0 ? (
+              <div className="dash-empty-block compact">
+                <p className="dash-empty-heading">No upcoming bookings</p>
+                <p className="dash-empty-body">Book a bay first, then add guests to that reservation.</p>
+                <a href="/book" className="dash-btn primary dash-btn-full">Book a Bay</a>
+              </div>
+            ) : (
+              <form action={addAccountGuest} className="gw-add-form">
+                <label className="gw-field">
+                  <span>Booking</span>
+                  <select name="bookingId" className="gw-input" required>
+                    {upcomingBookings.map(booking => (
+                      <option key={booking.id} value={booking.id}>
+                        {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {booking.bayLabel}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="gw-field">
+                  <span>Name</span>
+                  <input name="name" className="gw-input" placeholder="Guest name" required />
+                </label>
+                <label className="gw-field">
+                  <span>Phone</span>
+                  <input name="phone" className="gw-input" placeholder="(203) 555-0100" />
+                </label>
+                <label className="gw-field">
+                  <span>Email optional</span>
+                  <input name="email" className="gw-input" type="email" placeholder="guest@example.com" />
+                </label>
+                <button type="submit" className="dash-btn primary gw-add-submit">Add Guest</button>
+              </form>
+            )}
+          </div>
+
           <div className="dash-section-card">
             <div className="dash-section-header">
               <span className="dash-section-label gold">YOUR GUESTS</span>
               <div className="gw-header-actions">
-                <button type="button" className="dash-btn primary gw-btn-sm">+ Add Guest</button>
-                <button type="button" className="dash-btn ghost gw-btn-sm">Send Waiver Link to All</button>
+                <form action={sendAllGuestWaiverLinks}>
+                  <button type="submit" className="dash-btn ghost gw-btn-sm" disabled={!canSendAny}>Send Waiver Link to All</button>
+                </form>
               </div>
             </div>
 
-            {guests.length === 0 ? (
+            {guestRows.length === 0 ? (
               <div className="dash-empty-block">
                 <p className="dash-empty-heading">No guests added yet</p>
                 <p className="dash-empty-body">
-                  Add a guest by name and phone — anytime, including when you book.
+                  Add a guest to an upcoming booking and we&apos;ll send their waiver link.
                 </p>
-                <button type="button" className="dash-btn primary dash-btn-full">
-                  Add Your First Guest
-                </button>
               </div>
             ) : (
               <div className="gw-list">
-                {guests.map(g => (
-                  <div key={g.id} className="gw-row">
-                    <div className="gw-avatar">{initials(g.name)}</div>
-                    <div className="gw-info">
-                      <p className="gw-name">{g.name}</p>
-                      <p className="gw-email">{g.email}</p>
+                {guestRows.map(g => {
+                  const status = statusFor(g.waiverExpiresAt)
+                  return (
+                    <div key={g.id} className="gw-row">
+                      <div className="gw-avatar">{initials(g.name ?? 'Guest')}</div>
+                      <div className="gw-info">
+                        <p className="gw-name">{g.name ?? 'Guest'}</p>
+                        <p className="gw-email">
+                          {[g.email, g.phone].filter(Boolean).join(' - ') || 'No contact on file'}
+                        </p>
+                        <p className="gw-booking-line">
+                          {formatInTimeZone(g.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {g.bayLabel}
+                        </p>
+                      </div>
+                      <div className="gw-status-col">
+                        <span className={`gw-status ${status}`}>
+                          <span className="gw-status-dot" />
+                          {status === 'signed' ? 'Signed' : status === 'pending' ? 'Pending' : 'Expired'}
+                        </span>
+                        <span className="gw-status-date">
+                          {status === 'signed' && g.waiverExpiresAt
+                            ? `Valid until ${formatInTimeZone(g.waiverExpiresAt, FACILITY_TZ, 'MMM d, yyyy')}`
+                            : 'Waiver needed'}
+                        </span>
+                      </div>
+                      {status !== 'signed' && (g.email || g.phone) && (
+                        <form action={sendGuestWaiverLinkAction}>
+                          <input type="hidden" name="guestId" value={g.id} />
+                          <button type="submit" className="gw-row-action-text">Send link</button>
+                        </form>
+                      )}
                     </div>
-                    <div className="gw-status-col">
-                      <span className={`gw-status ${g.status}`}>
-                        <span className="gw-status-dot" />
-                        {g.status === 'signed' ? 'Signed' : g.status === 'pending' ? 'Pending' : 'Expired'}
-                      </span>
-                      <span className="gw-status-date">{g.date}</span>
-                    </div>
-                    <button type="button" className="gw-row-action" aria-label="More actions">⋯</button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
 
           <p className="gw-footer-note">
-            You can add guests anytime, including at booking. We&apos;ll check if their waiver is on file and text them a link if it&apos;s missing or expired. Waivers are valid for one year from the date signed.
+            You can add guests anytime, including at booking. We&apos;ll check if their waiver is on file and text or email a link if it&apos;s missing or expired. Waivers are valid for one year from the date signed.
           </p>
         </div>
 
-        {/* Right sidebar: Guest Policy */}
         <aside className="gw-aside">
           <div className="dash-section-card gw-policy">
             <div className="gw-policy-icon">
@@ -122,22 +235,10 @@ export default async function GuestsWaiversPage() {
             <div className="gw-policy-divider" />
 
             <ul className="gw-policy-list">
-              <li>
-                <span className="gw-policy-bullet">✓</span>
-                Members can bring up to 3 guests per booking.
-              </li>
-              <li>
-                <span className="gw-policy-bullet">✓</span>
-                Add a guest anytime — name and phone is all we need.
-              </li>
-              <li>
-                <span className="gw-policy-bullet">✓</span>
-                We auto-check waivers and text a link if one&apos;s missing.
-              </li>
-              <li>
-                <span className="gw-policy-bullet">✓</span>
-                Waivers are valid for one year from the date signed.
-              </li>
+              <li><span className="gw-policy-bullet">&#10003;</span> Members can bring up to 3 guests per booking.</li>
+              <li><span className="gw-policy-bullet">&#10003;</span> Add a guest anytime with name and contact info.</li>
+              <li><span className="gw-policy-bullet">&#10003;</span> We send signing links when a waiver is missing.</li>
+              <li><span className="gw-policy-bullet">&#10003;</span> Waivers are valid for one year from the date signed.</li>
             </ul>
 
             <a href="/memberships" className="dash-btn ghost dash-btn-full" style={{ marginTop: 16 }}>

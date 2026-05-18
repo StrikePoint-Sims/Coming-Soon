@@ -65,6 +65,36 @@ function buildDateList(offset: number) {
   })
 }
 
+type RateCategoryKey = 'night' | 'offPeak' | 'peak'
+
+interface RateCategory {
+  key: RateCategoryKey
+  label: string
+  detail: string
+}
+
+const RATE_CATEGORIES: Record<RateCategoryKey, RateCategory> = {
+  night: { key: 'night', label: 'Night', detail: '$30 / hr' },
+  offPeak: { key: 'offPeak', label: 'Off-peak', detail: '$45 / hr' },
+  peak: { key: 'peak', label: 'Peak', detail: '$60 / hr' },
+}
+
+function rateCategoryForRow(row: GridRow): RateCategory {
+  const start = new Date(row.startsAt)
+  const hour = Number(formatInTimeZone(start, FACILITY_TZ, 'H'))
+  if (hour >= 22 || hour < 6) return RATE_CATEGORIES.night
+
+  const dayOfWeek = Number(formatInTimeZone(start, FACILITY_TZ, 'i'))
+  const isWeekend = dayOfWeek === 6 || dayOfWeek === 7
+  if (!isWeekend && hour < 17) return RATE_CATEGORIES.offPeak
+
+  return RATE_CATEGORIES.peak
+}
+
+function isSixAm(row: GridRow): boolean {
+  return formatInTimeZone(new Date(row.startsAt), FACILITY_TZ, 'H:mm') === '6:00'
+}
+
 export default function BookPage() {
   const { data: session } = useSession()
   const today = format(new Date(), 'yyyy-MM-dd')
@@ -82,6 +112,8 @@ export default function BookPage() {
   const [window_, setWindowInfo] = useState<BookingWindow>({ maxDays: 3, tierName: null })
   const resumedRef = useRef(false)
   const calInputRef = useRef<HTMLInputElement>(null)
+  const desktopSlotFrameRef = useRef<HTMLDivElement>(null)
+  const mobileSlotFrameRef = useRef<HTMLDivElement>(null)
 
   const dates = buildDateList(dateOffset)
   const daysOut = daysBetween(today, selectedDate)
@@ -145,6 +177,24 @@ export default function BookPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.id])
+
+  useEffect(() => {
+    if (loading || isPastWindow || rows.length === 0) return
+
+    const scrollFrameToSix = (frame: HTMLDivElement | null) => {
+      if (!frame) return
+      const target = frame.querySelector<HTMLElement>('[data-scroll-anchor="day-start"]')
+      if (!target) return
+      frame.scrollTop = Math.max(0, target.offsetTop - frame.offsetTop)
+    }
+
+    const raf = requestAnimationFrame(() => {
+      scrollFrameToSix(desktopSlotFrameRef.current)
+      scrollFrameToSix(mobileSlotFrameRef.current)
+    })
+
+    return () => cancelAnimationFrame(raf)
+  }, [rows, loading, isPastWindow])
 
   async function handleReserve(slot?: SelectedSlot) {
     const target = slot ?? selected
@@ -307,8 +357,9 @@ export default function BookPage() {
               ) : rows.length === 0 ? (
                 <p className="book-no-slots">No times available. Try a different date or duration.</p>
               ) : (
-                <div className="book-slot-list">
-                  {rows.map(row => {
+                <div className="book-slot-frame" ref={desktopSlotFrameRef}>
+                  <div className="book-slot-list">
+                  {rows.map((row, index) => {
                     const avail = row.cells.filter(c => c.status === 'available')
                     const total = row.cells.length
                     const isBooked = avail.length === 0
@@ -316,9 +367,18 @@ export default function BookPage() {
                     const isSelected = selected?.startsAt === row.startsAt
                     const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
                     const price = avail[0]?.priceCents ?? 0
+                    const rateCategory = rateCategoryForRow(row)
+                    const prevRateCategory = index > 0 ? rateCategoryForRow(rows[index - 1]!) : null
+                    const showRateSeparator = !prevRateCategory || prevRateCategory.key !== rateCategory.key
                     return (
-                      <button
-                        key={row.startsAt}
+                      <div className="book-slot-item" key={row.startsAt} data-scroll-anchor={isSixAm(row) ? 'day-start' : undefined}>
+                        {showRateSeparator && (
+                          <div className={`book-rate-separator ${rateCategory.key}`}>
+                            <span>{rateCategory.label}</span>
+                            <small>{rateCategory.detail}</small>
+                          </div>
+                        )}
+                        <button
                         className={`book-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                         onClick={() => {
                           if (isBooked) return
@@ -337,9 +397,11 @@ export default function BookPage() {
                         <span className="book-slot-action">
                           {isBooked ? '' : isSelected ? '✓ Selected' : 'Select →'}
                         </span>
-                      </button>
+                        </button>
+                      </div>
                     )
                   })}
+                  </div>
                 </div>
               )}
             </div>
@@ -480,18 +542,28 @@ export default function BookPage() {
           ) : rows.length === 0 ? (
             <p className="book-no-slots">No times available. Try a different date or duration.</p>
           ) : (
-            <div className="book-m-slot-list">
-              {rows.map(row => {
+            <div className="book-m-slot-frame" ref={mobileSlotFrameRef}>
+              <div className="book-m-slot-list">
+              {rows.map((row, index) => {
                 const avail = row.cells.filter(c => c.status === 'available')
                 const total = row.cells.length
                 const isBooked = avail.length === 0
                 const isLimited = avail.length === 1
                 const isSelected = selected?.startsAt === row.startsAt
                 const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
+                const rateCategory = rateCategoryForRow(row)
+                const prevRateCategory = index > 0 ? rateCategoryForRow(rows[index - 1]!) : null
+                const showRateSeparator = !prevRateCategory || prevRateCategory.key !== rateCategory.key
 
                 return (
-                  <button
-                    key={row.startsAt}
+                  <div className="book-m-slot-item" key={row.startsAt} data-scroll-anchor={isSixAm(row) ? 'day-start' : undefined}>
+                    {showRateSeparator && (
+                      <div className={`book-rate-separator ${rateCategory.key}`}>
+                        <span>{rateCategory.label}</span>
+                        <small>{rateCategory.detail}</small>
+                      </div>
+                    )}
+                    <button
                     className={`book-m-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                     onClick={() => {
                       if (isBooked) return
@@ -522,9 +594,11 @@ export default function BookPage() {
                     <span className="book-m-slot-end">
                       {!isBooked && (isSelected ? '✓' : '›')}
                     </span>
-                  </button>
+                    </button>
+                  </div>
                 )
               })}
+              </div>
             </div>
           )}
 

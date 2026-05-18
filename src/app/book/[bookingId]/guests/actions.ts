@@ -6,10 +6,15 @@ import { auditLog, bookings, bookingGuests } from '@/db/schema'
 import { and, eq, gt } from 'drizzle-orm'
 import { nanoid } from '@/lib/utils'
 import { redirect } from 'next/navigation'
+import { revalidatePath } from 'next/cache'
+import { sendGuestWaiverLink } from '@/lib/waivers/guest-links'
+import { users } from '@/db/schema'
+import { formatInTimeZone } from 'date-fns-tz'
 
 interface GuestInput {
   name: string
   phone: string
+  email?: string
 }
 
 function normalizePhone(raw: string): string {
@@ -27,8 +32,13 @@ export async function addGuestsToBooking(
   if (!session?.user?.id) return { error: 'Not authenticated.' }
 
   const [booking] = await db
-    .select({ id: bookings.id })
+    .select({
+      id: bookings.id,
+      startsAt: bookings.startsAt,
+      userName: users.name,
+    })
     .from(bookings)
+    .innerJoin(users, eq(bookings.userId, users.id))
     .where(and(
       eq(bookings.id, bookingId),
       eq(bookings.userId, session.user.id),
@@ -39,8 +49,8 @@ export async function addGuestsToBooking(
   if (!booking) return { error: 'Booking not found.' }
 
   const guests = guestsRaw
-    .map(g => ({ name: g.name.trim(), phone: normalizePhone(g.phone) }))
-    .filter(g => g.name.length > 0 && g.phone.length > 0)
+    .map(g => ({ name: g.name.trim(), phone: normalizePhone(g.phone), email: g.email?.trim().toLowerCase() || null }))
+    .filter(g => g.name.length > 0 && (g.phone.length > 0 || g.email))
 
   if (guests.length === 0) return { error: 'Please provide at least one guest.' }
 
@@ -55,16 +65,31 @@ export async function addGuestsToBooking(
     return { error: `You can add ${openGuestSlots} more guest${openGuestSlots === 1 ? '' : 's'} to this booking.` }
   }
 
+  const sessionLabel = formatInTimeZone(booking.startsAt, 'America/New_York', 'EEE, MMM d, h:mm a')
+  let linksSent = 0
+
   for (const g of guests) {
+    const guestId = nanoid()
     await db.insert(bookingGuests).values({
-      id: nanoid(),
+      id: guestId,
       bookingId,
       name: g.name,
       phone: g.phone,
+      email: g.email,
       waiverSigningId: null,
     })
 
-    // TODO: integrate SMS provider here to text the waiver link to the guest.
+    if (g.phone || g.email) {
+      await sendGuestWaiverLink({
+        guestId,
+        guestName: g.name,
+        guestEmail: g.email,
+        guestPhone: g.phone,
+        hostName: booking.userName,
+        sessionLabel,
+      })
+      linksSent += 1
+    }
   }
 
   const newPartySize = Math.min(4, 1 + existingGuests.length + guests.length)
@@ -80,10 +105,12 @@ export async function addGuestsToBooking(
     action: 'booking.guests.added',
     targetType: 'booking',
     targetId: bookingId,
-    payloadJson: { addedGuests: guests.length, partySize: newPartySize },
+    payloadJson: { addedGuests: guests.length, waiverLinksSent: linksSent, partySize: newPartySize },
     at: new Date(),
   })
 
+  revalidatePath('/account/guests')
+  revalidatePath(`/account/bookings/${bookingId}`)
   return { ok: true, waiverMissing: guests.length }
 }
 

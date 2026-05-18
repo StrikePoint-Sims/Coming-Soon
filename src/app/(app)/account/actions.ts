@@ -6,6 +6,7 @@ import { users, auditLog, supportThreads, supportMessages } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { nanoid } from '@/lib/utils'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 import { z } from 'zod'
 
 function normalizePhone(raw: unknown): string {
@@ -19,7 +20,7 @@ function normalizePhone(raw: unknown): string {
 }
 
 const profileSchema = z.object({
-  name: z.string().min(1).max(120),
+  name: z.string().trim().max(120).optional().or(z.literal('')),
   phone: z
     .preprocess(normalizePhone, z
     .string()
@@ -45,12 +46,31 @@ export async function updateProfile(formData: FormData) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
+  const intent = formData.get('_intent') === 'notifications' ? 'notifications' : 'profile'
+  const [currentUser] = await db
+    .select({
+      name: users.name,
+      phone: users.phone,
+      handedness: users.handedness,
+      marketingEmailConsent: users.marketingEmailConsent,
+      smsConsent: users.smsConsent,
+    })
+    .from(users)
+    .where(eq(users.id, session.user.id))
+    .limit(1)
+
+  if (!currentUser) throw new Error('Account not found')
+
   const parsed = profileSchema.safeParse({
-    name: formData.get('name'),
-    phone: formData.get('phone') ?? '',
-    handedness: formData.get('handedness'),
-    marketingEmailConsent: formData.get('marketingEmailConsent') === 'on',
-    smsConsent: formData.get('smsConsent') === 'on',
+    name: intent === 'notifications' ? currentUser.name ?? '' : formData.get('name'),
+    phone: intent === 'notifications' ? currentUser.phone ?? '' : formData.get('phone') ?? '',
+    handedness: intent === 'notifications' ? currentUser.handedness ?? '' : formData.get('handedness'),
+    marketingEmailConsent: intent === 'profile'
+      ? currentUser.marketingEmailConsent
+      : formData.get('marketingEmailConsent') === 'on',
+    smsConsent: intent === 'profile'
+      ? currentUser.smsConsent
+      : formData.get('smsConsent') === 'on',
   })
 
   if (!parsed.success) {
@@ -58,11 +78,12 @@ export async function updateProfile(formData: FormData) {
   }
 
   const { name, phone, handedness, marketingEmailConsent, smsConsent } = parsed.data
+  if (intent === 'profile' && !name) throw new Error('Enter your full name')
 
   await db
     .update(users)
     .set({
-      name,
+      name: name || null,
       phone: phone || null,
       handedness: handedness ?? null,
       marketingEmailConsent,
@@ -83,6 +104,8 @@ export async function updateProfile(formData: FormData) {
   })
 
   revalidatePath('/account')
+  revalidatePath('/account/settings')
+  redirect(`/account/settings?saved=${intent}` as never)
 }
 
 export async function requestDataExport() {

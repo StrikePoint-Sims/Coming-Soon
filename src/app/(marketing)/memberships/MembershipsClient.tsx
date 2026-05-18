@@ -160,7 +160,7 @@ export function MembershipsClient() {
                   <span className="mem-tier-price-num">{billing === 'monthly' ? tier.monthly : tier.annual}</span>
                   <span className="mem-tier-price-mo">{period}</span>
                 </div>
-                <a className="mem-tier-cta" href={`/login?plan=${tier.name.toLowerCase()}&billing=${billing}`}>
+                <a className="mem-tier-cta" href={`/memberships/checkout?plan=${tier.name.toLowerCase()}&billing=${billing}`}>
                   {tier.cta}
                 </a>
                 <div className="mem-tier-divider" />

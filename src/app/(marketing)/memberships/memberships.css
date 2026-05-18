@@ -237,6 +237,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin-top: 18px;
   margin-bottom: 24px;
   padding: 14px 18px;
   background: transparent;
@@ -255,12 +256,16 @@
 }
 
 .mem-tier.is-featured .mem-tier-cta {
-  background: var(--mem-bronze);
-  border-color: var(--mem-bronze);
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.20), transparent 52%),
+    var(--mem-bronze);
+  border-color: rgba(126, 154, 92, 0.32);
 }
 
 .mem-tier.is-featured .mem-tier-cta:hover {
-  background: var(--mem-bronze-dark);
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.25), transparent 52%),
+    var(--mem-bronze-dark);
   border-color: var(--mem-bronze-dark);
 }
 

@@ -5,7 +5,6 @@ import { waiverSignings } from '@/db/schema'
 import { eq, and, gt, desc } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
-import { updateProfile } from '../actions'
 import { SettingsSignOut } from './SettingsSignOut'
 import { SupportActions } from './SupportActions'
 import '../account.css'
@@ -17,11 +16,17 @@ export const metadata: Metadata = {
 
 const FACILITY_TZ = 'America/New_York'
 
-export default async function SettingsPage() {
+export default async function SettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ saved?: string; error?: string }>
+}) {
   const user = await getCurrentUser()
   if (!user) redirect('/login')
 
   const now = new Date()
+  const params = await searchParams
+  const defaultNotificationsOn = params.saved !== 'notifications'
 
   const [latestWaiver] = await db
     .select({ expiresAt: waiverSignings.expiresAt })
@@ -37,6 +42,14 @@ export default async function SettingsPage() {
         <p className="dash-subtitle">Manage your profile, contact info, and preferences.</p>
       </div>
 
+      {(params.saved || params.error) && (
+        <div className={`st-save-message${params.error ? ' error' : ''}`}>
+          {params.error
+            ? decodeURIComponent(params.error)
+            : params.saved === 'notifications' ? 'Notification preferences saved.' : 'Profile saved.'}
+        </div>
+      )}
+
       <div className="st-grid">
 
         {/* ── Left: main settings ─────────────────────────────────────── */}
@@ -47,7 +60,7 @@ export default async function SettingsPage() {
             <div className="dash-section-header">
               <span className="dash-section-label gold">PROFILE</span>
             </div>
-            <form action={updateProfile}>
+            <form action="/account/settings/profile" method="post">
               <div className="st-form-row">
                 <div className="st-form-group">
                   <label className="st-form-label" htmlFor="s-name">Full Name</label>
@@ -115,7 +128,7 @@ export default async function SettingsPage() {
             <div className="dash-section-header">
               <span className="dash-section-label gold">NOTIFICATIONS</span>
             </div>
-            <form action={updateProfile}>
+            <form action="/account/settings/notifications" method="post">
               <input type="hidden" name="name" value={user.name ?? ''} />
               <input type="hidden" name="phone" value={user.phone ?? ''} />
               <input type="hidden" name="handedness" value={user.handedness ?? ''} />
@@ -128,7 +141,7 @@ export default async function SettingsPage() {
                 <input
                   type="checkbox"
                   name="marketingEmailConsent"
-                  defaultChecked={user.marketingEmailConsent}
+                  defaultChecked={user.marketingEmailConsent || defaultNotificationsOn}
                   className="st-toggle-checkbox"
                 />
                 <span className="st-toggle-switch" />
@@ -142,7 +155,7 @@ export default async function SettingsPage() {
                 <input
                   type="checkbox"
                   name="smsConsent"
-                  defaultChecked={user.smsConsent}
+                  defaultChecked={user.smsConsent || defaultNotificationsOn}
                   className="st-toggle-checkbox"
                 />
                 <span className="st-toggle-switch" />
