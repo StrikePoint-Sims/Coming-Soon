@@ -1,5 +1,9 @@
+import crypto from 'crypto'
 import { brevo } from '@/lib/brevo/client'
 import { env } from '@/env'
+import { db } from '@/db'
+import { bookingGuests } from '@/db/schema'
+import { eq } from 'drizzle-orm'
 
 interface GuestWaiverLinkParams {
   guestId: string
@@ -10,6 +14,14 @@ interface GuestWaiverLinkParams {
   sessionLabel: string
 }
 
+export function hashGuestToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex')
+}
+
+export function generateGuestToken(): string {
+  return crypto.randomBytes(32).toString('base64url')
+}
+
 export async function sendGuestWaiverLink({
   guestId,
   guestName,
@@ -18,7 +30,15 @@ export async function sendGuestWaiverLink({
   hostName,
   sessionLabel,
 }: GuestWaiverLinkParams): Promise<{ email: boolean; sms: boolean }> {
-  const waiverUrl = `${env.NEXT_PUBLIC_APP_URL}/waiver/${guestId}`
+  // Issue a fresh random token and persist its hash. The token itself goes
+  // in the URL; the database never sees the raw value.
+  const token = generateGuestToken()
+  await db
+    .update(bookingGuests)
+    .set({ accessTokenHash: hashGuestToken(token) })
+    .where(eq(bookingGuests.id, guestId))
+
+  const waiverUrl = `${env.NEXT_PUBLIC_APP_URL}/waiver/${token}`
   const host = hostName ?? 'Your host'
   const name = guestName ?? 'there'
   let email = false
@@ -64,7 +84,7 @@ export async function sendGuestWaiverLink({
   return { email, sms }
 }
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

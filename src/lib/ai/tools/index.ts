@@ -2,6 +2,14 @@ import type Anthropic from '@anthropic-ai/sdk'
 
 // ── Tool definition type ──────────────────────────────────────────────────────
 
+// Sealed, server-side context handed to every tool. LLM-supplied versions of
+// these fields are ignored — the registry overwrites them with the trusted
+// values from the request handler.
+export interface ToolContext {
+  threadId: string
+  userId: string | null
+}
+
 export interface AgentTool {
   definition: {
     name: string
@@ -12,12 +20,10 @@ export interface AgentTool {
       required?: string[]
     }
   }
-  execute: (input: Record<string, unknown>) => Promise<string>
+  execute: (input: Record<string, unknown>, ctx: ToolContext) => Promise<string>
 }
 
 // ── Tool registry ─────────────────────────────────────────────────────────────
-// Tools are added here as backend capabilities come online (week by week).
-// Financial/access tools must not be registered until their backing systems are tested.
 
 const registry = new Map<string, AgentTool>()
 
@@ -34,13 +40,18 @@ export function getToolDefinitions(): Anthropic.Tool[] {
   }))
 }
 
-/** Executes a tool call by name, injecting threadId. */
+/** Executes a tool call by name, injecting the trusted server context. */
 export async function executeToolCall(
   name: string,
   input: Record<string, unknown>,
-  threadId: string,
+  ctx: ToolContext,
 ): Promise<string> {
   const t = registry.get(name)
   if (!t) return JSON.stringify({ error: `Unknown tool: ${name}` })
-  return t.execute({ thread_id: threadId, ...input })
+  // Strip any context-shaped keys the model tried to set. The trusted values
+  // come from `ctx`, never from the LLM.
+  const cleaned: Record<string, unknown> = { ...input }
+  delete cleaned['thread_id']
+  delete cleaned['user_id']
+  return t.execute(cleaned, ctx)
 }

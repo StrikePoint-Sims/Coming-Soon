@@ -44,7 +44,7 @@ registerTool({
     },
   },
 
-  async execute(input) {
+  async execute(input, _ctx) {
     const tierName = input['tier'] as string
     const tiers = tierName === 'all' ? TIERS : TIERS.filter((t) => t.name === tierName)
 

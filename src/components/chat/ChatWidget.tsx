@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import type { ChatMessage } from '@/lib/ai/agent'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -20,7 +19,6 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Message[]>([GREETING])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [threadId, setThreadId] = useState<string | undefined>()
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -51,17 +49,14 @@ export function ChatWidget() {
     setInput('')
     setLoading(true)
 
-    // Build full history for the API (exclude the pending placeholder)
-    const history: ChatMessage[] = [...messages, userMsg].map((m) => ({
-      role: m.role,
-      content: m.content,
-    }))
-
+    // The server is the source of truth for conversation history (threadId is
+    // bound to a server-issued cookie). We only send the new user turn.
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, threadId }),
+        credentials: 'same-origin',
+        body: JSON.stringify({ message: text }),
       })
 
       if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`)
@@ -83,7 +78,7 @@ export function ChatWidget() {
           if (!data) continue
 
           try {
-            const event = JSON.parse(data) as { type: string; text?: string; threadId?: string; fullText?: string }
+            const event = JSON.parse(data) as { type: string; text?: string; fullText?: string }
 
             if (event.type === 'delta' && event.text) {
               assistantText += event.text
@@ -102,7 +97,6 @@ export function ChatWidget() {
             }
 
             if (event.type === 'done') {
-              if (event.threadId) setThreadId(event.threadId)
               setMessages((prev) => {
                 const updated = [...prev]
                 const last = updated[updated.length - 1]
@@ -139,7 +133,7 @@ export function ChatWidget() {
     } finally {
       setLoading(false)
     }
-  }, [input, loading, messages, threadId])
+  }, [input, loading])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {

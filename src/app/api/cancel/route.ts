@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { bookings } from '@/db/schema'
+import { bookings, bookingHolds } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { cancelBooking, cancelHold } from '@/lib/booking/createHold'
 
@@ -15,6 +15,14 @@ export async function POST(req: NextRequest) {
   try { body = await req.json() } catch { return NextResponse.json({ error: 'Bad JSON' }, { status: 400 }) }
 
   if (body.holdId) {
+    // Ensure the caller owns the hold before cancelling.
+    const rows = await db
+      .select({ userId: bookingHolds.userId })
+      .from(bookingHolds)
+      .where(eq(bookingHolds.id, body.holdId))
+      .limit(1)
+    if (!rows[0]) return NextResponse.json({ error: 'not_found' }, { status: 404 })
+    if (rows[0].userId !== session.user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     const r = await cancelHold(body.holdId)
     if (!r) return NextResponse.json({ error: 'not_found' }, { status: 404 })
     return NextResponse.json({ ok: true }, { headers: { 'Cache-Control': 'no-store' } })

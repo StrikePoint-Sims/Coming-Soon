@@ -95,9 +95,14 @@ export interface ChatMessage {
 
 const MAX_ITERATIONS = 5
 
+export interface AgentContext {
+  threadId: string
+  userId: string | null
+}
+
 export async function runAgentTurn(
   messages: ChatMessage[],
-  threadId: string,
+  context: AgentContext,
   onDelta?: (text: string) => void,
 ): Promise<string> {
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY ?? '' })
@@ -145,7 +150,7 @@ export async function runAgentTurn(
         const result = await executeToolCall(
           block.name,
           block.input as Record<string, unknown>,
-          threadId,
+          context,
         )
         toolResults.push({
           type: 'tool_result',

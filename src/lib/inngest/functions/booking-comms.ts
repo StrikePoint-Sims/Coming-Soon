@@ -2,12 +2,15 @@ import { inngest } from '@/lib/inngest/client'
 import { db } from '@/db'
 import { auditLog, bookings, bays, users, accessCodes } from '@/db/schema'
 import { eq } from 'drizzle-orm'
+import crypto from 'crypto'
 import { nanoid } from '@/lib/utils'
 import { sendUserEmail, sendUserSms } from '@/lib/comms'
 import { bookingConfirmationEmail, bookingConfirmationSms, bookingReminderSms } from '@/lib/comms/templates'
 
+// Cryptographically random 6-digit code. This gates physical access to the
+// facility — Math.random() is not acceptable here.
 function generateAccessCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString()
+  return crypto.randomInt(0, 1_000_000).toString().padStart(6, '0')
 }
 
 // Fires immediately after booking/created — sends confirmation and creates access code row

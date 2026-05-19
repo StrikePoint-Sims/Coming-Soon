@@ -9,8 +9,21 @@ import { env } from '@/env'
 import { nanoid } from '@/lib/utils'
 import { eq } from 'drizzle-orm'
 import { z } from 'zod'
+import { headers } from 'next/headers'
+import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 const BREVO_FOUNDERS_LIST_ID = 3
+
+// Rate-limit gate for the unauthenticated Stripe endpoints. Each one creates a
+// real Stripe customer; without this an attacker can pollute the account and
+// burn the bill.
+async function gate(scope: string, perIp: number, perWindowMs: number): Promise<{ ok: true } | { ok: false; error: string }> {
+  const h = await headers()
+  const ip = getClientIp(h)
+  const r = await rateLimit({ key: `${scope}:ip:${ip}`, limit: perIp, windowMs: perWindowMs })
+  if (!r.ok) return { ok: false, error: 'Too many requests. Please slow down and try again.' }
+  return { ok: true }
+}
 
 // ── Stripe: create $1 PaymentIntent for card authorization ────────────────────
 // Matches the original join.html flow: authorize $1 (never captured) to verify card.
@@ -23,6 +36,20 @@ export async function createFoundingPaymentIntent(
   if (!stripe) {
     throw new Error('Payment system not configured.')
   }
+  // 5 PI creations per IP per 10 min. Each call hits Stripe twice (customer +
+  // intent); without this, an attacker can spam-create thousands of customers.
+  const g = await gate('founding_pi_create', 5, 10 * 60_000)
+  if (!g.ok) throw new Error(g.error)
+  // Validate inputs before any Stripe call.
+  const parsed = z.object({
+    email: z.string().email(),
+    name: z.string().max(120).optional().default(''),
+    tier: z.string().max(40).optional().default(''),
+  }).safeParse({ email, name, tier })
+  if (!parsed.success) throw new Error('Invalid input')
+  email = parsed.data.email
+  name = parsed.data.name
+  tier = parsed.data.tier
   const customer = await stripe.customers.create({
     email,
     name: name || undefined,
@@ -69,6 +96,9 @@ export async function saveLeadProgress(input: {
   status?: 'started' | 'completed'
   founderPath?: boolean
 }) {
+  // Generous limit since this fires on every slide. Still blocks pathological loops.
+  const g = await gate('lead_progress', 60, 10 * 60_000)
+  if (!g.ok) return
   const parsed = leadProgressSchema.safeParse(input)
   if (!parsed.success) return // silent — never block the UI
 
@@ -144,6 +174,7 @@ const founderSchema = z.object({
   community: z.string().max(80).optional().default(''),
   priority: z.string().max(300).optional().default(''),
   isFounder: z.boolean().optional().default(false),
+  paymentIntentId: z.string().startsWith('pi_').optional(),
 })
 
 export async function submitFounderData(input: {
@@ -155,12 +186,36 @@ export async function submitFounderData(input: {
   community: string
   priority: string
   isFounder: boolean
+  paymentIntentId?: string
 }) {
+  // 20 submissions per IP per 10 min covers retries on flaky networks while
+  // blocking bulk writes from a single source.
+  const g = await gate('founder_submit', 20, 10 * 60_000)
+  if (!g.ok) return { error: g.error }
+
   const parsed = founderSchema.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.errors[0]?.message ?? 'Please check your information.' }
   }
   const d = parsed.data
+
+  // Founder path requires a verified Stripe PaymentIntent that we created.
+  // Anyone who skips the card form should not be able to land in the founders
+  // list — the confirmation email tells them their card is on file.
+  if (d.isFounder) {
+    if (!stripe) return { error: 'Payment system not configured.' }
+    if (!d.paymentIntentId) return { error: 'Card verification required to reserve a Founder spot.' }
+    try {
+      const pi = await stripe.paymentIntents.retrieve(d.paymentIntentId)
+      const okStatus = pi.status === 'requires_capture' || pi.status === 'succeeded'
+      const okSource = pi.metadata?.source === 'founder_signup'
+      if (!okStatus || !okSource) {
+        return { error: 'Card verification did not complete. Please try again.' }
+      }
+    } catch {
+      return { error: 'Could not verify your card. Please try again.' }
+    }
+  }
 
   try {
     await db
@@ -285,6 +340,11 @@ export async function submitFounderData(input: {
 
 export async function createSetupIntent(email: string) {
   if (!stripe) throw new Error('Stripe not configured')
+  const g = await gate('legacy_setup_intent', 5, 10 * 60_000)
+  if (!g.ok) throw new Error(g.error)
+  const parsed = z.object({ email: z.string().email() }).safeParse({ email })
+  if (!parsed.success) throw new Error('Invalid email')
+  email = parsed.data.email
   const customer = await stripe.customers.create({ email })
   const setupIntent = await stripe.setupIntents.create({
     customer: customer.id,

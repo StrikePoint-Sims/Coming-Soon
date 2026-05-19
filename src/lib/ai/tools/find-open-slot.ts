@@ -29,7 +29,7 @@ registerTool({
     },
   },
 
-  async execute(input) {
+  async execute(input, _ctx) {
     const locationId = env.NEXT_PUBLIC_LOCATION_ID
     const date = (input['date'] as string | undefined) ?? format(addDays(new Date(), 1), 'yyyy-MM-dd')
     const duration = (input['duration_minutes'] as number | undefined) ?? 60

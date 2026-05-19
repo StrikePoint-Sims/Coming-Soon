@@ -4,9 +4,9 @@ import { eq, and, gt } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { WAIVER_CONTENT } from '@/lib/waivers/content'
 import { signGuestWaiver } from './actions'
+import { hashGuestToken } from '@/lib/waivers/guest-links'
 import { formatDateET } from '@/lib/utils'
 import type { Metadata } from 'next'
-import crypto from 'crypto'
 
 export const metadata: Metadata = {
   title: 'Sign Waiver — StrikePoint Sims',
@@ -20,16 +20,18 @@ export default async function GuestWaiverPage({
 }) {
   const { token } = await params
 
+  // Token is opaque and random. We look up by its hash; the row primary key is
+  // not an accepted credential.
+  const tokenHash = hashGuestToken(token)
   const [guest] = await db
     .select()
     .from(bookingGuests)
-    .where(eq(bookingGuests.id, token))
+    .where(eq(bookingGuests.accessTokenHash, tokenHash))
     .limit(1)
 
   if (!guest) notFound()
 
   // Check if already signed
-  const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
   const [existing] = await db
     .select({ signedAt: waiverSignings.signedAt, expiresAt: waiverSignings.expiresAt })
     .from(waiverSignings)
