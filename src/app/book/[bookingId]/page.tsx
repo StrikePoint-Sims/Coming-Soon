@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
 import { db } from '@/db'
-import { bookings, bays } from '@/db/schema'
-import { eq, and } from 'drizzle-orm'
+import { bookings, bays, waiverSignings } from '@/db/schema'
+import { eq, and, gt, desc } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
 import { CopyButton } from './CopyButton'
@@ -30,22 +30,34 @@ export default async function BookingConfirmedPage({
   const session = await auth()
   if (!session?.user?.id) redirect('/login')
 
-  const [booking] = await db
-    .select({
-      id: bookings.id,
-      startsAt: bookings.startsAt,
-      endsAt: bookings.endsAt,
-      status: bookings.status,
-      bayLabel: bays.label,
-      totalCents: bookings.totalCents,
-      partySize: bookings.partySize,
-    })
-    .from(bookings)
-    .innerJoin(bays, eq(bookings.bayId, bays.id))
-    .where(and(eq(bookings.id, bookingId), eq(bookings.userId, session.user.id)))
-    .limit(1)
+  const now = new Date()
+
+  const [[booking], [latestWaiver]] = await Promise.all([
+    db
+      .select({
+        id: bookings.id,
+        startsAt: bookings.startsAt,
+        endsAt: bookings.endsAt,
+        status: bookings.status,
+        bayLabel: bays.label,
+        totalCents: bookings.totalCents,
+        partySize: bookings.partySize,
+      })
+      .from(bookings)
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
+      .where(and(eq(bookings.id, bookingId), eq(bookings.userId, session.user.id)))
+      .limit(1),
+
+    db
+      .select({ expiresAt: waiverSignings.expiresAt })
+      .from(waiverSignings)
+      .where(and(eq(waiverSignings.userId, session.user.id), gt(waiverSignings.expiresAt, now)))
+      .orderBy(desc(waiverSignings.signedAt))
+      .limit(1),
+  ])
 
   if (!booking) redirect('/account')
+  const hasWaiver = !!latestWaiver
 
   const confirmationNum = `SPC-${bookingId.slice(0, 6).toUpperCase()}-${bookingId.slice(-4).toUpperCase()}`
 
@@ -88,9 +100,9 @@ export default async function BookingConfirmedPage({
                 </svg>
               </div>
               <div>
-                <p className="conf-next-title">Access Details</p>
+                <p className="conf-next-title">Bay &amp; Access Code</p>
                 <p className="conf-next-body">
-                  You&apos;ll receive an email with everything you need to access {booking.bayLabel} before your session.
+                  You&apos;ll be assigned a bay and sent a one-time access code 1 hour before your session, by email and text message.
                 </p>
               </div>
             </div>
@@ -103,10 +115,22 @@ export default async function BookingConfirmedPage({
                 </svg>
               </div>
               <div>
-                <p className="conf-next-title">Waivers Required</p>
-                <p className="conf-next-body">
-                  All players must have a signed waiver on file. Guests will receive a link to complete theirs.
-                </p>
+                {hasWaiver ? (
+                  <>
+                    <p className="conf-next-title">Waivers Required</p>
+                    <p className="conf-next-body">
+                      All players must have a signed waiver on file. Guests will receive a link to complete theirs.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="conf-next-title">Sign Your Waiver</p>
+                    <p className="conf-next-body">
+                      You don&apos;t have an active waiver on file. A signed waiver is required before your session.{' '}
+                      <a href="/waiver" style={{ color: '#A97845', textDecoration: 'underline' }}>Sign it now →</a>
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
@@ -134,8 +158,8 @@ export default async function BookingConfirmedPage({
             <a href={`/api/book/${bookingId}/ics`} download className="conf-btn ghost">
               Add to Calendar
             </a>
-            <a href="/book" className="conf-btn ghost">
-              Book Another Session
+            <a href={`/book/${bookingId}/guests`} className="conf-btn ghost">
+              Add Guests
             </a>
           </div>
 
@@ -213,7 +237,7 @@ export default async function BookingConfirmedPage({
               </span>
               <div>
                 <p className="conf-summary-label">Bay</p>
-                <p className="conf-summary-value">{booking.bayLabel}</p>
+                <p className="conf-summary-value">{booking.bayLabel ?? 'TBD'}</p>
               </div>
             </div>
 
@@ -232,8 +256,8 @@ export default async function BookingConfirmedPage({
             <a href={`/api/book/${bookingId}/ics`} download className="conf-btn ghost">
               Add to Calendar
             </a>
-            <a href="/book" className="conf-btn ghost">
-              Book Another Session
+            <a href={`/book/${bookingId}/guests`} className="conf-btn ghost">
+              Add Guests
             </a>
           </div>
         </aside>

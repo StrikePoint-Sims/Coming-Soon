@@ -56,7 +56,7 @@ export default async function BookingsPage({
         partySize: bookings.partySize,
       })
       .from(bookings)
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(and(
         eq(bookings.userId, user.id),
         gt(bookings.startsAt, now),
@@ -76,7 +76,7 @@ export default async function BookingsPage({
         partySize: bookings.partySize,
       })
       .from(bookings)
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(and(
         eq(bookings.userId, user.id),
         lt(bookings.startsAt, now),
@@ -172,7 +172,7 @@ export default async function BookingsPage({
                     </svg>
                     <div>
                       <p className="bk-meta-label">Bay</p>
-                      <p className="bk-meta-value">{nextBooking.bayLabel}</p>
+                      <p className="bk-meta-value">{nextBooking.bayLabel ?? 'TBD'}</p>
                     </div>
                   </div>
                   <div className="bk-meta">
@@ -274,7 +274,7 @@ function BookingRow({ b, past = false }: {
     id: string
     startsAt: Date
     endsAt: Date
-    bayLabel: string
+    bayLabel: string | null
     status: string
     totalCents: number
     partySize: number
@@ -298,7 +298,7 @@ function BookingRow({ b, past = false }: {
           {' '}<span className="dash-muted">({durationLabel(b.startsAt, b.endsAt)})</span>
         </p>
         <p className="bk-row-meta">
-          {b.partySize || 1} Player{b.partySize !== 1 ? 's' : ''} · {b.bayLabel}
+          {b.partySize || 1} Player{b.partySize !== 1 ? 's' : ''}{b.bayLabel ? ` · ${b.bayLabel}` : ''}
         </p>
       </div>
       <div className="bk-row-right">

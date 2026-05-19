@@ -17,11 +17,11 @@ const TIERS = [
     cta: 'Choose Practice',
     featured: false,
     features: [
-      { strong: 'Unlimited', text: ' off-peak access' },
+      { strong: 'Unlimited', text: ' off-peak + night access' },
       { muted: true, text: 'No included peak hours' },
       { text: '7-day advance booking' },
       { text: '1 active reservation' },
-      { text: 'Bring up to 3 guests' },
+      { text: 'Bring up to 3 guests per session' },
     ],
   },
   {
@@ -37,10 +37,10 @@ const TIERS = [
     featured: true,
     features: [
       { strong: '8 peak hours', text: ' per month' },
-      { text: 'Unlimited off-peak access' },
+      { text: 'Unlimited off-peak + night access' },
       { text: '10-day advance booking' },
       { text: '1 active reservation' },
-      { text: 'Bring up to 3 guests' },
+      { text: 'Bring up to 3 guests per session' },
     ],
   },
   {
@@ -56,10 +56,10 @@ const TIERS = [
     featured: false,
     features: [
       { strong: '16 peak hours', text: ' per month' },
-      { text: 'Unlimited off-peak access' },
+      { text: 'Unlimited off-peak + night access' },
       { text: '14-day advance booking' },
       { strong: '2 active reservations', text: '' },
-      { text: 'Bring up to 3 guests' },
+      { text: 'Bring up to 3 guests per session' },
     ],
   },
 ]
@@ -71,7 +71,7 @@ const COMPARE_ROWS = [
   ['Peak hours / month', '-', '8 hr', '16 hr'],
   ['Advance booking', '7 days', '10 days', '14 days'],
   ['Active reservations', '1', '1', '2'],
-  ['Guests', 'Up to 3', 'Up to 3', 'Up to 3'],
+  ['Guests', 'Up to 3 / session', 'Up to 3 / session', 'Up to 3 / session'],
 ]
 
 function CheckIcon() {
@@ -142,7 +142,7 @@ export function MembershipsClient() {
               className={billing === 'annual' ? 'is-active' : ''}
               onClick={() => setBilling('annual')}
             >
-              Annual <strong>Save about 17%</strong>
+              Annual <strong>2 months free</strong>
             </button>
           </div>
         </div>
@@ -154,7 +154,7 @@ export function MembershipsClient() {
             {TIERS.map(tier => (
               <article key={tier.name} className={`mem-tier${tier.featured ? ' is-featured' : ''}`}>
                 {tier.featured && <span className="mem-tier-flag">Most members start here</span>}
-                <p className="mem-tier-name">{tier.name}</p>
+                <p className="mem-tier-name" style={{ fontSize: '1.35rem', fontWeight: 700 }}>{tier.name}</p>
                 <p className="mem-tier-pitch">{tier.pitch}</p>
                 <div className="mem-tier-price">
                   <span className="mem-tier-price-num">{billing === 'monthly' ? tier.monthly : tier.annual}</span>
@@ -210,7 +210,6 @@ export function MembershipsClient() {
         <div className="mem-wrap">
           <div className="mem-compare-head">
             <h2>Compare head to head</h2>
-            <p>Everything is transparent: plan price, booking access, peak hours, and guests.</p>
           </div>
           <div className="mem-compare-table">
             <div className="mem-compare-row head">

@@ -64,7 +64,7 @@ export default async function GuestsWaiversPage({
       })
       .from(bookingGuests)
       .innerJoin(bookings, eq(bookingGuests.bookingId, bookings.id))
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .leftJoin(waiverSignings, eq(bookingGuests.waiverSigningId, waiverSignings.id))
       .where(eq(bookings.userId, user.id))
       .orderBy(desc(bookings.startsAt)),
@@ -77,7 +77,7 @@ export default async function GuestsWaiversPage({
         bayLabel: bays.label,
       })
       .from(bookings)
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(and(eq(bookings.userId, user.id), gt(bookings.startsAt, now)))
       .orderBy(bookings.startsAt),
   ])
@@ -133,7 +133,7 @@ export default async function GuestsWaiversPage({
                   <select name="bookingId" className="gw-input" required>
                     {upcomingBookings.map(booking => (
                       <option key={booking.id} value={booking.id}>
-                        {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {booking.bayLabel}
+                        {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')}{booking.bayLabel ? ` - ${booking.bayLabel}` : ''}
                       </option>
                     ))}
                   </select>
@@ -185,7 +185,7 @@ export default async function GuestsWaiversPage({
                           {[g.email, g.phone].filter(Boolean).join(' - ') || 'No contact on file'}
                         </p>
                         <p className="gw-booking-line">
-                          {formatInTimeZone(g.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {g.bayLabel}
+                          {formatInTimeZone(g.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')}{g.bayLabel ? ` - ${g.bayLabel}` : ''}
                         </p>
                       </div>
                       <div className="gw-status-col">

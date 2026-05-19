@@ -54,7 +54,7 @@ export default async function ManageBookingPage({
       createdAt: bookings.createdAt,
     })
     .from(bookings)
-    .innerJoin(bays, eq(bookings.bayId, bays.id))
+    .leftJoin(bays, eq(bookings.bayId, bays.id))
     .where(and(eq(bookings.id, id), eq(bookings.userId, user.id)))
     .limit(1)
 
@@ -77,6 +77,7 @@ export default async function ManageBookingPage({
 
   const [accessCode] = await db
     .select({
+      code: accessCodes.code,
       sentAt: accessCodes.sentAt,
       validFrom: accessCodes.validFrom,
       validTo: accessCodes.validTo,
@@ -96,7 +97,7 @@ export default async function ManageBookingPage({
       </a>
 
       <div className="dash-header" style={{ marginTop: 8 }}>
-        <h1 className="dash-title">{bookingTitle}</h1>
+        <h1 className="dash-title">Your {bookingTitle} booking</h1>
         <p className="dash-subtitle">
           {isFuture ? 'View your reservation and make changes.' : 'Review this past reservation.'}
         </p>
@@ -178,7 +179,7 @@ export default async function ManageBookingPage({
             </div>
             <div>
               <p className="mb-res-label">Bay</p>
-              <p className="mb-res-value">{booking.bayLabel}</p>
+              <p className="mb-res-value">{booking.bayLabel ?? 'TBD'}</p>
             </div>
           </div>
 
@@ -253,62 +254,24 @@ export default async function ManageBookingPage({
             <a href="/waiver" className="dash-btn ghost">Sign Waiver</a>
           )}
         </div>
-        {isFuture && waiver && (
-          <div className="mb-waiver-row" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 14, marginTop: 6 }}>
-            <div className="mb-waiver-info">
-              <p className="mb-waiver-label">Access Code</p>
-              <p className="mb-waiver-status">Sent by SMS 1 hour before your session.</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="dash-section-card">
-        <div className="dash-section-header">
-          <span className="dash-section-label gold">ACCESS CODE AUDIT</span>
-        </div>
-        <div className="mb-waiver-row">
+        <div className="mb-waiver-row" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 14, marginTop: 6 }}>
           <div className="mb-waiver-info">
-            <p className="mb-waiver-label">SMS Status</p>
-            <p className="mb-waiver-status">
-              {accessCode?.sentAt
-                ? `Sent by text on ${formatInTimeZone(accessCode.sentAt, FACILITY_TZ, 'MMM d, yyyy')} at ${formatInTimeZone(accessCode.sentAt, FACILITY_TZ, 'h:mm a')}`
-                : isFuture
-                  ? `Scheduled for ${formatInTimeZone(new Date(booking.startsAt.getTime() - 60 * 60_000), FACILITY_TZ, 'MMM d, yyyy')} at ${formatInTimeZone(new Date(booking.startsAt.getTime() - 60 * 60_000), FACILITY_TZ, 'h:mm a')}`
-                  : 'No SMS send time is recorded for this booking.'}
-            </p>
+            <p className="mb-waiver-label">Access Code</p>
+            {accessCode?.sentAt ? (
+              <p className="mb-waiver-status valid">
+                {accessCode.code} · Sent via text message on {formatInTimeZone(accessCode.sentAt, FACILITY_TZ, 'MMM d')} at {formatInTimeZone(accessCode.sentAt, FACILITY_TZ, 'h:mm a')}
+              </p>
+            ) : isFuture ? (
+              <p className="mb-waiver-status">
+                Sent via text message and email 1 hour before your session.
+              </p>
+            ) : (
+              <p className="mb-waiver-status">No access code on record.</p>
+            )}
           </div>
         </div>
-        {accessCode && (
-          <div className="mb-waiver-row" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 14, marginTop: 6 }}>
-            <div className="mb-waiver-info">
-              <p className="mb-waiver-label">Code Window</p>
-              <p className="mb-waiver-status">
-                Valid {formatInTimeZone(accessCode.validFrom, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(accessCode.validTo, FACILITY_TZ, 'h:mm a')} ({statusLabel(accessCode.status)})
-              </p>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* ── Bottom CTAs ─────────────────────────────────────────────────── */}
-      {isFuture ? (
-        <div className="mb-bottom-actions">
-          <a href={`/api/book/${booking.id}/ics`} download className="dash-btn ghost dash-btn-full">
-            Add to Calendar
-          </a>
-          <a href={`/book/${booking.id}/guests`} className="dash-btn ghost dash-btn-full">
-            Add Guests
-          </a>
-          <a href="/book" className="dash-btn primary dash-btn-full">
-            Book Another Session
-          </a>
-        </div>
-      ) : (
-        <a href="/book" className="dash-btn primary dash-btn-full">
-          Book Again
-        </a>
-      )}
     </div>
   )
 }

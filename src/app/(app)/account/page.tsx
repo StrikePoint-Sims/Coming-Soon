@@ -22,7 +22,7 @@ type BookingSummary = {
   id: string
   startsAt: Date
   endsAt: Date
-  bayLabel: string
+  bayLabel: string | null
   status: string
   totalCents?: number
   partySize?: number
@@ -65,7 +65,7 @@ export default async function AccountDashboardPage() {
         partySize: bookings.partySize,
       })
       .from(bookings)
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(and(
         eq(bookings.userId, user.id),
         gt(bookings.startsAt, now),
@@ -108,7 +108,7 @@ export default async function AccountDashboardPage() {
         totalCents: bookings.totalCents,
       })
       .from(bookings)
-      .innerJoin(bays, eq(bookings.bayId, bays.id))
+      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(eq(bookings.userId, user.id))
       .orderBy(desc(bookings.startsAt))
       .limit(5),
@@ -253,7 +253,7 @@ function NextSessionCard({ nextBooking }: { nextBooking: BookingSummary | null }
           <div>
             <span className="dash-section-label gold">NEXT SESSION</span>
             <h2>
-              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')} · {nextBooking.bayLabel}
+              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')}{nextBooking.bayLabel ? ` · ${nextBooking.bayLabel}` : ''}
             </h2>
             <p>
               {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'MMMM d, yyyy')} · {durationLabel(nextBooking.startsAt, nextBooking.endsAt)}
@@ -273,7 +273,7 @@ function NextSessionCard({ nextBooking }: { nextBooking: BookingSummary | null }
         </div>
         <div>
           <p className="dash-access-label">Access details</p>
-          <p className="dash-access-copy">Your one-time access code is sent by SMS 1 hour before your session, around <strong>{formatInTimeZone(unlockTime, FACILITY_TZ, 'h:mm a')}</strong>.</p>
+          <p className="dash-access-copy">Your one-time access code is sent via text message 1 hour before your session, around <strong>{formatInTimeZone(unlockTime, FACILITY_TZ, 'h:mm a')}</strong>.</p>
         </div>
       </div>
 
@@ -294,7 +294,7 @@ function QuickRebook({ recentBookings }: { recentBookings: BookingSummary[] }) {
   return (
     <section className="dash-regular">
       <div className="dash-section-header slim">
-        <span className="dash-section-label gold">YOUR REGULAR SLOTS</span>
+        <span className="dash-section-label gold">SECURE YOUR REGULAR SLOTS</span>
         <a href="/book" className="dash-section-link">Open calendar ›</a>
       </div>
       <div className="dash-regular-grid">
@@ -304,7 +304,7 @@ function QuickRebook({ recentBookings }: { recentBookings: BookingSummary[] }) {
             <span className="dash-regular-title">
               {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE')} · {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}
             </span>
-            <span className="dash-regular-sub">{booking.bayLabel} · {durationLabel(booking.startsAt, booking.endsAt)}</span>
+            <span className="dash-regular-sub">{booking.bayLabel ? `${booking.bayLabel} · ` : ''}{durationLabel(booking.startsAt, booking.endsAt)}</span>
             <span className="dash-regular-arrow">›</span>
           </a>
         ))}
@@ -462,7 +462,7 @@ function RecentReservations({ bookings }: { bookings: BookingSummary[] }) {
               </div>
               <div className="dash-recent-info">
                 <p className="dash-recent-date">{formatInTimeZone(b.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(b.endsAt, FACILITY_TZ, 'h:mm a')}</p>
-                <p className="dash-recent-time">{b.bayLabel} · {durationLabel(b.startsAt, b.endsAt)}</p>
+                <p className="dash-recent-time">{b.bayLabel ? `${b.bayLabel} · ` : ''}{durationLabel(b.startsAt, b.endsAt)}</p>
               </div>
               <div className="dash-recent-meta">
                 {(b.totalCents ?? 0) > 0 && <span className="dash-recent-price">${((b.totalCents ?? 0) / 100).toFixed(2)}</span>}

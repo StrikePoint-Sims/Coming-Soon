@@ -149,7 +149,7 @@ export default async function SettingsPage({
 
               <label className="st-toggle">
                   <span className="st-toggle-text">
-                    <span className="st-toggle-label">SMS notifications</span>
+                    <span className="st-toggle-label">Text message notifications</span>
                   <span className="st-toggle-sub">Optional reminders and account updates.</span>
                   </span>
                 <input
