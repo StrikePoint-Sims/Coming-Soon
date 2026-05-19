@@ -185,9 +185,9 @@
 .mem-tier-name {
   margin: 0 0 10px;
   color: var(--mem-tan);
-  font-size: 0.78rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -481,9 +481,9 @@
 
 .mem-compare-row.head .mem-compare-cell {
   color: var(--mem-tan);
-  font-size: 0.62rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 

@@ -3819,9 +3819,13 @@ select.st-form-input {
 
 .gw-add-form {
   display: grid;
-  grid-template-columns: minmax(180px, 1.2fr) minmax(140px, 1fr) minmax(140px, 1fr) minmax(160px, 1fr) auto;
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 10px;
   align-items: end;
+}
+
+.gw-add-form .gw-field:first-child {
+  grid-column: 1 / -1;
 }
 
 .gw-field {

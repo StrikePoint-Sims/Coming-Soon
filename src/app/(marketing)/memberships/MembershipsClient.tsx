@@ -154,7 +154,7 @@ export function MembershipsClient() {
             {TIERS.map(tier => (
               <article key={tier.name} className={`mem-tier${tier.featured ? ' is-featured' : ''}`}>
                 {tier.featured && <span className="mem-tier-flag">Most members start here</span>}
-                <p className="mem-tier-name" style={{ fontSize: '1.35rem', fontWeight: 700 }}>{tier.name}</p>
+                <p className="mem-tier-name">{tier.name}</p>
                 <p className="mem-tier-pitch">{tier.pitch}</p>
                 <div className="mem-tier-price">
                   <span className="mem-tier-price-num">{billing === 'monthly' ? tier.monthly : tier.annual}</span>
