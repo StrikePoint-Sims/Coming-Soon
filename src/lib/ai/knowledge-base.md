@@ -285,28 +285,27 @@ Rates are per bay, not per person, subject to the bay capacity limit.
 
 ## 10. Guest Policy
 
-### Bay Capacity
+### Guests
 
-Maximum 4 people total per bay.
+Members and booking holders can bring up to 3 guests per booking.
 
-This includes:
+Guests include:
 
-- member or booking holder
 - adult guests
 - children
 - minors
 
 ### Guest Privileges
 
-All membership tiers include guest privileges, subject to the 4-person bay capacity limit.
+All membership tiers include the ability to bring up to 3 guests per booking.
 
 ### Hourly Guests
 
-Hourly bookings are per bay and may include guests, subject to the 4-person total bay capacity.
+Hourly bookings are per bay and may include up to 3 guests.
 
 ### Recommended Response
 
-> Yes, you can bring guests. Each bay is limited to 4 people total, including the person who booked.
+> Yes, you can bring up to 3 guests per booking.
 
 ---
 
@@ -435,7 +434,7 @@ Minors may visit with an adult.
 
 ### Capacity
 
-Children count toward the 4-person bay capacity.
+Children count as one of the 3 guests per booking.
 
 ### Approved Response
 
@@ -805,7 +804,7 @@ A:
 
 A:
 
-> Yes. Bays are limited to 4 people total, including the person who booked.
+> Yes. You can bring up to 3 guests per booking.
 
 ### Q: Can kids come?
 
@@ -859,7 +858,7 @@ A:
 
 A:
 
-> Hourly rates are $30 for nights, $45 off-peak, and $60 peak. Rates are per bay, subject to the 4-person bay limit.
+> Hourly rates are $30 for nights, $45 off-peak, and $60 peak. Rates are per bay, and you can bring up to 3 guests.
 
 ### Q: What counts as off-peak?
 
@@ -982,4 +981,3 @@ Update this KB when any of the following change:
 - support escalation workflows
 - access-control workflows
 - booking/payment integrations
-

@@ -1,0 +1,1461 @@
+/* ── Page wrapper ─────────────────────────────────────────────────────────── */
+
+.book-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+}
+
+.book-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 48px 40px 96px;
+  box-sizing: border-box;
+}
+
+/* ── Hero heading ─────────────────────────────────────────────────────────── */
+
+.book-hero {
+  margin-bottom: 36px;
+}
+
+.book-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.book-subtitle {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Date scroller ────────────────────────────────────────────────────────── */
+
+.book-date-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.book-date-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  line-height: 1;
+}
+
+.book-date-arrow:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.book-date-arrow:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+.book-date-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 60px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.45);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+  padding: 0 10px;
+  gap: 3px;
+}
+
+.book-date-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-date-btn.is-selected {
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.08), transparent 55%),
+    rgba(169, 120, 69, 0.08);
+  border-color: rgba(126, 154, 92, 0.46);
+  color: #A97845;
+}
+
+.book-date-name {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.book-date-num {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.book-date-cal-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 60px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.book-date-cal-btn:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.book-date-cal-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+/* ── Controls row (duration + players) ───────────────────────────────────── */
+
+.book-controls-row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+/* ── Stepper (Duration) ──────────────────────────────────────────────────── */
+
+.book-control-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 100px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.book-control-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 0 14px;
+  white-space: nowrap;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.book-step-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.book-step-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.book-step-btn:disabled {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+
+.book-control-value {
+  min-width: 56px;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  border-left: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+}
+
+/* ── Pills (Players) ─────────────────────────────────────────────────────── */
+
+.book-control-pills {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 100px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.book-control-pills .book-control-label {
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.book-pill {
+  width: 40px;
+  height: 100%;
+  background: transparent;
+  border: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.5);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.book-pill:last-of-type {
+  border-right: none;
+}
+
+.book-pill:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.book-pill.is-active {
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.10), transparent 58%),
+    rgba(169, 120, 69, 0.1);
+  color: #A97845;
+}
+
+/* ── Error banner ─────────────────────────────────────────────────────────── */
+
+.book-error {
+  color: #e8735a;
+  font-size: 0.83rem;
+  padding: 14px 18px;
+  background: rgba(232, 115, 90, 0.05);
+  border: 1px solid rgba(232, 115, 90, 0.15);
+  border-radius: 13px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.book-error-link {
+  color: #A97845;
+  text-decoration: underline;
+}
+
+/* ── Main two-column layout ───────────────────────────────────────────────── */
+
+.book-body {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* ── Grid column ──────────────────────────────────────────────────────────── */
+
+.book-grid-col {
+  min-width: 0;
+}
+
+.book-avail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.book-avail-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+.book-avail-count {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(169, 120, 69, 0.55);
+  letter-spacing: 0.04em;
+}
+
+/* ── Loading / empty states ───────────────────────────────────────────────── */
+
+.book-loading-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 56px 0;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 0.82rem;
+}
+
+.book-spinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(169, 120, 69, 0.12);
+  border-top-color: rgba(169, 120, 69, 0.55);
+  animation: book-spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes book-spin {
+  to { transform: rotate(360deg); }
+}
+
+.book-no-slots {
+  padding: 56px 0 24px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+/* ── Availability table ───────────────────────────────────────────────────── */
+
+.book-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book-avail-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 3px;
+  min-width: 480px;
+}
+
+.book-th-time {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  padding: 0 0 10px 4px;
+  text-align: left;
+  width: 80px;
+}
+
+.book-th-bay {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  padding: 0 4px 10px;
+  text-align: center;
+}
+
+.book-td-time {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  padding: 0 12px 0 4px;
+  white-space: nowrap;
+  vertical-align: middle;
+  width: 80px;
+}
+
+.book-td-cell {
+  padding: 2px 4px;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* ── Desktop slot list (replaces bay×time table) ──────────────────────────── */
+
+.book-slot-frame {
+  box-sizing: border-box;
+  height: clamp(360px, calc(100vh - 560px), 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 10px 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 154, 92, 0.45) rgba(255, 255, 255, 0.035);
+}
+
+.book-slot-frame::-webkit-scrollbar {
+  width: 8px;
+}
+
+.book-slot-frame::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 999px;
+}
+
+.book-slot-frame::-webkit-scrollbar-thumb {
+  background: rgba(126, 154, 92, 0.45);
+  border-radius: 999px;
+}
+
+.book-slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-slot-item {
+  scroll-margin-top: 8px;
+}
+
+.book-rate-separator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.book-rate-separator::before,
+.book-rate-separator::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.book-rate-separator small {
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.book-rate-separator.night span,
+.book-rate-separator.night small {
+  color: rgba(166, 186, 120, 0.58);
+}
+
+.book-rate-separator.offPeak span,
+.book-rate-separator.offPeak small {
+  color: rgba(169, 120, 69, 0.68);
+}
+
+.book-rate-separator.peak span,
+.book-rate-separator.peak small {
+  color: rgba(232, 198, 128, 0.7);
+}
+
+.book-slot {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 58px;
+  padding: 15px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.08), transparent 22%),
+    rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, box-shadow 0.14s, transform 0.14s;
+  font-family: var(--font-sans);
+  text-align: left;
+  gap: 16px;
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.book-slot::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: rgba(126, 154, 92, 0.65);
+}
+
+.book-slot:hover:not(:disabled):not(.is-unavail) {
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.12), transparent 24%),
+    rgba(255, 255, 255, 0.06);
+  border-color: rgba(126, 154, 92, 0.28);
+  transform: translateY(-1px);
+}
+
+.book-slot.is-selected {
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.2), transparent 32%),
+    linear-gradient(135deg, rgba(61, 90, 42, 0.14), transparent 55%),
+    rgba(169, 120, 69, 0.1);
+  border-color: rgba(166, 186, 120, 0.48);
+  box-shadow: 0 0 0 1px rgba(126, 154, 92, 0.14), 0 10px 24px rgba(0, 0, 0, 0.22);
+}
+
+.book-slot.is-selected::before {
+  background: #A6BA78;
+}
+
+.book-slot.is-unavail {
+  cursor: default;
+  opacity: 0.58;
+  background: rgba(255, 255, 255, 0.018);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+.book-slot.is-unavail::before {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.book-slot-time {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.94);
+  min-width: 94px;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.book-slot.is-selected .book-slot-time {
+  color: #f5f1e8;
+}
+
+.book-slot-avail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.book-slot-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.035);
+}
+
+.book-slot-dot.is-avail   { background: #5CA910; }
+.book-slot-dot.is-limited { background: #A97845; }
+.book-slot-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
+
+.book-slot-price {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  flex-shrink: 0;
+  min-width: 46px;
+  text-align: right;
+}
+
+.book-slot.is-selected .book-slot-price {
+  color: #A6BA78;
+}
+
+.book-slot-action {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: rgba(166, 186, 120, 0.58);
+  flex-shrink: 0;
+  min-width: 90px;
+  text-align: right;
+}
+
+.book-slot.is-selected .book-slot-action {
+  color: #A6BA78;
+}
+
+/* ── Availability cells ───────────────────────────────────────────────────── */
+
+.book-cell-btn {
+  width: 100%;
+  min-width: 80px;
+  height: 48px;
+  border-radius: 10px;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.14s;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.book-cell-btn.is-available {
+  background: rgba(74, 110, 52, 0.16);
+  border-color: rgba(74, 110, 52, 0.32);
+  color: rgba(143, 166, 94, 0.9);
+}
+
+.book-cell-btn.is-available:hover {
+  background: rgba(74, 110, 52, 0.3);
+  border-color: rgba(74, 110, 52, 0.58);
+  color: #a8c878;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.book-cell-btn.is-selected {
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.12), transparent 58%),
+    rgba(169, 120, 69, 0.12);
+  border-color: rgba(126, 154, 92, 0.58);
+  color: #A97845;
+  box-shadow: 0 0 0 1px rgba(126, 154, 92, 0.14), 0 2px 12px rgba(169, 120, 69, 0.08);
+  transform: translateY(-1px);
+}
+
+.book-cell-btn.is-booked {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.16);
+  cursor: default;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.book-cell-price {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.book-cell-check {
+  font-size: 0.6rem;
+  opacity: 0.65;
+  line-height: 1;
+}
+
+/* ── Right rail ───────────────────────────────────────────────────────────── */
+
+.book-rail {
+  position: sticky;
+  top: 88px;
+}
+
+.book-rail-card {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.book-rail-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(169, 120, 69, 0.35) 40%,
+    rgba(169, 120, 69, 0.35) 60%,
+    transparent 95%
+  );
+}
+
+.book-rail-label {
+  padding: 20px 24px 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.2);
+  display: block;
+}
+
+.book-rail-empty {
+  padding: 20px 24px 28px;
+  font-size: 0.84rem;
+  color: rgba(255, 255, 255, 0.22);
+  line-height: 1.65;
+}
+
+.book-rail-date {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 12px 24px 2px;
+  line-height: 1.2;
+}
+
+.book-rail-time {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 24px 2px;
+}
+
+.book-rail-meta {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 24px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.book-rail-dot {
+  opacity: 0.4;
+}
+
+.book-rail-bay {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(169, 120, 69, 0.7);
+  margin: 0 24px 16px;
+  letter-spacing: 0.02em;
+}
+
+.book-rail-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 0 24px 16px;
+}
+
+.book-rail-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0 24px 4px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.book-rail-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.book-rail-tax-note {
+  font-size: 0.67rem;
+  color: rgba(255, 255, 255, 0.18);
+  margin: 0 24px 20px;
+  line-height: 1.5;
+}
+
+.book-rail-btn {
+  display: block;
+  width: 100%;
+  height: 54px;
+  border-radius: 0 0 19px 19px;
+  background: #4a6e34;
+  border: none;
+  border-top: 1px solid rgba(74, 110, 52, 0.6);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s, box-shadow 0.2s;
+}
+
+.book-rail-btn:hover:not(:disabled) {
+  background: #5a8040;
+  box-shadow: 0 -2px 16px rgba(74, 110, 52, 0.3);
+}
+
+.book-rail-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .book-body {
+    grid-template-columns: 1fr;
+  }
+
+  .book-rail {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .book-content {
+    padding: 0 20px 80px;
+  }
+
+  .book-date-btn {
+    min-width: 60px;
+    height: 52px;
+    padding: 0 8px;
+  }
+
+  .book-pill {
+    width: 36px;
+    font-size: 0.84rem;
+  }
+
+  .book-control-stepper,
+  .book-control-pills {
+    height: 36px;
+  }
+
+  .book-step-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .book-control-value {
+    min-width: 50px;
+    font-size: 0.82rem;
+  }
+
+  .book-step-btn {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ── Visibility toggles ───────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .book-desktop-ui { display: none !important; }
+}
+
+@media (min-width: 641px) {
+  .book-mobile-ui  { display: none !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOBILE — single-scroll booking page
+══════════════════════════════════════════════════════════════════════════ */
+
+.book-mobile-ui {
+  padding-bottom: 100px; /* clear bottom nav */
+}
+
+.book-mobile-ui.has-bar {
+  padding-bottom: 160px; /* also clear sticky bottom bar */
+}
+
+/* ── Page hero ────────────────────────────────────────────────────────────── */
+
+.book-m-hero {
+  padding: 24px 0 18px;
+}
+
+.book-m-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 4px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.book-m-subtitle {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Date scroller ────────────────────────────────────────────────────────── */
+
+.book-m-date-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.book-m-dates-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.book-m-dates-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.book-m-date-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 58px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  flex-shrink: 0;
+  gap: 2px;
+  transition: all 0.15s;
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-date-pill:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-date-pill.is-selected {
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.10), transparent 58%),
+    rgba(169, 120, 69, 0.1);
+  border-color: rgba(126, 154, 92, 0.48);
+  color: #A97845;
+}
+
+.book-m-date-pill-name {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.book-m-date-pill-md {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.book-m-nav-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: background 0.14s, color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-nav-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.book-m-nav-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+
+/* ── Control blocks (Duration / Players) ──────────────────────────────────── */
+
+.book-m-control-block {
+  margin-bottom: 18px;
+}
+
+.book-m-ctrl-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  margin-bottom: 9px;
+}
+
+.book-m-pill-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.book-m-pill {
+  height: 38px;
+  padding: 0 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.48);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-pill:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.book-m-pill.is-active {
+  background:
+    linear-gradient(135deg, rgba(61, 90, 42, 0.28), transparent 55%),
+    #A97845;
+  border-color: rgba(126, 154, 92, 0.48);
+  color: #0d0a00;
+  font-weight: 700;
+}
+
+/* Square number pills for player count */
+.book-m-pill-num {
+  min-width: 40px;
+  padding: 0;
+  text-align: center;
+}
+
+/* ── Duration stepper (mobile) ───────────────────────────────────────────── */
+
+.book-m-dur-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.book-m-dur-step-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: var(--font-sans);
+  font-size: 1.15rem;
+  font-weight: 400;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.14s, color 0.14s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-dur-step-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.book-m-dur-step-btn:disabled {
+  opacity: 0.22;
+  cursor: not-allowed;
+}
+
+.book-m-dur-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
+  min-width: 52px;
+  text-align: center;
+}
+
+/* ── Available times header ────────────────────────────────────────────────── */
+
+.book-m-times-hdr {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 6px 0 10px;
+}
+
+.book-m-slots-count {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: rgba(169, 120, 69, 0.55);
+}
+
+/* ── Time slot list ───────────────────────────────────────────────────────── */
+
+.book-m-slot-frame {
+  box-sizing: border-box;
+  height: clamp(320px, calc(100vh - 400px), 500px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 10px 8px 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(126, 154, 92, 0.45) rgba(255, 255, 255, 0.035);
+}
+
+.book-m-slot-frame::-webkit-scrollbar {
+  width: 6px;
+}
+
+.book-m-slot-frame::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 999px;
+}
+
+.book-m-slot-frame::-webkit-scrollbar-thumb {
+  background: rgba(126, 154, 92, 0.45);
+  border-radius: 999px;
+}
+
+.book-m-slot-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-m-slot-item {
+  scroll-margin-top: 8px;
+}
+
+.book-m-slot {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 14px 15px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.08), transparent 28%),
+    rgba(255, 255, 255, 0.035);
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s, transform 0.14s;
+  font-family: var(--font-sans);
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  gap: 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.book-m-slot::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: rgba(126, 154, 92, 0.65);
+}
+
+.book-m-slot:hover:not(:disabled):not(.is-unavail) {
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.12), transparent 30%),
+    rgba(255, 255, 255, 0.06);
+  border-color: rgba(126, 154, 92, 0.28);
+}
+
+.book-m-slot.is-selected {
+  background:
+    linear-gradient(90deg, rgba(126, 154, 92, 0.2), transparent 36%),
+    linear-gradient(135deg, rgba(61, 90, 42, 0.14), transparent 58%),
+    rgba(169, 120, 69, 0.1);
+  border-color: rgba(166, 186, 120, 0.48);
+}
+
+.book-m-slot.is-selected::before {
+  background: #A6BA78;
+}
+
+.book-m-slot.is-unavail {
+  cursor: default;
+  opacity: 0.58;
+  background: rgba(255, 255, 255, 0.018);
+  border-color: rgba(255, 255, 255, 0.04);
+}
+
+.book-m-slot.is-unavail::before {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.book-m-slot-time {
+  font-size: 0.93rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.94);
+  min-width: 78px;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+
+.book-m-slot.is-selected .book-m-slot-time {
+  color: #f5f1e8;
+}
+
+.book-m-slot-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
+  flex-shrink: 0;
+  margin-left: auto;
+  margin-right: 8px;
+}
+
+.book-m-slot.is-selected .book-m-slot-price {
+  color: #A6BA78;
+}
+
+.book-m-slot-avail {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+/* Availability dot */
+.book-m-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.035);
+}
+
+.book-m-dot.is-avail   { background: #5CA910; }
+.book-m-dot.is-limited { background: #A97845; }
+.book-m-dot.is-booked  { background: rgba(255, 255, 255, 0.2); }
+
+.book-m-slot-end {
+  font-size: 1.1rem;
+  color: rgba(166, 186, 120, 0.58);
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.book-m-slot.is-selected .book-m-slot-end {
+  color: #A6BA78;
+  font-weight: 700;
+}
+
+/* ── Sticky bottom bar ────────────────────────────────────────────────────── */
+
+.book-m-bar {
+  position: fixed;
+  bottom: 56px; /* above MobileBottomNav */
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 8, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  z-index: 40;
+}
+
+.book-m-bar-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.book-m-bar-headline {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.2;
+}
+
+.book-m-bar-meta {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  line-height: 1.3;
+}
+
+.book-m-bar-cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.book-m-bar-price {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.book-m-reserve {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #4a6e34, #3D5A2A);
+  border: 1px solid rgba(126, 154, 92, 0.34);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, opacity 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.book-m-reserve:hover:not(:disabled) {
+  background: #5a8040;
+}
+
+.book-m-reserve:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* ── Window upsell card ───────────────────────────────────────────────────── */
+
+.book-upsell {
+  background: linear-gradient(135deg, rgba(74, 110, 52, 0.07), rgba(169, 120, 69, 0.05));
+  border: 1px solid rgba(169, 120, 69, 0.28);
+  border-radius: 16px;
+  padding: 28px 26px;
+  text-align: center;
+  max-width: 480px;
+  margin: 8px auto;
+}
+
+.book-upsell-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(169, 120, 69, 0.08);
+  border: 1px solid rgba(169, 120, 69, 0.28);
+  color: rgba(169, 120, 69, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.book-upsell-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.book-upsell-eyebrow {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(169, 120, 69, 0.7);
+  margin: 0 0 10px;
+}
+
+.book-upsell-title {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 10px;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.book-upsell-body {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+
+.book-upsell-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 42px;
+  padding: 0 22px;
+  border-radius: 10px;
+  background: rgba(169, 120, 69, 0.06);
+  border: 1px solid rgba(169, 120, 69, 0.4);
+  color: #A97845;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.book-upsell-cta:hover {
+  background: rgba(169, 120, 69, 0.12);
+  border-color: rgba(169, 120, 69, 0.6);
+}

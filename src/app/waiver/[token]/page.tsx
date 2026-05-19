@@ -65,7 +65,7 @@ export default async function GuestWaiverPage({
     <main className="min-h-screen bg-[#0a0a0a]">
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.06)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logohorizontal.png" alt="StrikePoint Sims" className="h-8" />
+        <img src="/logohorizontal.png" alt="StrikePoint Sims" className="h-12" />
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-12 pb-24">
@@ -128,12 +128,12 @@ export default async function GuestWaiverPage({
                 placeholder="Your full name"
                 required
                 minLength={2}
-                className="h-11 w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1a1a1a] px-4 text-sm text-white font-['Playfair_Display'] italic placeholder:text-[rgba(255,255,255,0.25)] focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                className="h-11 w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1a1a1a] px-4 text-sm text-white font-['Playfair_Display'] italic placeholder:text-[rgba(255,255,255,0.25)] focus:border-[#A97845] focus:outline-none focus:ring-1 focus:ring-[#A97845]"
               />
             </div>
 
             <label className="flex items-start gap-3 cursor-pointer">
-              <input type="checkbox" name="agreed" required className="mt-0.5 h-4 w-4 rounded accent-[#D4AF37]" />
+              <input type="checkbox" name="agreed" required className="mt-0.5 h-4 w-4 rounded accent-[#A97845]" />
               <span className="text-sm text-[rgba(255,255,255,0.65)] leading-relaxed">
                 I have read this entire Waiver and agree to its terms. Valid for 12 months.
               </span>
@@ -141,7 +141,7 @@ export default async function GuestWaiverPage({
 
             <button
               type="submit"
-              className="w-full h-12 rounded-lg bg-[#1B4332] text-[#D4AF37] border border-[#D4AF37] font-semibold text-sm hover:bg-[#2a5c46] transition-colors"
+              className="w-full h-12 rounded-lg bg-[#1B4332] text-[#A97845] border border-[#A97845] font-semibold text-sm hover:bg-[#2a5c46] transition-colors"
             >
               Sign waiver
             </button>

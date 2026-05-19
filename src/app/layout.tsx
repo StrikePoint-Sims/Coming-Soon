@@ -4,6 +4,7 @@ import './globals.css'
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { PostHogProvider } from '@/components/PostHogProvider'
 import { PrivacyConsent } from '@/components/PrivacyConsent'
+import { Providers } from '@/components/Providers'
 import { Suspense } from 'react'
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -37,11 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${hankenGrotesk.variable} ${playfairDisplay.variable}`}>
         <Suspense>
-          <PostHogProvider>
-            {children}
-            <ChatWidget />
-            <PrivacyConsent />
-          </PostHogProvider>
+          <Providers>
+            <PostHogProvider>
+              {children}
+              <ChatWidget />
+              <PrivacyConsent />
+            </PostHogProvider>
+          </Providers>
         </Suspense>
       </body>
     </html>

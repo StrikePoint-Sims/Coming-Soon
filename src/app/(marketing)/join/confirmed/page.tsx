@@ -18,7 +18,7 @@ export default function JoinConfirmedPage() {
             fontFamily: "'Playfair Display', Georgia, serif",
             fontSize: 'clamp(1.8rem, 5vw, 2.6rem)',
             fontWeight: 600,
-            color: '#D4AF37',
+            color: '#A97845',
             marginBottom: 16,
           }}
         >
@@ -36,9 +36,9 @@ export default function JoinConfirmedPage() {
             display: 'inline-block',
             padding: '12px 28px',
             background: '#1B4332',
-            color: '#D4AF37',
+            color: '#A97845',
             borderRadius: 8,
-            border: '1px solid #D4AF37',
+            border: '1px solid #A97845',
             fontSize: '0.9rem',
             fontWeight: 600,
             textDecoration: 'none',

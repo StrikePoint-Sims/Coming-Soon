@@ -7,6 +7,8 @@ ALTER TABLE "booking_holds" ALTER COLUMN "bay_id" DROP NOT NULL;
 --> statement-breakpoint
 ALTER TABLE "booking_holds" ADD COLUMN IF NOT EXISTS "status" text NOT NULL DEFAULT 'active';
 --> statement-breakpoint
+ALTER TABLE "booking_holds" ADD COLUMN IF NOT EXISTS "party_size" integer NOT NULL DEFAULT 1;
+--> statement-breakpoint
 
 DO $$ BEGIN
   CREATE TYPE "block_type" AS ENUM ('admin_block', 'maintenance_block');

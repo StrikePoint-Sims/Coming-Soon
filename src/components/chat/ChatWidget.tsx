@@ -31,6 +31,15 @@ export function ChatWidget() {
     }
   }, [open, messages])
 
+  useEffect(() => {
+    function handleOpenChat() {
+      setOpen(true)
+    }
+
+    window.addEventListener('strikepoint:open-chat', handleOpenChat)
+    return () => window.removeEventListener('strikepoint:open-chat', handleOpenChat)
+  }, [])
+
   const sendMessage = useCallback(async () => {
     const text = input.trim()
     if (!text || loading) return
@@ -153,8 +162,8 @@ export function ChatWidget() {
           height: '56px',
           borderRadius: '50%',
           backgroundColor: '#1B4332',
-          color: '#D4AF37',
-          border: '2px solid #D4AF37',
+          color: '#A97845',
+          border: '2px solid #A97845',
           fontSize: '24px',
           cursor: 'pointer',
           zIndex: 9999,
@@ -201,7 +210,7 @@ export function ChatWidget() {
           >
             <span style={{ fontSize: '20px' }}>⛳</span>
             <div>
-              <div style={{ fontWeight: 600, color: '#D4AF37', fontSize: '14px' }}>Striker</div>
+              <div style={{ fontWeight: 600, color: '#A97845', fontSize: '14px' }}>Striker</div>
               <div style={{ fontSize: '11px', color: '#aaa' }}>StrikePoint Sims Support</div>
             </div>
           </div>
@@ -231,7 +240,7 @@ export function ChatWidget() {
                     padding: '8px 12px',
                     borderRadius: msg.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
                     backgroundColor: msg.role === 'user' ? '#1B4332' : '#1e1e1e',
-                    color: msg.role === 'user' ? '#D4AF37' : '#eee',
+                    color: msg.role === 'user' ? '#A97845' : '#eee',
                     fontSize: '13px',
                     lineHeight: '1.5',
                     border: msg.role === 'assistant' ? '1px solid #2a2a2a' : 'none',
@@ -277,9 +286,9 @@ export function ChatWidget() {
               disabled={loading || !input.trim()}
               style={{
                 backgroundColor: '#1B4332',
-                border: '1px solid #D4AF37',
+                border: '1px solid #A97845',
                 borderRadius: '8px',
-                color: '#D4AF37',
+                color: '#A97845',
                 padding: '8px 14px',
                 cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
                 opacity: loading || !input.trim() ? 0.5 : 1,

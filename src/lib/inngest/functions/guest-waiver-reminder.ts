@@ -63,7 +63,7 @@ export const guestWaiverReminder = inngest.createFunction(
         subject: `Reminder: Sign your StrikePoint Sims waiver before ${sessionDate}`,
         htmlContent: `
           <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-            <img src="${env.NEXT_PUBLIC_APP_URL}/logo.png" alt="StrikePoint Sims" height="36" style="margin-bottom:28px">
+            <img src="${env.NEXT_PUBLIC_APP_URL}/logo.png" alt="StrikePoint Sims" height="52" style="margin-bottom:28px">
             <h2 style="margin:0 0 12px;font-size:20px;color:#111">Waiver reminder</h2>
             <p style="color:#555;margin:0 0 16px;line-height:1.6">
               ${bookerName} has invited you to a session at StrikePoint Sims on <strong>${sessionDate}</strong>.
@@ -72,7 +72,7 @@ export const guestWaiverReminder = inngest.createFunction(
               All participants must sign a waiver before entering a bay. It takes about 2 minutes.
               <strong>Your access code won't be sent until your waiver is on file.</strong>
             </p>
-            <a href="${waiverUrl}" style="display:inline-block;background:#1B4332;color:#D4AF37;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px">
+            <a href="${waiverUrl}" style="display:inline-block;background:#1B4332;color:#A97845;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px">
               Sign waiver now →
             </a>
             <p style="margin:28px 0 0;font-size:12px;color:#999">

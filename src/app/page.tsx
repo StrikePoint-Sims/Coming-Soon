@@ -75,10 +75,10 @@ const jsonLdFaq = `{
     { "@type": "Question", "name": "When do you open?", "acceptedAnswer": { "@type": "Answer", "text": "Fall 2026. Founding members get first access to opening week slots." } },
     { "@type": "Question", "name": "What is Trackman iO?", "acceptedAnswer": { "@type": "Answer", "text": "Ceiling-mounted dual-radar launch monitor. It is the most accurate golf simulation technology commercially available, with over 30 data points per swing on the same system used on the PGA Tour." } },
     { "@type": "Question", "name": "How does 24/7 access work?", "acceptedAnswer": { "@type": "Answer", "text": "Golfers reserve a bay online, enter with a secure access code, and use their scheduled bay independently. Common areas are monitored for security." } },
-    { "@type": "Question", "name": "What does it cost?", "acceptedAnswer": { "@type": "Answer", "text": "Walk-in rates will be $45-60 depending on time. Membership runs from Range through Standard and Elite. Founding Members lock in a permanent discount off our standard monthly pricing." } },
-    { "@type": "Question", "name": "Who are the Founding 20?", "acceptedAnswer": { "@type": "Answer", "text": "The first twenty members of StrikePoint Sims. They lock in a permanent monthly discount for the life of their membership and get permanent recognition on the wall at the facility." } },
-    { "@type": "Question", "name": "Is this a waitlist or am I committing?", "acceptedAnswer": { "@type": "Answer", "text": "It's a real reservation. Your card is saved at signup but not charged until we open. Once we open, your first month bills automatically and you have 14 days to cancel for a full refund." } },
-    { "@type": "Question", "name": "Can I bring guests?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Every membership includes guest privileges. Full guest policy publishes at launch." } }
+    { "@type": "Question", "name": "What does it cost?", "acceptedAnswer": { "@type": "Answer", "text": "Hourly rates are $30 for nights, $45 off-peak, and $60 peak. Memberships are Practice at $149/month, Standard at $279/month, and Elite at $419/month. Founding 20 members receive preferred pricing while their membership stays active." } },
+    { "@type": "Question", "name": "Who are the Founding 20?", "acceptedAnswer": { "@type": "Answer", "text": "The first twenty members of StrikePoint Sims. Founding members lock in preferred pricing while their membership stays active, get their name on the wall, launch event access, first access to leagues, and a 14-day money-back guarantee after opening." } },
+    { "@type": "Question", "name": "Is this a waitlist or am I committing?", "acceptedAnswer": { "@type": "Answer", "text": "It's a real reservation. Your card is authorized for a $1 temporary hold to reserve your spot, but your membership is not charged until StrikePoint opens." } },
+    { "@type": "Question", "name": "Can I bring guests?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can bring up to 3 guests per booking." } }
   ]
 }`;
 
@@ -124,8 +124,11 @@ export default function HomePage() {
             Private bays · Trackman Powered · 24/7 access
           </p>
           <div className="hero-actions">
-            <a href="#founder-20" className="cta" id="hero-cta">Become a Founding Member</a>
-            <p className="hero-cta-micro">Limited spots · Lock in preferred pricing for life</p>
+            <div className="hero-cta-row">
+              <a href="#founder-20" className="cta" id="hero-cta">Become a Founding Member</a>
+              <a href="/join?updates=1" className="cta cta--secondary">Get updates instead</a>
+            </div>
+            <p className="hero-cta-micro">Card authorized for $1 today. Membership billing starts when we open.</p>
           </div>
           <a href="#experience" className="hero-scroll-hint" aria-label="Scroll down">
             <span className="hero-scroll-line"></span>
@@ -142,7 +145,7 @@ export default function HomePage() {
           <div className="experience-split">
 
             <div className="experience-text" data-anim="">
-              <span className="section-eyebrow">Built for golfers.</span>
+              <span className="section-eyebrow">Built for golfers</span>
               <h2 className="section-heading">Your new home sim</h2>
               <p className="section-body">Become a member at StrikePoint Sims. Enjoy spacious premium bays, real courses, and no one standing over your shoulder.</p>
               <p className="section-body">Book from your phone, enter the door code, and the bay is yours.</p>
@@ -216,7 +219,7 @@ export default function HomePage() {
           {/* Left: Owner copy */}
           <div className="owner-left">
             <span className="section-eyebrow" data-anim="">From the owner</span>
-            <h2 className="owner-heading" data-anim="" style={{ ['--anim-delay' as string]: '0.1s' }}>I&apos;m building the sim<br />I want nearby.</h2>
+            <h2 className="owner-heading" data-anim="" style={{ ['--anim-delay' as string]: '0.1s' }}>I&apos;m building the sim<br />I want nearby</h2>
             <div data-anim="" style={{ ['--anim-delay' as string]: '0.18s' }}>
               <p className="section-body">I love golf. I&apos;m not great at it, but I&apos;ve been playing for over a decade.</p>
               <p className="section-body">With two little kids and a long winter, I don&apos;t get out golfing as much as I&apos;d like. So I built a sim at home and it&apos;s humble, but it is fun. So fun, that I wanted to share the feeling of having a home sim and build it to a standard I&apos;d be proud to bring my friends and family to.</p>
@@ -229,15 +232,23 @@ export default function HomePage() {
           <div className="f20-card" data-anim="" style={{ ['--anim-delay' as string]: '0.3s' }}>
             <img src="logosmall.svg" alt="StrikePoint Sims" className="f20-badge" loading="lazy" />
             <p className="f20-title">Founding 20</p>
-            <p className="f20-sub">Exclusive Founding Memberships</p>
+            <p className="f20-sub">Founding membership reservation</p>
+            <div className="f20-price-block">
+              <span className="f20-price-label">Standard founding rate</span>
+              <div className="f20-price-row">
+                <span className="f20-price">$229</span>
+                <span className="f20-price-meta">/ month</span>
+              </div>
+              <p className="f20-price-note">$279 standard rate after Founding 20 fills</p>
+            </div>
             <ul className="f20-checklist">
-              <li><span className="f20-check">✓</span> Lock in founding member pricing</li>
-              <li><span className="f20-check">✓</span> Get your name on the wall</li>
-              <li><span className="f20-check">✓</span> First access to events &amp; leagues</li>
-              <li><span className="f20-check">✓</span> Limited to 20 founding members</li>
+              <li><span className="f20-check">✓</span> Preferred pricing for life</li>
+              <li><span className="f20-check">✓</span> Name on the Founding 20 wall</li>
+              <li><span className="f20-check">✓</span> Launch events and first access to leagues</li>
+              <li><span className="f20-check">✓</span> 14-day money-back guarantee after opening</li>
             </ul>
             <a href="/join" className="f20-cta" id="founder-cta">Become a Founding Member</a>
-            <p className="f20-fine">Spots are limited. Once they&apos;re gone, they&apos;re gone.</p>
+            <p className="f20-fine">$1 temporary authorization today. Membership billing starts when StrikePoint opens.</p>
           </div>
 
         </div>
@@ -250,7 +261,7 @@ export default function HomePage() {
         <div className="faq-inner">
           <div className="faq-header" data-anim="">
             <span className="section-eyebrow section-eyebrow--green">Common questions</span>
-            <h2 className="section-heading">Everything you need to know.</h2>
+            <h2 className="section-heading">Everything you need to know</h2>
           </div>
           <div className="faq-list" data-anim="" style={{ ['--anim-delay' as string]: '0.15s' }}>
             <details className="faq-item">
@@ -267,19 +278,19 @@ export default function HomePage() {
             </details>
             <details className="faq-item">
               <summary className="faq-q">What does it cost?</summary>
-              <p className="faq-a">Walk-in rates will be $45–60 depending on time. Off-peak is weekdays before 5pm and every night between 10pm and 6am. Membership runs from Range (off-peak access) through Standard and Elite. Founding Members lock in a permanent discount off our standard monthly pricing, with a 14-day money-back guarantee.</p>
+              <p className="faq-a">Hourly rates are $30 for nights, $45 off-peak, and $60 peak. Memberships are Practice at $149/month, Standard at $279/month, and Elite at $419/month. Founding Members receive preferred pricing while their membership stays active.</p>
             </details>
             <details className="faq-item">
               <summary className="faq-q">Who are the Founding 20?</summary>
-              <p className="faq-a">The first twenty members of StrikePoint Sims. Founding Members lock in a permanent monthly discount off our standard rates — for the life of their membership, as long as it stays active — and get permanent recognition on the wall at the facility. Once the twenty spots are filled, Founding pricing closes for good.</p>
+              <p className="faq-a">The first twenty members of StrikePoint Sims. Founding Members lock preferred pricing while their membership stays active, get their name on the wall, launch event access, first access to leagues, and a 14-day money-back guarantee after opening.</p>
             </details>
             <details className="faq-item">
               <summary className="faq-q">Is this a waitlist or am I committing?</summary>
-              <p className="faq-a">It&apos;s a real reservation. Your card is saved at signup but not charged until we open. Once we open, your first month bills automatically and you have 14 days to cancel for a full refund. We do this so we know who&apos;s actually in — we&apos;d rather have 20 committed Founding Members than 200 names on a list.</p>
+              <p className="faq-a">It&apos;s a real reservation. Your card is authorized for a $1 temporary hold to reserve your spot, but your membership is not charged until StrikePoint opens. Billing begins when the business opens.</p>
             </details>
             <details className="faq-item">
               <summary className="faq-q">Can I bring guests?</summary>
-              <p className="faq-a">Yes. Every membership includes guest privileges. Full guest policy publishes at launch.</p>
+              <p className="faq-a">Yes. You can bring up to 3 guests per booking.</p>
             </details>
             <details className="faq-item">
               <summary className="faq-q">Where are you opening?</summary>

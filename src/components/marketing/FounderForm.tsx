@@ -26,7 +26,7 @@ const TIERS = [
     accessNote: 'Peak hours not included',
     booking: '7-day advance',
     bestFor: 'Practice and off-peak play',
-    tagline: 'Built for easy, consistent reps.',
+    tagline: 'Built for easy, consistent reps',
     elite: false,
   },
   {
@@ -36,7 +36,7 @@ const TIERS = [
     access: '8 peak hours/month + unlimited off-peak',
     booking: '10-day advance',
     bestFor: 'Regular rounds and flexible play',
-    tagline: 'The core membership.',
+    tagline: 'The core membership',
     elite: false,
   },
   {
@@ -46,7 +46,7 @@ const TIERS = [
     access: '16 peak hours/month + unlimited off-peak',
     booking: '14-day advance',
     bestFor: 'Priority access and full rounds',
-    tagline: 'Priority access when demand is highest.',
+    tagline: 'Priority access when demand is highest',
     elite: true,
     flagText: '5 spots only',
   },
@@ -269,18 +269,20 @@ function PaymentSlideInner({ isActive, tier, fullName, email, onSuccess }: Payme
 
 interface FounderFormProps {
   stripePublishableKey: string
+  initialMode?: 'founder' | 'updates'
 }
 
-export function FounderForm({ stripePublishableKey }: FounderFormProps) {
+export function FounderForm({ stripePublishableKey, initialMode = 'founder' }: FounderFormProps) {
   const stripePromise = getStripe(stripePublishableKey)
+  const startsInUpdatesMode = initialMode === 'updates'
 
   // ─ Screen / transition state ─
-  const [formVisible, setFormVisible] = useState(false)
-  const [formShown, setFormShown] = useState(false)
-  const [offerHiding, setOfferHiding] = useState(false)
+  const [formVisible, setFormVisible] = useState(startsInUpdatesMode)
+  const [formShown, setFormShown] = useState(startsInUpdatesMode)
+  const [offerHiding, setOfferHiding] = useState(startsInUpdatesMode)
 
   // ─ Flow state ─
-  const [isFounder, setIsFounder] = useState(true)
+  const [isFounder, setIsFounder] = useState(!startsInUpdatesMode)
   const [currentSlide, setCurrentSlide] = useState<1 | 2 | 3 | 4 | 6 | 7>(1)
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null)
   const [reservationNextVisible, setReservationNextVisible] = useState(false)
@@ -311,8 +313,8 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
   const fullName = [firstName.trim(), lastName.trim()].filter(Boolean).join(' ')
 
   const slide1Heading = isFounder && selectedTier
-    ? `Finish your ${selectedTier.name} reservation.`
-    : 'Where should we send updates?'
+    ? `Finish your ${selectedTier.name} reservation`
+    : 'Where should we send updates'
   const slide1Hint = isFounder
     ? "We'll use this for your confirmation and opening updates."
     : 'Build progress, opening news, and when bookings go live.'
@@ -322,14 +324,18 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
   const isPrioritySlide = currentSlide === 4
   const showNextBtn = !isChoiceSlide
 
-  // ─ URL param: ?mode=updates ─
+  // ─ Initial updates flow ─
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get('updates') === '1' || params.get('mode') === 'updates') {
-      openForm(false)
+    if (!startsInUpdatesMode) return
+    document.body.style.overflow = 'hidden'
+    const focusTimer = window.setTimeout(() => {
+      slide1FirstRef.current?.focus()
+    }, 50)
+    return () => {
+      window.clearTimeout(focusTimer)
+      document.body.style.overflow = ''
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [startsInUpdatesMode])
 
   // ─ Screen transitions ─
   function openForm(asFounder: boolean) {
@@ -346,12 +352,8 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
   }
 
   function closeForm() {
-    setFormShown(false)
-    setTimeout(() => {
-      setFormVisible(false)
-      setOfferHiding(false)
-      document.body.style.overflow = ''
-    }, 400)
+    document.body.style.overflow = ''
+    window.location.assign('/')
   }
 
   // ─ Slide navigation ─
@@ -556,8 +558,8 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
 
   // ─ Confirmation copy ─
   const confirmHeading = isFounder && selectedTier
-    ? `You’re in${firstName ? `, ${firstName.trim()}` : ''}.`
-    : `You’re on the list${firstName ? `, ${firstName.trim()}` : ''}.`
+    ? `You’re in${firstName ? `, ${firstName.trim()}` : ''}`
+    : `You’re on the list${firstName ? `, ${firstName.trim()}` : ''}`
   const confirmBody = isFounder && selectedTier
     ? `Your ${selectedTier.name} spot is reserved. Your first membership charge happens when we open.`
     : "You'll get build updates, opening news, and when bookings go live."
@@ -565,6 +567,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
     ? "We’ll follow up as we get closer with membership details, preview timing, and opening updates."
     : 'No spam. Just updates that matter.'
   const showReserveLink = !isFounder || !selectedTier
+  const hideOfferScreen = startsInUpdatesMode || (formVisible && !offerHiding)
 
   // ─ Render ─────────────────────────────────────────────────────────────────
 
@@ -574,7 +577,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
       <div
         id="offer-screen"
         className={offerHiding ? 'hiding' : ''}
-        style={formVisible && !offerHiding ? { display: 'none' } : undefined}
+        style={hideOfferScreen ? { display: 'none' } : undefined}
       >
         <div className="offer-wrap">
 
@@ -709,7 +712,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
         <div className="form-topbar">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logohorizontal.png" alt="StrikePoint Sims" className="form-topbar-logo" />
-          <button className="form-close-btn" onClick={closeForm} aria-label="Back to offer">&times;</button>
+          <button className="form-close-btn" onClick={closeForm} aria-label="Back to home">Back</button>
         </div>
 
         {/* Progress bar */}
@@ -788,7 +791,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
           <div className={`slide${currentSlide === 2 ? ' is-active' : ''}`} data-slide="2">
             <div className="slide-inner">
               <p className="slide-step">{isFounder ? '2 of 4' : '2 of 3'}</p>
-              <h2 className="slide-q">How does golf fit into your life?</h2>
+              <h2 className="slide-q">How does golf fit into your life</h2>
               <div className="choices" id="level-choices">
                 {[
                   { key: 'A', val: 'I play often and want to improve', desc: '50+ rounds a year. Always sharpening my game.' },
@@ -816,7 +819,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
           <div className={`slide${currentSlide === 3 ? ' is-active' : ''}`} data-slide="3">
             <div className="slide-inner">
               <p className="slide-step">{isFounder ? '3 of 4' : '3 of 3'}</p>
-              <h2 className="slide-q">Where are you coming from?</h2>
+              <h2 className="slide-q">Where are you coming from</h2>
               <div className="choices" id="town-choices">
                 {[
                   { key: 'A', val: 'Colchester' },
@@ -880,7 +883,7 @@ export function FounderForm({ stripePublishableKey }: FounderFormProps) {
           <div className={`slide${currentSlide === 4 ? ' is-active' : ''}`} data-slide="4">
             <div className="slide-inner">
               <p className="slide-step">4 of 4</p>
-              <h2 className="slide-q">What matters most to you in a sim facility?</h2>
+                <h2 className="slide-q">What matters most to you in a sim facility</h2>
               <div className="choices" id="priority-choices">
                 {[
                   { key: 'A', val: 'Accuracy of the shot data' },

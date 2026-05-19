@@ -16,8 +16,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function JoinPage() {
+export default async function JoinPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ updates?: string; mode?: string }>
+}) {
+  const params = await searchParams
+  const initialMode = params.updates === '1' || params.mode === 'updates' ? 'updates' : 'founder'
+
   return (
-    <FounderForm stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''} />
+    <FounderForm stripePublishableKey={env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? ''} initialMode={initialMode} />
   )
 }

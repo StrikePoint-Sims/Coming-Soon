@@ -1,0 +1,357 @@
+/* ── Page ─────────────────────────────────────────────────────────────────── */
+
+.conf-page {
+  min-height: 100vh;
+  background: #0a0a0a;
+  padding: 48px 24px 80px;
+  display: flex;
+  justify-content: center;
+}
+
+.conf-wrap {
+  width: 100%;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
+}
+
+.conf-main {
+  min-width: 0;
+}
+
+/* ── Success check ────────────────────────────────────────────────────────── */
+
+.conf-check {
+  width: 64px;
+  height: 64px;
+  color: #8fbc58;
+  margin-bottom: 22px;
+}
+
+.conf-check svg {
+  width: 100%;
+  height: 100%;
+}
+
+.conf-heading {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.conf-intro {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.55);
+  margin: 0 0 28px;
+  line-height: 1.55;
+}
+
+/* ── Confirmation number card ────────────────────────────────────────────── */
+
+.conf-number-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.26);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+
+.conf-number-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: rgba(169, 120, 69, 0.7);
+  margin: 0 0 3px;
+}
+
+.conf-number-value {
+  font-family: 'SF Mono', Monaco, Menlo, monospace;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #8fbc58;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.conf-copy {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(169, 120, 69, 0.05);
+  border: 1px solid rgba(74, 110, 52, 0.3);
+  color: rgba(169, 120, 69, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.conf-copy:hover {
+  background: rgba(169, 120, 69, 0.12);
+  color: #A97845;
+}
+
+.conf-copy svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ── Section label (shared) ───────────────────────────────────────────────── */
+
+.conf-section-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(169, 120, 69, 0.7);
+  margin: 0 0 16px;
+}
+
+/* ── What happens next ────────────────────────────────────────────────────── */
+
+.conf-next {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.22);
+  border-radius: 14px;
+  padding: 20px 22px;
+  margin-bottom: 28px;
+}
+
+.conf-next-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+}
+
+.conf-next-item:first-of-type {
+  padding-top: 0;
+}
+
+.conf-next-item + .conf-next-item {
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.conf-next-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(169, 120, 69, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.conf-next-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.conf-next-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 4px;
+}
+
+.conf-next-body {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Aside (booking summary) ──────────────────────────────────────────────── */
+
+.conf-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.conf-summary {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(74, 110, 52, 0.22);
+  border-radius: 14px;
+  padding: 22px;
+}
+
+.conf-summary-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+}
+
+.conf-summary-row:first-of-type {
+  padding-top: 0;
+}
+
+.conf-summary-icon {
+  width: 24px;
+  height: 24px;
+  color: rgba(169, 120, 69, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.conf-summary-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.conf-summary-label {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.conf-summary-value {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 2px 0 0;
+}
+
+.conf-total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: 16px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(74, 110, 52, 0.22);
+}
+
+.conf-total-label {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.conf-total-value {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #A97845;
+}
+
+/* ── Actions ──────────────────────────────────────────────────────────────── */
+
+.conf-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.conf-actions-desktop {
+  display: flex;
+}
+
+.conf-actions-mobile {
+  display: none;
+  margin-top: 28px;
+}
+
+.conf-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.conf-btn.primary {
+  background: #4a6e34;
+  color: #fff;
+  border-color: #4a6e34;
+}
+
+.conf-btn.primary:hover {
+  background: #5a8040;
+  border-color: #5a8040;
+  box-shadow: 0 2px 12px rgba(74, 110, 52, 0.3);
+}
+
+.conf-btn.ghost {
+  background: transparent;
+  border-color: rgba(74, 110, 52, 0.4);
+  color: rgba(143, 166, 94, 0.95);
+}
+
+.conf-btn.ghost:hover {
+  background: rgba(74, 110, 52, 0.08);
+  border-color: rgba(74, 110, 52, 0.6);
+  color: #8fa65e;
+}
+
+.conf-footer-note {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.3);
+  text-align: center;
+  margin: 24px 0 0;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .conf-wrap {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .conf-aside {
+    order: -1;
+  }
+
+  .conf-actions-desktop {
+    display: none;
+  }
+
+  .conf-actions-mobile {
+    display: flex;
+  }
+
+  .conf-check {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .conf-page {
+    padding: 32px 16px 64px;
+  }
+
+  .conf-number-card,
+  .conf-next,
+  .conf-summary {
+    padding: 18px;
+  }
+}

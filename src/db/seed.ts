@@ -53,13 +53,14 @@ async function seed() {
   const bayRows = [
     { id: 'bay_1', locationId: LOCATION_ID, label: 'Bay 1' },
     { id: 'bay_2', locationId: LOCATION_ID, label: 'Bay 2' },
+    { id: 'bay_3', locationId: LOCATION_ID, label: 'Bay 3' },
   ]
 
   for (const bay of bayRows) {
     await db.insert(bays).values(bay).onConflictDoNothing()
   }
 
-  console.log('✓ Bays seeded (Bay 1, Bay 2)')
+  console.log('✓ Bays seeded (Bay 1, Bay 2, Bay 3)')
   console.log('Done.')
   process.exit(0)
 }

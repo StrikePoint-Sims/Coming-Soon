@@ -1,27 +1,39 @@
+import { auth } from '@/auth'
 import { LoginForm } from '@/components/auth/LoginForm'
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: 'Sign In — StrikePoint Sims',
   robots: { index: false },
 }
 
-export default function LoginPage({
+export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ callbackUrl?: string; error?: string }>
+  searchParams: Promise<{ callbackUrl?: string; error?: string; plan?: string; billing?: string }>
 }) {
-  return (
-    <div>
-      <div className="mb-8 text-center">
-        <h1 className="font-['Playfair_Display'] text-2xl font-semibold text-white mb-2">
-          Sign in
-        </h1>
-        <p className="text-sm text-[rgba(255,255,255,0.55)]">
-          Enter your email or phone number to continue
-        </p>
-      </div>
-      <LoginForm searchParams={searchParams} />
-    </div>
-  )
+  const params = await searchParams
+  const session = await auth()
+
+  if (session?.user?.id) {
+    if (params.plan) {
+      const billing = params.billing === 'annual' ? 'annual' : 'monthly'
+      redirect(`/memberships/checkout?plan=${encodeURIComponent(params.plan)}&billing=${billing}`)
+    }
+    if (params.callbackUrl) redirect(safeCallbackUrl(params.callbackUrl) as never)
+    redirect('/account')
+  }
+
+  return <LoginForm callbackUrl={params.callbackUrl} />
+}
+
+function safeCallbackUrl(raw: string): string {
+  try {
+    const url = new URL(raw, 'https://www.strikepointsims.com')
+    if (url.origin !== 'https://www.strikepointsims.com') return '/account'
+    return `${url.pathname}${url.search}${url.hash}` || '/account'
+  } catch {
+    return '/account'
+  }
 }

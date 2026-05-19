@@ -5,8 +5,10 @@ import type { NextRequest } from 'next/server'
 
 const { auth } = NextAuth(authConfig)
 
-const PROTECTED_PREFIXES = ['/account', '/book', '/dashboard']
-const WAIVER_REQUIRED_PREFIXES = ['/book']
+// /book (root) is public — auth is enforced in the server action at confirm time.
+// /book/:id sub-pages (confirmed booking receipts) do require auth.
+const PROTECTED_PREFIXES = ['/account', '/book/', '/dashboard']
+const WAIVER_REQUIRED_PREFIXES = ['/book/']
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
@@ -33,5 +35,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/account/:path*', '/book/:path*', '/dashboard/:path*'],
+  // /book (exact) is intentionally excluded — it's public
+  matcher: ['/account/:path*', '/book/:path+', '/dashboard/:path*'],
 }

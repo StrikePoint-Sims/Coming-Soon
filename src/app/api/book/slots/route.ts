@@ -1,15 +1,10 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { getAvailableSlots } from '@/lib/booking/availability'
 
 export const runtime = 'nodejs'
 
+// Public — no auth required. createHold() enforces auth server-side.
 export async function GET(req: NextRequest) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { searchParams } = req.nextUrl
   const locationId = searchParams.get('locationId')
   const date = searchParams.get('date')

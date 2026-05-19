@@ -24,14 +24,14 @@ export default async function WaiverPage({
     <main className="min-h-screen bg-[#0a0a0a]">
       <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-[#0a0a0a] border-b border-[rgba(255,255,255,0.06)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logohorizontal.png" alt="StrikePoint Sims" className="h-8" />
+        <img src="/logohorizontal.png" alt="StrikePoint Sims" className="h-12" />
         <a href="/account" className="text-xs text-[rgba(255,255,255,0.45)] hover:text-white">
           ← Account
         </a>
       </div>
 
       <div className="max-w-3xl mx-auto px-5 py-12 pb-24">
-        <span className="text-xs font-bold uppercase tracking-widest text-[#8fa65e] mb-4 block">
+        <span className="text-xs font-bold uppercase tracking-widest text-[rgba(169, 120, 69,0.75)] mb-4 block">
           Legal
         </span>
         <h1 className="font-['Playfair_Display'] text-3xl md:text-4xl font-semibold text-white mb-2">
@@ -83,7 +83,7 @@ export default async function WaiverPage({
                 placeholder={user.name ?? 'Your full name'}
                 required
                 minLength={2}
-                className="h-11 w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1a1a1a] px-4 text-sm text-white font-['Playfair_Display'] italic placeholder:text-[rgba(255,255,255,0.25)] focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                className="h-11 w-full rounded-lg border border-[rgba(255,255,255,0.12)] bg-[#1a1a1a] px-4 text-sm text-white font-['Playfair_Display'] italic placeholder:text-[rgba(255,255,255,0.25)] focus:border-[#A97845] focus:outline-none focus:ring-1 focus:ring-[#A97845]"
               />
               <p className="text-xs text-[rgba(255,255,255,0.3)]">
                 Signing on behalf of a minor? Type the minor&apos;s full name.
@@ -95,7 +95,7 @@ export default async function WaiverPage({
                 type="checkbox"
                 name="agreed"
                 required
-                className="mt-0.5 h-4 w-4 rounded accent-[#D4AF37]"
+                className="mt-0.5 h-4 w-4 rounded accent-[#A97845]"
               />
               <span className="text-sm text-[rgba(255,255,255,0.65)] leading-relaxed">
                 I have read this entire Waiver, I understand that I am giving up substantial legal rights, and I agree to be bound by its terms. This signature applies to all future visits for the next 12 months.
@@ -109,7 +109,7 @@ export default async function WaiverPage({
 
             <button
               type="submit"
-              className="w-full h-12 rounded-lg bg-[#1B4332] text-[#D4AF37] border border-[#D4AF37] font-semibold text-sm hover:bg-[#2a5c46] transition-colors"
+              className="w-full h-12 rounded-lg bg-[#4a6e34] text-white border border-[#4a6e34] font-bold text-sm tracking-wider uppercase hover:bg-[#5a8040] hover:border-[#5a8040] hover:shadow-lg hover:shadow-[#4a6e34]/30 transition-all"
             >
               Sign waiver and continue
             </button>

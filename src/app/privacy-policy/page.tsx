@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
     <>
       <style>{`
         .pp-topbar { display:flex;align-items:center;justify-content:space-between;padding:24px 40px;background:#0a0a0a;border-bottom:1px solid rgba(255,255,255,0.06); }
-        .pp-topbar-logo { height:36px;width:auto;opacity:0.9; }
+        .pp-topbar-logo { height:50px;width:auto;opacity:0.9; }
         .pp-topbar-home { font-size:0.82rem;color:rgba(255,255,255,0.6);text-decoration:none;letter-spacing:0.03em;transition:color 0.25s; }
         .pp-topbar-home:hover { color:#fff; }
         .pp-wrap { max-width:720px;margin:0 auto;padding:64px 40px 96px;font-family:'Hanken Grotesk',system-ui,sans-serif; }

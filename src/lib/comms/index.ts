@@ -15,18 +15,18 @@ export function isQuietHours(): boolean {
 }
 
 // Send SMS only if user has consented and it's not quiet hours.
-// Transactional messages (access codes, etc.) bypass quiet hours.
+// Transactional messages (access codes, receipts, safety notices) are always sent.
 export async function sendUserSms(params: {
   userId: string
   content: string
   tag: string
-  transactional?: boolean  // if true, skips quiet-hours gate but still checks consent
+  transactional?: boolean
 }): Promise<void> {
   const [user] = await db.select({ phone: users.phone, smsConsent: users.smsConsent })
     .from(users).where(eq(users.id, params.userId)).limit(1)
 
   if (!user?.phone) return
-  if (!user.smsConsent) return
+  if (!params.transactional && !user.smsConsent) return
 
   if (!params.transactional && isQuietHours()) {
     // Non-transactional messages during quiet hours are silently dropped.

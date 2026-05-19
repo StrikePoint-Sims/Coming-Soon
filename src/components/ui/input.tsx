@@ -24,7 +24,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             h-11 w-full rounded-lg border bg-[#1a1a1a] px-4 text-sm text-white
             placeholder:text-[rgba(255,255,255,0.3)]
             border-[rgba(255,255,255,0.12)]
-            focus:border-[#D4AF37] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]
+            focus:border-[#A97845] focus:outline-none focus:ring-1 focus:ring-[#A97845]
             disabled:opacity-50 disabled:cursor-not-allowed
             ${error ? 'border-red-600 focus:border-red-500 focus:ring-red-500' : ''}
             ${className}
