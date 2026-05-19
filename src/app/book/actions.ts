@@ -74,13 +74,16 @@ export async function confirmBooking(holdId: string): Promise<void> {
     .limit(1)
 
   if (!hold) throw new Error('Hold expired or not found. Please select a time again.')
+  if (!hold.bayId) throw new Error('Hold is missing a bay assignment. Please select a time again.')
+
+  const bayId = hold.bayId
 
   // Check for conflicts introduced since the hold was created
   const conflict = await db
     .select({ id: bookings.id })
     .from(bookings)
     .where(and(
-      eq(bookings.bayId, hold.bayId),
+      eq(bookings.bayId, bayId),
       eq(bookings.locationId, hold.locationId),
       lt(bookings.startsAt, hold.endsAt),
       gt(bookings.endsAt, hold.startsAt),
@@ -97,7 +100,7 @@ export async function confirmBooking(holdId: string): Promise<void> {
   await db.insert(bookings).values({
     id: bookingId,
     locationId: hold.locationId,
-    bayId: hold.bayId,
+    bayId,
     userId,
     type: 'member',
     startsAt: hold.startsAt,
@@ -115,7 +118,7 @@ export async function confirmBooking(holdId: string): Promise<void> {
     action: 'booking.created',
     targetType: 'booking',
     targetId: bookingId,
-    payloadJson: { bayId: hold.bayId, startsAt: hold.startsAt.toISOString() },
+    payloadJson: { bayId, startsAt: hold.startsAt.toISOString() },
     at: new Date(),
   })
 
@@ -156,11 +159,14 @@ export async function getHoldDetails(holdId: string): Promise<HoldDetails | { er
     .limit(1)
 
   if (!hold) return { error: 'Hold expired or not found.' }
+  if (!hold.bayId) return { error: 'Hold is missing a bay assignment. Please select a time again.' }
+
+  const bayId = hold.bayId
 
   const [bay] = await db
     .select({ label: bays.label })
     .from(bays)
-    .where(eq(bays.id, hold.bayId))
+    .where(eq(bays.id, bayId))
     .limit(1)
 
   const durationMs = hold.endsAt.getTime() - hold.startsAt.getTime()
@@ -206,6 +212,9 @@ export async function createPaymentIntent(
     .limit(1)
 
   if (!hold) return { error: 'Hold expired or not found. Please select a new time.' }
+  if (!hold.bayId) return { error: 'Hold is missing a bay assignment. Please select a new time.' }
+
+  const bayId = hold.bayId
 
   // Calculate price using ET start hour
   const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
@@ -222,7 +231,7 @@ export async function createPaymentIntent(
     metadata: {
       holdId,
       userId: session.user.id,
-      bayId: hold.bayId,
+      bayId,
       startsAt: hold.startsAt.toISOString(),
       endsAt: hold.endsAt.toISOString(),
     },
@@ -256,13 +265,16 @@ export async function confirmBookingAfterPayment(
     .limit(1)
 
   if (!hold) return { error: 'Hold not found. Your booking may already be confirmed.' }
+  if (!hold.bayId) return { error: 'Hold is missing a bay assignment. Please contact us.' }
+
+  const bayId = hold.bayId
 
   // Check for conflicts
   const conflict = await db
     .select({ id: bookings.id })
     .from(bookings)
     .where(and(
-      eq(bookings.bayId, hold.bayId),
+      eq(bookings.bayId, bayId),
       eq(bookings.locationId, hold.locationId),
       lt(bookings.startsAt, hold.endsAt),
       gt(bookings.endsAt, hold.startsAt),
@@ -289,7 +301,7 @@ export async function confirmBookingAfterPayment(
   await db.insert(bookings).values({
     id: bookingId,
     locationId: hold.locationId,
-    bayId: hold.bayId,
+    bayId,
     userId,
     type: 'member',
     startsAt: hold.startsAt,
@@ -321,7 +333,7 @@ export async function confirmBookingAfterPayment(
     targetType: 'booking',
     targetId: bookingId,
     payloadJson: {
-      bayId: hold.bayId,
+      bayId,
       startsAt: hold.startsAt.toISOString(),
       totalCents,
       paymentIntentId,

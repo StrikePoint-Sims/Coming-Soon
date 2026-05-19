@@ -32,11 +32,13 @@ export const bookingConfirmation = inngest.createFunction(
 
     if (!booking) return { skipped: true, reason: 'booking not found' }
 
-    const [bay] = await db
-      .select({ label: bays.label })
-      .from(bays)
-      .where(eq(bays.id, booking.bayId))
-      .limit(1)
+    const [bay] = booking.bayId
+      ? await db
+        .select({ label: bays.label })
+        .from(bays)
+        .where(eq(bays.id, booking.bayId))
+        .limit(1)
+      : []
 
     const [user] = await db
       .select({ name: users.name })
@@ -106,11 +108,13 @@ export const bookingReminder = inngest.createFunction(
 
     if (!current || current.status === 'cancelled') return { skipped: true, reason: 'cancelled' }
 
-    const [bay] = await db
-      .select({ label: bays.label })
-      .from(bays)
-      .where(eq(bays.id, booking.bayId))
-      .limit(1)
+    const [bay] = booking.bayId
+      ? await db
+        .select({ label: bays.label })
+        .from(bays)
+        .where(eq(bays.id, booking.bayId))
+        .limit(1)
+      : []
 
     // Look up the access code for this booking
     const [accessCode] = await db

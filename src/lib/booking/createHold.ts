@@ -11,6 +11,10 @@ import { clearAvailabilityCacheForRange } from './cache'
 import { nanoid } from '@/lib/utils'
 
 const HOLD_TTL_MINUTES = 12
+const FNV_OFFSET_BASIS_64 = BigInt('1469598103934665603')
+const FNV_PRIME_64 = BigInt('1099511628211')
+const UINT64_MASK = BigInt('0xffffffffffffffff')
+const PG_BIGINT_MASK = BigInt('0x7fffffffffffffff')
 
 export interface HoldRequest {
   userId: string
@@ -27,13 +31,13 @@ export interface HoldResult {
 // Stable bigints for pg_advisory_xact_lock based on local business date.
 // Date-level locks are fine for a 3-bay site — see README.
 function dateLockKey(date: string): bigint {
-  let h = 1469598103934665603n
+  let h = FNV_OFFSET_BASIS_64
   for (let i = 0; i < date.length; i++) {
     h ^= BigInt(date.charCodeAt(i))
-    h = (h * 1099511628211n) & 0xffffffffffffffffn
+    h = (h * FNV_PRIME_64) & UINT64_MASK
   }
   // Postgres bigint is signed; mask to 63 bits.
-  return h & 0x7fffffffffffffffn
+  return h & PG_BIGINT_MASK
 }
 
 // Re-check capacity directly inside the transaction. Half-open overlap.
