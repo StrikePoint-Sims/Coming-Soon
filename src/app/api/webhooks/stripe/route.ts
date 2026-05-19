@@ -33,8 +33,23 @@ export async function POST(req: NextRequest) {
     at: new Date(),
   }).catch(console.error)
 
-  // Week 5 handlers: invoice.paid, invoice.payment_failed, customer.subscription.*,
-  // payment_intent.succeeded, payment_intent.payment_failed, charge.refunded
+  // Convert hold → confirmed booking after payment. Re-checks state inside a
+  // tx so a late webhook (after hold expiry) does not produce a phantom booking.
+  if (event.type === 'checkout.session.completed' || event.type === 'payment_intent.succeeded') {
+    const obj = event.data.object as { metadata?: Record<string, string>; amount_total?: number; amount?: number }
+    const holdId = obj.metadata?.holdId
+    const bookingType = (obj.metadata?.bookingType ?? 'walk_in') as
+      'member' | 'walk_in' | 'day_pass' | 'trial' | 'corporate' | 'league' | 'lesson'
+    if (holdId) {
+      const { confirmHoldAsBooking } = await import('@/lib/booking/createHold')
+      const totalCents = obj.amount_total ?? obj.amount ?? 0
+      const result = await confirmHoldAsBooking({ holdId, type: bookingType, totalCents })
+      if ('error' in result) {
+        // Flag for manual reconciliation / refund.
+        console.error('hold_confirm_failed', { holdId, error: result.error, eventId: event.id })
+      }
+    }
+  }
 
   return NextResponse.json({ received: true })
 }

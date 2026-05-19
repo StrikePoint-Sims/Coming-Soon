@@ -85,6 +85,8 @@ export const incidentSeverityEnum = pgEnum('incident_severity', [
 
 export const adminRoleEnum = pgEnum('admin_role', ['owner', 'manager', 'staff'])
 
+export const blockTypeEnum = pgEnum('block_type', ['admin_block', 'maintenance_block'])
+
 // ── Tables ────────────────────────────────────────────────────────────────────
 
 export const locations = pgTable('locations', {
@@ -194,7 +196,7 @@ export const memberships = pgTable('memberships', {
 export const bookings = pgTable('bookings', {
   id: id(),
   locationId: locationId(),
-  bayId: text('bay_id').notNull().references(() => bays.id),
+  bayId: text('bay_id').references(() => bays.id),
   userId: text('user_id').notNull().references(() => users.id),
   type: bookingTypeEnum('type').notNull(),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
@@ -455,12 +457,29 @@ export const maintenanceTasks = pgTable('maintenance_tasks', {
 export const bookingHolds = pgTable('booking_holds', {
   id: id(),
   locationId: locationId(),
-  bayId: text('bay_id').notNull().references(() => bays.id),
+  bayId: text('bay_id').references(() => bays.id),
   userId: text('user_id').notNull().references(() => users.id),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  // 'active' | 'consumed' (converted to booking) | 'cancelled' | 'expired'
+  status: text('status').notNull().default('active'),
   createdAt: createdAt(),
+})
+
+// Admin / maintenance blocks. bay_id null => consumes 1 unit of overall capacity
+// (same semantics as a booking with no bay assigned). bay_id set => only that bay.
+export const bookingBlocks = pgTable('booking_blocks', {
+  id: id(),
+  locationId: locationId(),
+  bayId: text('bay_id').references(() => bays.id),
+  type: blockTypeEnum('type').notNull(),
+  startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
+  endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
+  reason: text('reason'),
+  createdByUserId: text('created_by_user_id'),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
 })
 
 export const inventoryItems = pgTable('inventory_items', {
