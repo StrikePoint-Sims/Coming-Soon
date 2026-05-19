@@ -29,7 +29,9 @@ export type Events = {
     data: { userId: string; membershipId: string; attemptNumber: number }
   }
   'waiver/guest-reminder': {
-    data: { guestEmail: string; guestPhone?: string; tokenHash: string; bookingId: string }
+    // guestId targets the specific guest row; bookingId is kept for legacy
+    // events that pre-date the per-guest field.
+    data: { guestId?: string; bookingId: string }
   }
   'bay/health-check': {
     data: { locationId: string }

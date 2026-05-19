@@ -9,6 +9,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { WAIVER_VERSION } from '@/lib/waivers/content'
+import { safeCallbackUrl } from '@/lib/auth/safe-redirect'
 
 const WAIVER_VALIDITY_MONTHS = 12
 
@@ -18,7 +19,7 @@ export async function signWaiver(formData: FormData) {
 
   const signatureText = formData.get('signatureText')?.toString().trim()
   const agreed = formData.get('agreed') === 'on'
-  const callbackUrl = formData.get('callbackUrl')?.toString() ?? '/account'
+  const callbackUrl = safeCallbackUrl(formData.get('callbackUrl'))
 
   if (!signatureText || signatureText.length < 2) {
     throw new Error('Please type your full name as your signature.')

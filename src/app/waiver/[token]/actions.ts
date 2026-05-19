@@ -7,7 +7,7 @@ import { nanoid } from '@/lib/utils'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { WAIVER_VERSION } from '@/lib/waivers/content'
-import crypto from 'crypto'
+import { hashGuestToken } from '@/lib/waivers/guest-links'
 
 const WAIVER_VALIDITY_MONTHS = 12
 
@@ -20,8 +20,10 @@ export async function signGuestWaiver(formData: FormData) {
     throw new Error('Please complete all fields and check the agreement box.')
   }
 
-  // Look up the signing record by token hash
-  const tokenHash = crypto.createHash('sha256').update(token).digest('hex')
+  // Token is a random opaque string; we look the guest up by its hash and
+  // never accept the row's primary key as a fallback.
+  const tokenHash = hashGuestToken(token)
+
   const [existingSigning] = await db
     .select()
     .from(waiverSignings)
@@ -33,11 +35,10 @@ export async function signGuestWaiver(formData: FormData) {
     redirect(`/waiver/${token}/confirmed`)
   }
 
-  // Look up booking guest record
   const [guest] = await db
     .select()
     .from(bookingGuests)
-    .where(eq(bookingGuests.id, token))
+    .where(eq(bookingGuests.accessTokenHash, tokenHash))
     .limit(1)
 
   if (!guest) {

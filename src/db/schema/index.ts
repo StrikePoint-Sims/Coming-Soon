@@ -222,6 +222,8 @@ export const bookingGuests = pgTable('booking_guests', {
   email: text('email'),
   phone: text('phone'),
   waiverSigningId: text('waiver_signing_id').references(() => waiverSignings.id),
+  // sha256 of the random URL token. The token itself is never stored.
+  accessTokenHash: text('access_token_hash'),
   codeSentAt: timestamp('code_sent_at', { withTimezone: true }),
   createdAt: createdAt(),
 })
@@ -388,6 +390,9 @@ export const corporateEvents = pgTable('corporate_events', {
 export const supportThreads = pgTable('support_threads', {
   id: id(),
   userId: text('user_id').references(() => users.id),
+  // Server-issued opaque id for anonymous visitors (cookie-bound). Lets us
+  // attach a thread to a session without trusting client-supplied threadIds.
+  anonId: text('anon_id'),
   channel: channelEnum('channel').notNull(),
   status: supportThreadStatusEnum('status').notNull().default('open'),
   escalatedAt: timestamp('escalated_at', { withTimezone: true }),

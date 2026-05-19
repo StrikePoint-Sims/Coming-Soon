@@ -300,6 +300,7 @@ export function FounderForm({ stripePublishableKey, initialMode = 'founder' }: F
 
   // ─ Stripe state ─
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null)
   const [fetchingIntent, setFetchingIntent] = useState(false)
   const [intentError, setIntentError] = useState('')
 
@@ -375,6 +376,7 @@ export function FounderForm({ stripePublishableKey, initialMode = 'founder' }: F
         selectedTier?.name ?? '',
       )
       setClientSecret(result.clientSecret)
+      setPaymentIntentId(result.paymentIntentId)
     } catch {
       setIntentError('Payment system unavailable. Please try again.')
     } finally {
@@ -490,6 +492,7 @@ export function FounderForm({ stripePublishableKey, initialMode = 'founder' }: F
       community: community === 'other' ? communityOther.trim() : community,
       priority: priority.join(', '),
       isFounder,
+      ...(isFounder && paymentIntentId ? { paymentIntentId } : {}),
     }).catch(console.error)
   }
 
