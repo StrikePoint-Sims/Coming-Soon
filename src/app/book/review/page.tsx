@@ -35,10 +35,28 @@ interface HoldDetails {
 }
 
 interface PaymentIntentResult {
-  clientSecret: string
+  clientSecret: string | null
+  requiresPayment: boolean
   subtotalCents: number
+  membershipDiscountCents: number
+  membershipMinutesApplied: number
+  membershipMinutesRemainingBefore: number
+  taxableCents: number
   taxCents: number
   totalCents: number
+}
+
+function membershipHoursLabel(minutes: number): string {
+  const hours = minutes / 60
+  return `${Number.isInteger(hours) ? hours.toFixed(0) : hours.toFixed(1)} membership hr${hours === 1 ? '' : 's'}`
+}
+
+function membershipDiscountLabel(pricing: PaymentIntentResult): string {
+  const applied = membershipHoursLabel(pricing.membershipMinutesApplied)
+  const remaining = membershipHoursLabel(pricing.membershipMinutesRemainingBefore)
+  return pricing.membershipMinutesApplied === pricing.membershipMinutesRemainingBefore
+    ? `Membership hours (${applied})`
+    : `Membership hours (${applied} of ${remaining})`
 }
 
 function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
@@ -97,6 +115,35 @@ function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
         {submitting ? 'Processing…' : `Confirm Reservation · $${(pricing.totalCents / 100).toFixed(2)}`}
       </button>
     </form>
+  )
+}
+
+function IncludedHoursConfirm({ holdId, pricing, onError }: CheckoutFormProps) {
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleConfirm() {
+    setSubmitting(true)
+    onError('')
+    const res = await fetch('/api/book/confirm-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ holdId, paymentIntentId: null }),
+    })
+    const result = await res.json() as { bookingId?: string; partySize?: number; error?: string }
+    if (!res.ok || result.error || !result.bookingId) {
+      onError(result.error ?? 'Could not confirm booking. Please contact us.')
+      setSubmitting(false)
+      return
+    }
+    window.location.href = (result.partySize ?? 1) > 1
+      ? `/book/${result.bookingId}/guests`
+      : `/book/${result.bookingId}`
+  }
+
+  return (
+    <button type="button" className="rv-confirm-btn" onClick={() => void handleConfirm()} disabled={submitting}>
+      {submitting ? 'Confirming...' : `Confirm Reservation · $${(pricing.totalCents / 100).toFixed(2)}`}
+    </button>
   )
 }
 
@@ -296,7 +343,9 @@ export default function ReviewPage() {
 
               {payError && <p className="rv-pay-error">{payError}</p>}
 
-              {clientSecret && pricing ? (
+              {pricing && !pricing.requiresPayment ? (
+                <IncludedHoursConfirm holdId={holdId} pricing={pricing} onError={setPayError} />
+              ) : clientSecret && pricing ? (
                 <Elements
                   stripe={stripePromise}
                   options={{
@@ -394,6 +443,12 @@ export default function ReviewPage() {
                     <span>Subtotal</span>
                     <span>${(pricing.subtotalCents / 100).toFixed(2)}</span>
                   </div>
+                  {pricing.membershipDiscountCents > 0 && (
+                    <div className="rv-summary-row">
+                      <span>{membershipDiscountLabel(pricing)}</span>
+                      <span>-${(pricing.membershipDiscountCents / 100).toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="rv-summary-row">
                     <span>Sales Tax (6.35%)</span>
                     <span>${(pricing.taxCents / 100).toFixed(2)}</span>

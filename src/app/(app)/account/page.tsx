@@ -1,8 +1,8 @@
 import { getCurrentUser } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/db'
-import { bays, bookings, memberships, membershipTiers, waiverSignings } from '@/db/schema'
-import { and, desc, eq, gt, gte, inArray, lt } from 'drizzle-orm'
+import { bays, bookings, membershipHourLedger, memberships, membershipTiers, waiverSignings } from '@/db/schema'
+import { and, desc, eq, gt, gte, inArray, lt, sql } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
 import { findBestSavings, summarizeUsage } from '@/lib/booking/usage'
@@ -94,6 +94,7 @@ export default async function AccountDashboardPage() {
       .innerJoin(membershipTiers, eq(memberships.tierId, membershipTiers.id))
       .where(and(
         eq(memberships.userId, user.id),
+        inArray(memberships.status, ['active', 'reactivated', 'trial']),
         gt(memberships.currentPeriodEnd, now),
       ))
       .limit(1),
@@ -129,6 +130,18 @@ export default async function AccountDashboardPage() {
   ])
 
   const usage = summarizeUsage(last30Bookings)
+  const [membershipUsage] = membership
+    ? await db
+      .select({
+        usedMinutes: sql<number>`coalesce(sum(case when ${membershipHourLedger.kind} = 'debit' then ${membershipHourLedger.minutes} when ${membershipHourLedger.kind} = 'refund' then -${membershipHourLedger.minutes} else 0 end), 0)`,
+      })
+      .from(membershipHourLedger)
+      .where(and(
+        eq(membershipHourLedger.membershipId, membership.id),
+        gte(membershipHourLedger.createdAt, membership.startedAt),
+        lt(membershipHourLedger.createdAt, membership.currentPeriodEnd),
+      ))
+    : [{ usedMinutes: 0 }]
   const nextBooking = upcomingBookings[0] ?? null
   const isMember = !!membership
   const savings = !isMember ? findBestSavings(usage) : null
@@ -167,7 +180,7 @@ export default async function AccountDashboardPage() {
             tierName={membership.tierName}
             startedAt={membership.startedAt}
             currentPeriodEnd={membership.currentPeriodEnd}
-            peakMinutesUsed={usage.peakMinutes}
+            peakMinutesUsed={Number(membershipUsage?.usedMinutes ?? 0)}
             peakMinutesIncluded={membership.includedPeakMinutes ?? 0}
           />
         ) : (
@@ -353,7 +366,7 @@ function MembershipCard({
       {peakHoursIncluded > 0 ? (
         <div className="dash-peak-tracker">
           <div className="dash-peak-row">
-            <span className="dash-peak-label">Peak hours this month</span>
+            <span className="dash-peak-label">Membership hours this period</span>
             <span className="dash-peak-value">{peakHoursUsed} <span>of {peakHoursIncluded}</span></span>
           </div>
           <div className="dash-peak-bar">

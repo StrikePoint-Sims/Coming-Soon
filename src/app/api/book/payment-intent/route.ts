@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { db } from '@/db'
 import { bookingHolds } from '@/db/schema'
+import { getActiveMembershipHourQuote } from '@/lib/booking/membership-hours'
 import { calculatePriceCents, CT_SALES_TAX } from '@/lib/booking/pricing'
 import { stripe } from '@/lib/stripe/client'
 import { and, eq, gt } from 'drizzle-orm'
@@ -35,8 +36,29 @@ export async function POST(req: NextRequest) {
   const startET = toZonedTime(hold.startsAt, FACILITY_TZ)
   const durationMinutes = Math.round((hold.endsAt.getTime() - hold.startsAt.getTime()) / 60_000)
   const subtotalCents = calculatePriceCents(startET.getHours(), startET.getMinutes(), durationMinutes, startET.getDay())
-  const taxCents = Math.round(subtotalCents * CT_SALES_TAX)
-  const totalCents = subtotalCents + taxCents
+  const memberHours = await getActiveMembershipHourQuote({
+    userId: session.user.id,
+    startsAt: hold.startsAt,
+    endsAt: hold.endsAt,
+    subtotalCents,
+  })
+  const taxableCents = Math.max(0, subtotalCents - memberHours.discountCents)
+  const taxCents = Math.round(taxableCents * CT_SALES_TAX)
+  const totalCents = taxableCents + taxCents
+
+  if (totalCents === 0) {
+    return NextResponse.json({
+      clientSecret: null,
+      requiresPayment: false,
+      subtotalCents,
+      membershipDiscountCents: memberHours.discountCents,
+      membershipMinutesApplied: memberHours.appliedMinutes,
+      membershipMinutesRemainingBefore: memberHours.remainingMinutes,
+      taxableCents,
+      taxCents,
+      totalCents,
+    }, { headers: { 'Cache-Control': 'no-store' } })
+  }
 
   const pi = await stripe.paymentIntents.create({
     amount: totalCents,
@@ -45,7 +67,9 @@ export async function POST(req: NextRequest) {
     metadata: {
       holdId: hold.id,
       userId: session.user.id,
-      bookingType: 'walk_in',
+      bookingType: memberHours.appliedMinutes > 0 ? 'member' : 'walk_in',
+      membershipDiscountCents: String(memberHours.discountCents),
+      membershipMinutesApplied: String(memberHours.appliedMinutes),
       startsAt: hold.startsAt.toISOString(),
       endsAt: hold.endsAt.toISOString(),
     },
@@ -55,7 +79,12 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     clientSecret: pi.client_secret,
+    requiresPayment: true,
     subtotalCents,
+    membershipDiscountCents: memberHours.discountCents,
+    membershipMinutesApplied: memberHours.appliedMinutes,
+    membershipMinutesRemainingBefore: memberHours.remainingMinutes,
+    taxableCents,
     taxCents,
     totalCents,
   }, { headers: { 'Cache-Control': 'no-store' } })

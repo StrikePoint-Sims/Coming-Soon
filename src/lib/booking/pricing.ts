@@ -64,6 +64,17 @@ export function calculatePriceCents(
   return totalCents
 }
 
+export function calculateCoveredMinutesValueCents(
+  startHourET: number,
+  startMinuteET: number,
+  durationMinutes: number,
+  coveredMinutes: number,
+  dayOfWeek: number,
+): number {
+  const minutesToCover = Math.max(0, Math.min(durationMinutes, coveredMinutes))
+  return calculatePriceCents(startHourET, startMinuteET, minutesToCover, dayOfWeek)
+}
+
 export function formatPrice(cents: number): string {
   return '$' + (cents / 100).toFixed(2)
 }

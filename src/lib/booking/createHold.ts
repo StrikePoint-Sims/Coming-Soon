@@ -10,6 +10,9 @@ import {
 import { clearAvailabilityCacheForRange } from './cache'
 import { inngest } from '@/lib/inngest/client'
 import { nanoid } from '@/lib/utils'
+import { getActiveMembershipHourQuote, insertMembershipHourDebit, refundEligibleMembershipHours } from './membership-hours'
+import { calculatePriceCents, CT_SALES_TAX } from './pricing'
+import { toZonedTime } from 'date-fns-tz'
 
 const HOLD_TTL_MINUTES = 12
 const FNV_OFFSET_BASIS_64 = BigInt('1469598103934665603')
@@ -152,7 +155,7 @@ export async function confirmHoldAsBooking(params: {
   type: 'member' | 'walk_in' | 'day_pass' | 'trial' | 'corporate' | 'league' | 'lesson'
   totalCents: number
   paymentIntentId?: string
-}): Promise<{ bookingId: string; partySize: number } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' }> {
+}): Promise<{ bookingId: string; partySize: number } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' | 'payment_mismatch' }> {
   const bookingId = nanoid()
   const paymentId = nanoid()
 
@@ -180,25 +183,47 @@ export async function confirmHoldAsBooking(params: {
     const peak = await consumedCount(tx, hold.locationId, startsAt, endsAt)
     if (peak > CAPACITY_TOTAL) return { error: 'capacity_unavailable' as const }
 
+    const startET = toZonedTime(startsAt, 'America/New_York')
+    const durationMinutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
+    const subtotalCents = calculatePriceCents(startET.getHours(), startET.getMinutes(), durationMinutes, startET.getDay())
+    const memberHours = await getActiveMembershipHourQuote({
+      userId: hold.userId,
+      startsAt,
+      endsAt,
+      subtotalCents,
+      db: tx as unknown as typeof txDb,
+    })
+    const taxableCents = Math.max(0, subtotalCents - memberHours.discountCents)
+    const taxCents = Math.round(taxableCents * CT_SALES_TAX)
+    const totalCents = taxableCents + taxCents
+
+    if (params.totalCents !== totalCents) return { error: 'payment_mismatch' as const }
+
     await tx.insert(bookings).values({
       id: bookingId,
       locationId: hold.locationId,
       bayId: null,
       userId: hold.userId,
-      type: params.type,
+      type: memberHours.appliedMinutes > 0 ? 'member' : params.type,
       startsAt,
       endsAt,
       partySize: hold.partySize,
       status: 'confirmed',
-      totalCents: params.totalCents,
+      totalCents,
       paidAt: new Date(),
     })
-    if (params.paymentIntentId && params.totalCents > 0) {
+    await insertMembershipHourDebit({
+      db: tx as unknown as typeof txDb,
+      userId: hold.userId,
+      bookingId,
+      quote: memberHours,
+    })
+    if (params.paymentIntentId && totalCents > 0) {
       await tx.insert(payments).values({
         id: paymentId,
         userId: hold.userId,
         bookingId,
-        amountCents: params.totalCents,
+        amountCents: totalCents,
         processor: 'stripe',
         processorRef: params.paymentIntentId,
         type: 'charge',
@@ -220,7 +245,10 @@ export async function confirmHoldAsBooking(params: {
       targetId: bookingId,
       payloadJson: {
         startsAt: startsAt.toISOString(),
-        totalCents: params.totalCents,
+        subtotalCents,
+        membershipDiscountCents: memberHours.discountCents,
+        membershipMinutesApplied: memberHours.appliedMinutes,
+        totalCents,
         paymentIntentId: params.paymentIntentId,
       },
       at: new Date(),
@@ -252,13 +280,20 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     const rows = await tx.select().from(bookings).where(eq(bookings.id, bookingId)).limit(1)
     const b = rows[0]
     if (!b) return null
+    const cancelledAt = new Date()
     await tx
       .update(bookings)
-      .set({ status: 'cancelled', cancelledAt: new Date(), cancellationReason: reason ?? null })
+      .set({ status: 'cancelled', cancelledAt, cancellationReason: reason ?? null })
       .where(eq(bookings.id, bookingId))
+    const membershipRefund = await refundEligibleMembershipHours({
+      db: tx as unknown as typeof txDb,
+      bookingId,
+      cancelledAt,
+    })
     return {
       startsAt: new Date(b.startsAt as unknown as string),
       endsAt: new Date(b.endsAt as unknown as string),
+      membershipRefund,
     }
   })
   if (result) await clearAvailabilityCacheForRange(result.startsAt, result.endsAt)

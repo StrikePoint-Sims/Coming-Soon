@@ -215,6 +215,17 @@ export const bookings = pgTable('bookings', {
   updatedAt: updatedAt(),
 })
 
+export const membershipHourLedger = pgTable('membership_hour_ledger', {
+  id: id(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  membershipId: text('membership_id').notNull().references(() => memberships.id, { onDelete: 'cascade' }),
+  bookingId: text('booking_id').references(() => bookings.id),
+  kind: text('kind').notNull(), // 'debit' | 'refund'
+  minutes: integer('minutes').notNull(),
+  amountCents: integer('amount_cents').notNull().default(0),
+  createdAt: createdAt(),
+})
+
 export const bookingGuests = pgTable('booking_guests', {
   id: id(),
   bookingId: text('booking_id').notNull().references(() => bookings.id),
