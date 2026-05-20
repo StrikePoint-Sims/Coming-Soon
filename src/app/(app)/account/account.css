@@ -3828,12 +3828,17 @@ select.st-form-input {
 
 .gw-add-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 10px;
   align-items: end;
 }
 
-.gw-add-form .gw-field:first-child {
+/* Next.js server actions inject a hidden input as the real :first-child */
+.gw-add-form .gw-field:first-of-type {
+  grid-column: 1 / -1;
+}
+
+.gw-add-submit {
   grid-column: 1 / -1;
 }
 
