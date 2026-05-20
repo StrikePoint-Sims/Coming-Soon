@@ -23,7 +23,7 @@ export async function GET(
       bayLabel: bays.label,
     })
     .from(bookings)
-    .innerJoin(bays, eq(bookings.bayId, bays.id))
+    .leftJoin(bays, eq(bookings.bayId, bays.id))
     .where(and(
       eq(bookings.id, bookingId),
       eq(bookings.userId, session.user.id),
@@ -35,7 +35,7 @@ export async function GET(
 
   return NextResponse.json({
     partySize: booking.partySize,
-    bayLabel: booking.bayLabel,
+    bayLabel: booking.bayLabel ?? 'Assigned before your session',
     dateLabel: formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d'),
     timeRange: `${formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')} – ${formatInTimeZone(booking.endsAt, FACILITY_TZ, 'h:mm a')}`,
   })

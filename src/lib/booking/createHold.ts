@@ -1,6 +1,6 @@
 import { sql, and, eq, gt, lt, inArray } from 'drizzle-orm'
 import { txDb } from './tx'
-import { bookings, bookingHolds, bookingBlocks } from '@/db/schema'
+import { auditLog, bookings, bookingHolds, bookingBlocks, payments } from '@/db/schema'
 import {
   CAPACITY_TOTAL,
   DEFAULT_SLOT_MINUTES,
@@ -8,6 +8,7 @@ import {
   facilityDateKey,
 } from './capacity'
 import { clearAvailabilityCacheForRange } from './cache'
+import { inngest } from '@/lib/inngest/client'
 import { nanoid } from '@/lib/utils'
 
 const HOLD_TTL_MINUTES = 12
@@ -21,6 +22,7 @@ export interface HoldRequest {
   locationId: string
   startsAt: Date
   endsAt: Date
+  partySize?: number
 }
 
 export interface HoldResult {
@@ -133,6 +135,7 @@ export async function createHold(req: HoldRequest): Promise<HoldResult> {
       endsAt: req.endsAt,
       expiresAt,
       status: 'active',
+      partySize: Math.min(4, Math.max(1, req.partySize ?? 1)),
     })
 
     return { id, expiresAt }
@@ -148,10 +151,12 @@ export async function confirmHoldAsBooking(params: {
   holdId: string
   type: 'member' | 'walk_in' | 'day_pass' | 'trial' | 'corporate' | 'league' | 'lesson'
   totalCents: number
-}): Promise<{ bookingId: string } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' }> {
+  paymentIntentId?: string
+}): Promise<{ bookingId: string; partySize: number } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' }> {
   const bookingId = nanoid()
+  const paymentId = nanoid()
 
-  return await txDb.transaction(async (tx) => {
+  const result = await txDb.transaction(async (tx) => {
     const rows = await tx
       .select()
       .from(bookingHolds)
@@ -159,7 +164,9 @@ export async function confirmHoldAsBooking(params: {
       .limit(1)
     const hold = rows[0]
     if (!hold) return { error: 'hold_missing' as const }
-    if (hold.status !== 'active') return { error: 'hold_not_active' as const }
+    if (hold.status !== 'active' || new Date(hold.expiresAt as unknown as string) <= new Date()) {
+      return { error: 'hold_not_active' as const }
+    }
 
     const startsAt = new Date(hold.startsAt as unknown as string)
     const endsAt = new Date(hold.endsAt as unknown as string)
@@ -181,19 +188,63 @@ export async function confirmHoldAsBooking(params: {
       type: params.type,
       startsAt,
       endsAt,
+      partySize: hold.partySize,
       status: 'confirmed',
       totalCents: params.totalCents,
       paidAt: new Date(),
     })
+    if (params.paymentIntentId && params.totalCents > 0) {
+      await tx.insert(payments).values({
+        id: paymentId,
+        userId: hold.userId,
+        bookingId,
+        amountCents: params.totalCents,
+        processor: 'stripe',
+        processorRef: params.paymentIntentId,
+        type: 'charge',
+        status: 'succeeded',
+        idempotencyKey: `booking-${params.paymentIntentId}`,
+        description: `Bay booking ${bookingId}`,
+      })
+    }
     await tx
       .update(bookingHolds)
       .set({ status: 'consumed' })
       .where(eq(bookingHolds.id, hold.id))
+    await tx.insert(auditLog).values({
+      id: nanoid(),
+      actorType: 'user',
+      actorId: hold.userId,
+      action: 'booking.created',
+      targetType: 'booking',
+      targetId: bookingId,
+      payloadJson: {
+        startsAt: startsAt.toISOString(),
+        totalCents: params.totalCents,
+        paymentIntentId: params.paymentIntentId,
+      },
+      at: new Date(),
+    })
 
     // Cache clear after commit, but we're still in tx — defer via process.nextTick.
     queueMicrotask(() => { void clearAvailabilityCacheForRange(startsAt, endsAt) })
-    return { bookingId }
+    return {
+      bookingId,
+      partySize: hold.partySize,
+      userId: hold.userId,
+      locationId: hold.locationId,
+    }
   })
+
+  if (!('error' in result)) {
+    await inngest.send({
+      name: 'booking/created',
+      data: { bookingId: result.bookingId, userId: result.userId, locationId: result.locationId },
+    }).catch(console.error)
+    return { bookingId: result.bookingId, partySize: result.partySize }
+  }
+
+  return result
 }
 
 export async function cancelBooking(bookingId: string, reason?: string) {

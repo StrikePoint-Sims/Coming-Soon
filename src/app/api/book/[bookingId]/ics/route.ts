@@ -33,7 +33,7 @@ export async function GET(
       bayLabel: bays.label,
     })
     .from(bookings)
-    .innerJoin(bays, eq(bookings.bayId, bays.id))
+    .leftJoin(bays, eq(bookings.bayId, bays.id))
     .where(and(eq(bookings.id, bookingId), eq(bookings.userId, session.user.id)))
     .limit(1)
 
@@ -42,7 +42,7 @@ export async function GET(
   }
 
   const uid = `booking-${booking.id}@strikepointsims.com`
-  const summary = escapeIcs(`StrikePoint Sims — ${booking.bayLabel}`)
+  const summary = escapeIcs(`StrikePoint Sims - ${booking.bayLabel ?? 'Bay assigned before session'}`)
   const description = escapeIcs('Your golf simulator session at StrikePoint Sims. Your access code will arrive by SMS 1 hour before your session.')
   const location = escapeIcs('StrikePoint Sims')
   const now = icsDate(new Date())

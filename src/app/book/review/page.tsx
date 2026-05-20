@@ -10,14 +10,6 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js'
-import {
-  getHoldDetails,
-  createPaymentIntent,
-  confirmBookingAfterPayment,
-  releaseHold,
-  type HoldDetails,
-  type PaymentIntentResult,
-} from '../actions'
 
 const stripePublishableKey = process.env['NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY'] ?? ''
 const stripePromise = stripePublishableKey
@@ -28,6 +20,25 @@ interface CheckoutFormProps {
   holdId: string
   pricing: PaymentIntentResult
   onError: (msg: string) => void
+}
+
+interface HoldDetails {
+  holdId: string
+  bayLabel: string
+  startsAt: string
+  endsAt: string
+  expiresAt: string
+  durationMinutes: number
+  partySize: number
+  dateLabel: string
+  timeRange: string
+}
+
+interface PaymentIntentResult {
+  clientSecret: string
+  subtotalCents: number
+  taxCents: number
+  totalCents: number
 }
 
 function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
@@ -57,14 +68,19 @@ function CheckoutForm({ holdId, pricing, onError }: CheckoutFormProps) {
     }
 
     if (paymentIntent?.status === 'succeeded') {
-      const result = await confirmBookingAfterPayment(holdId, paymentIntent.id)
-      if ('error' in result) {
-        onError(result.error)
+      const res = await fetch('/api/book/confirm-payment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ holdId, paymentIntentId: paymentIntent.id }),
+      })
+      const result = await res.json() as { bookingId?: string; partySize?: number; error?: string }
+      if (!res.ok || result.error || !result.bookingId) {
+        onError(result.error ?? 'Could not confirm booking. Please contact us.')
         setSubmitting(false)
         return
       }
       // If party has guests, send them to the add-guests step first.
-      window.location.href = result.partySize > 1
+      window.location.href = (result.partySize ?? 1) > 1
         ? `/book/${result.bookingId}/guests`
         : `/book/${result.bookingId}`
       return
@@ -108,19 +124,26 @@ export default function ReviewPage() {
         return
       }
 
-      const [detailsRes, piRes] = await Promise.all([
-        getHoldDetails(holdId),
-        createPaymentIntent(holdId),
+      const [detailsResponse, piResponse] = await Promise.all([
+        fetch(`/api/hold?holdId=${encodeURIComponent(holdId)}`, { cache: 'no-store' }),
+        fetch('/api/book/payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ holdId }),
+        }),
       ])
 
-      if ('error' in detailsRes) {
-        setPageError(detailsRes.error)
+      const detailsRes = await detailsResponse.json() as HoldDetails & { error?: string }
+      const piRes = await piResponse.json() as PaymentIntentResult & { error?: string }
+
+      if (!detailsResponse.ok || detailsRes.error) {
+        setPageError(detailsRes.error ?? 'Hold expired or not found.')
         setLoading(false)
         return
       }
 
-      if ('error' in piRes) {
-        setPageError(piRes.error)
+      if (!piResponse.ok || piRes.error) {
+        setPageError(piRes.error ?? 'Payment setup failed. Please try again.')
         setLoading(false)
         return
       }
@@ -137,7 +160,9 @@ export default function ReviewPage() {
   async function handleBack() {
     if (releasingHold) return
     setReleasingHold(true)
-    if (holdId) await releaseHold(holdId)
+    if (holdId) {
+      await fetch(`/api/hold?holdId=${encodeURIComponent(holdId)}`, { method: 'DELETE' })
+    }
     window.location.href = '/book'
   }
 
