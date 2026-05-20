@@ -3845,6 +3845,7 @@ select.st-form-input {
 .gw-field {
   display: grid;
   gap: 7px;
+  min-width: 0;
 }
 
 .gw-field span {
