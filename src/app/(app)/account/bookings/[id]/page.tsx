@@ -64,7 +64,7 @@ export default async function ManageBookingPage({
   const now = new Date()
   const isFuture = booking.startsAt > now
   const isCancellable = isFuture && booking.status !== 'cancelled'
-  const bookingTitle = `${formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d')} at ${formatInTimeZone(booking.startsAt, FACILITY_TZ, 'h:mm a')}`
+  const bookingTitle = formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEEE, MMMM d')
 
   const [waiver] = await db
     .select({ expiresAt: waiverSignings.expiresAt })
@@ -73,6 +73,7 @@ export default async function ManageBookingPage({
     .orderBy(desc(waiverSignings.signedAt))
     .limit(1)
 
+  const bayRevealed = !isFuture || (booking.startsAt.getTime() - now.getTime() <= 60 * 60_000)
   const confirmationNum = `SPC-${id.slice(0, 6).toUpperCase()}-${id.slice(-4).toUpperCase()}`
 
   const [accessCode] = await db
@@ -170,38 +171,14 @@ export default async function ManageBookingPage({
             </div>
           </div>
 
-          <div className="mb-res-item">
-            <div className="mb-res-icon">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <rect x="2" y="3" width="16" height="14" rx="2"/>
-                <path d="M2 7h16"/>
-              </svg>
-            </div>
-            <div>
-              <p className="mb-res-label">Bay</p>
-              <p className="mb-res-value">{booking.bayLabel ?? 'TBD'}</p>
-            </div>
-          </div>
-
-          <div className="mb-res-item">
-            <div className="mb-res-icon">
-              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                <rect x="2" y="5" width="16" height="11" rx="2"/>
-                <path d="M2 9h16"/>
-              </svg>
-            </div>
-            <div>
-              <p className="mb-res-label">Total</p>
-              <p className="mb-res-value">
-                {booking.totalCents > 0 ? `$${(booking.totalCents / 100).toFixed(2)}` : 'Free'}
-                {booking.paidAt && <span className="mb-res-paid"> · Paid</span>}
-              </p>
-            </div>
-          </div>
         </div>
 
         <p className="mb-conf-num">
-          Confirmation: <span>{confirmationNum}</span>
+          <span>
+            {booking.totalCents > 0 ? `$${(booking.totalCents / 100).toFixed(2)}` : 'Free'}
+            {booking.paidAt && <span className="mb-res-paid"> · Paid</span>}
+          </span>
+          <span>Confirmation: <span>{confirmationNum}</span></span>
         </p>
       </div>
 
@@ -267,6 +244,18 @@ export default async function ManageBookingPage({
               </p>
             ) : (
               <p className="mb-waiver-status">No access code on record.</p>
+            )}
+          </div>
+        </div>
+        <div className="mb-waiver-row" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: 14, marginTop: 6 }}>
+          <div className="mb-waiver-info">
+            <p className="mb-waiver-label">Assigned Bay</p>
+            {bayRevealed && booking.bayLabel ? (
+              <p className="mb-waiver-status valid">{booking.bayLabel}</p>
+            ) : (
+              <p className="mb-waiver-status">
+                Sent via text message and email 1 hour before your session.
+              </p>
             )}
           </div>
         </div>

@@ -158,7 +158,7 @@ export default async function AccountDashboardPage() {
       )}
 
       <SessionTicker nextBooking={nextBooking} now={now} />
-      <NextSessionCard nextBooking={nextBooking} />
+      <NextSessionCard nextBooking={nextBooking} now={now} />
       <QuickRebook recentBookings={recentBookings} />
 
       <div className="dash-grid-2 dash-main-grid">
@@ -226,7 +226,7 @@ function SessionTicker({ nextBooking, now }: { nextBooking: BookingSummary | nul
   )
 }
 
-function NextSessionCard({ nextBooking }: { nextBooking: BookingSummary | null }) {
+function NextSessionCard({ nextBooking, now }: { nextBooking: BookingSummary | null; now: Date }) {
   if (!nextBooking) {
     return (
       <section className="dash-next-card is-empty">
@@ -253,7 +253,8 @@ function NextSessionCard({ nextBooking }: { nextBooking: BookingSummary | null }
           <div>
             <span className="dash-section-label gold">NEXT SESSION</span>
             <h2>
-              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')}{nextBooking.bayLabel ? ` · ${nextBooking.bayLabel}` : ''}
+              {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'h:mm a')} - {formatInTimeZone(nextBooking.endsAt, FACILITY_TZ, 'h:mm a')}
+              {nextBooking.startsAt.getTime() - now.getTime() <= 60 * 60_000 && nextBooking.bayLabel ? ` · ${nextBooking.bayLabel}` : ''}
             </h2>
             <p>
               {formatInTimeZone(nextBooking.startsAt, FACILITY_TZ, 'MMMM d, yyyy')} · {durationLabel(nextBooking.startsAt, nextBooking.endsAt)}

@@ -228,19 +228,6 @@ export default async function BookingConfirmedPage({
               </div>
             </div>
 
-            <div className="conf-summary-row">
-              <span className="conf-summary-icon">
-                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
-                  <rect x="2" y="3" width="16" height="14" rx="2"/>
-                  <path d="M2 7h16"/>
-                </svg>
-              </span>
-              <div>
-                <p className="conf-summary-label">Bay</p>
-                <p className="conf-summary-value">{booking.bayLabel ?? 'TBD'}</p>
-              </div>
-            </div>
-
             <div className="conf-total-row">
               <span className="conf-total-label">Total</span>
               <span className="conf-total-value">
