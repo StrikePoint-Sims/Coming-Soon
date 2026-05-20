@@ -1039,6 +1039,61 @@
   transition: width 0.4s ease;
 }
 
+.dash-hour-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 10px;
+}
+
+.dash-hour-stat {
+  min-width: 0;
+  padding: 10px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.dash-hour-stat-value,
+.dash-hour-stat-label {
+  display: block;
+  text-align: center;
+}
+
+.dash-hour-stat-value {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dash-hour-stat-label {
+  margin-top: 5px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.dash-hour-stat.used {
+  border-color: rgba(169, 120, 69, 0.18);
+}
+
+.dash-hour-stat.reserved {
+  border-color: rgba(143, 166, 94, 0.2);
+}
+
+.dash-hour-stat.available {
+  background: rgba(143, 166, 94, 0.07);
+  border-color: rgba(143, 166, 94, 0.24);
+}
+
+.dash-hour-stat.available .dash-hour-stat-value {
+  color: #8fa65e;
+}
+
 .dash-peak-sub {
   font-size: 0.74rem;
   color: rgba(255, 255, 255, 0.4);
