@@ -379,7 +379,7 @@ export default function BookPage() {
                           </div>
                         )}
                         <button
-                        className={`book-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
+                        className={`book-slot ${rateCategory.key}${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                         onClick={() => {
                           if (isBooked) return
                           const bay = avail[0]
@@ -564,7 +564,7 @@ export default function BookPage() {
                       </div>
                     )}
                     <button
-                    className={`book-m-slot${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
+                    className={`book-m-slot ${rateCategory.key}${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                     onClick={() => {
                       if (isBooked) return
                       const bay = avail[0]
