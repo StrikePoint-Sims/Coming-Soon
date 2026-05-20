@@ -5,6 +5,7 @@ import { bookings, membershipHourLedger, memberships, membershipTiers, payments 
 import { eq, and, gt, desc, gte, inArray, lt } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
+import { nextUpgradePlanId, planIdForTierName } from '@/lib/memberships/plans'
 import '../account.css'
 
 export const metadata: Metadata = {
@@ -135,7 +136,9 @@ export default async function MembershipBillingPage() {
   const availableMinutes = Math.max(0, includedMinutes - membershipHourSummary.usedMinutes - membershipHourSummary.reservedMinutes)
   const committedMinutes = Math.min(includedMinutes, membershipHourSummary.usedMinutes + membershipHourSummary.reservedMinutes)
   const committedPct = includedMinutes > 0 ? Math.min(100, (committedMinutes / includedMinutes) * 100) : 0
-  const canUpgrade = membership ? membership.tierName !== 'Elite' : false
+  const currentPlanId = planIdForTierName(membership?.tierName)
+  const upgradePlanId = currentPlanId ? nextUpgradePlanId(currentPlanId) : null
+  const canUpgrade = !!upgradePlanId
 
   return (
     <div className="dash-page dash-page-v2 dash-subpage">
@@ -212,7 +215,14 @@ export default async function MembershipBillingPage() {
                 )}
 
                 <div className="st-action-row" style={{ marginTop: 16 }}>
-                  {canUpgrade && <a href="/memberships" className="dash-btn ghost">Upgrade Membership</a>}
+                  {canUpgrade && (
+                    <a
+                      href={`/memberships/checkout?plan=${upgradePlanId}&billing=${membership.isAnnual ? 'annual' : 'monthly'}`}
+                      className="dash-btn ghost"
+                    >
+                      Upgrade Membership
+                    </a>
+                  )}
                   <a href="mailto:operations@strikepointsims.com?subject=Membership%20Cancel" className="dash-btn danger">
                     Cancel Membership
                   </a>

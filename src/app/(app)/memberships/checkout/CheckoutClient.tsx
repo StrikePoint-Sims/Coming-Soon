@@ -81,7 +81,9 @@ function MembershipPaymentForm({
     <form onSubmit={event => void handleSubmit(event)} className="mc-pay-form">
       <PaymentElement options={{ layout: 'tabs' }} />
       <button type="submit" className="mc-submit" disabled={!stripe || submitting}>
-        {submitting ? 'Processing...' : `Start Membership - ${(intent.amountCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}`}
+        {submitting
+          ? 'Processing...'
+          : `${intent.mode === 'upgrade' ? 'Upgrade Membership' : 'Start Membership'} - ${(intent.amountCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })}`}
       </button>
     </form>
   )
@@ -93,6 +95,7 @@ export function CheckoutClient({ plan: rawPlan, billing: rawBilling }: CheckoutC
   const plan = MEMBERSHIP_PLANS[planId]
   const amountCents = membershipAmountCents(plan, billing)
   const [intent, setIntent] = useState<MembershipCheckoutIntent | null>(null)
+  const displayAmountCents = intent?.amountCents ?? amountCents
   const [pageError, setPageError] = useState('')
   const [payError, setPayError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -131,7 +134,7 @@ export function CheckoutClient({ plan: rawPlan, billing: rawBilling }: CheckoutC
         <div className="mc-hero">
           <span className="mc-eyebrow">Membership checkout</span>
           <h1>Review &amp; Pay</h1>
-          <p>Join StrikePoint as a {plan.name} member</p>
+          <p>{intent?.mode === 'upgrade' ? `Upgrade to ${plan.name}` : `Join StrikePoint as a ${plan.name} member`}</p>
         </div>
 
         <div className="mc-grid">
@@ -212,13 +215,23 @@ export function CheckoutClient({ plan: rawPlan, billing: rawBilling }: CheckoutC
             <div className="mc-plan-card">
               <div>
                 <p className="mc-plan-name">{plan.name}</p>
-                <p className="mc-plan-sub">{billing === 'annual' ? 'Annual billing' : 'Monthly billing'}</p>
+                <p className="mc-plan-sub">
+                  {intent?.mode === 'upgrade' && intent.currentPlanName
+                    ? `${intent.currentPlanName} to ${plan.name}`
+                    : billing === 'annual' ? 'Annual billing' : 'Monthly billing'}
+                </p>
               </div>
               <div className="mc-price">
-                <span>{formatPrice(amountCents)}</span>
-                <small>/{billing === 'annual' ? 'yr' : 'mo'}</small>
+                <span>{formatPrice(displayAmountCents)}</span>
+                <small>{intent?.mode === 'upgrade' ? 'today' : `/${billing === 'annual' ? 'yr' : 'mo'}`}</small>
               </div>
             </div>
+
+            {intent?.mode === 'upgrade' && (
+              <p className="mc-annual-note">
+                Upgrade charge is the monthly price difference prorated across {intent.proratedDays} remaining day{intent.proratedDays === 1 ? '' : 's'} out of {intent.prorationBaseDays} this month. Partial days count as full days.
+              </p>
+            )}
 
             <div className="mc-includes">
               <div>

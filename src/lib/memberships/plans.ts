@@ -70,3 +70,15 @@ export function parseBilling(raw?: string | null): MembershipBilling {
 export function membershipAmountCents(plan: MembershipPlanConfig, billing: MembershipBilling): number {
   return billing === 'annual' ? plan.annualPriceCents : plan.monthlyPriceCents
 }
+
+export function planIdForTierName(name?: string | null): MembershipPlanId | null {
+  const normalized = name?.toLowerCase()
+  if (normalized === 'practice' || normalized === 'standard' || normalized === 'elite') return normalized
+  return null
+}
+
+export function nextUpgradePlanId(planId: MembershipPlanId): MembershipPlanId | null {
+  if (planId === 'practice') return 'standard'
+  if (planId === 'standard') return 'elite'
+  return null
+}
