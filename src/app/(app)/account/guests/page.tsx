@@ -2,7 +2,7 @@ import { getCurrentUser } from '@/auth'
 import { redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { db } from '@/db'
-import { bays, bookingGuests, bookings, waiverSignings } from '@/db/schema'
+import { bookingGuests, bookings, waiverSignings } from '@/db/schema'
 import { and, desc, eq, gt } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import { addAccountGuest, sendAllGuestWaiverLinks, sendGuestWaiverLinkAction } from './actions'
@@ -27,6 +27,11 @@ function initials(name: string): string {
 function statusFor(expiresAt?: Date | null): GuestStatus {
   if (!expiresAt) return 'pending'
   return expiresAt > new Date() ? 'signed' : 'expired'
+}
+
+function durationLabel(startsAt: Date, endsAt: Date): string {
+  const min = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
+  return min % 60 === 0 ? `${min / 60} hr` : `${(min / 60).toFixed(1)} hr`
 }
 
 function messageFor(searchParams: { added?: string; sent?: string; error?: string }) {
@@ -59,12 +64,10 @@ export default async function GuestsWaiversPage({
         phone: bookingGuests.phone,
         startsAt: bookings.startsAt,
         endsAt: bookings.endsAt,
-        bayLabel: bays.label,
         waiverExpiresAt: waiverSignings.expiresAt,
       })
       .from(bookingGuests)
       .innerJoin(bookings, eq(bookingGuests.bookingId, bookings.id))
-      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .leftJoin(waiverSignings, eq(bookingGuests.waiverSigningId, waiverSignings.id))
       .where(eq(bookings.userId, user.id))
       .orderBy(desc(bookings.startsAt)),
@@ -74,10 +77,8 @@ export default async function GuestsWaiversPage({
         id: bookings.id,
         startsAt: bookings.startsAt,
         endsAt: bookings.endsAt,
-        bayLabel: bays.label,
       })
       .from(bookings)
-      .leftJoin(bays, eq(bookings.bayId, bays.id))
       .where(and(eq(bookings.userId, user.id), gt(bookings.startsAt, now)))
       .orderBy(bookings.startsAt),
   ])
@@ -127,28 +128,28 @@ export default async function GuestsWaiversPage({
                 <a href="/book" className="dash-btn primary dash-btn-full">Book a Bay</a>
               </div>
             ) : (
-              <form action={addAccountGuest} className="gw-add-form">
+              <form action={addAccountGuest} className="gw-add-form" autoComplete="off">
                 <label className="gw-field">
                   <span>Booking</span>
                   <select name="bookingId" className="gw-input" required>
                     {upcomingBookings.map(booking => (
                       <option key={booking.id} value={booking.id}>
-                        {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')}{booking.bayLabel ? ` - ${booking.bayLabel}` : ''}
+                        {formatInTimeZone(booking.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {durationLabel(booking.startsAt, booking.endsAt)}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label className="gw-field">
                   <span>Name</span>
-                  <input name="name" className="gw-input" placeholder="Guest name" required />
+                  <input name="name" className="gw-input" placeholder="Guest name" autoComplete="off" required />
                 </label>
                 <label className="gw-field">
                   <span>Phone</span>
-                  <input name="phone" className="gw-input" placeholder="(203) 555-0100" />
+                  <input name="phone" className="gw-input" type="tel" placeholder="(203) 555-0100" autoComplete="off" />
                 </label>
                 <label className="gw-field">
                   <span>Email optional</span>
-                  <input name="email" className="gw-input" type="email" placeholder="guest@example.com" />
+                  <input name="email" className="gw-input" type="email" placeholder="guest@example.com" autoComplete="off" />
                 </label>
                 <button type="submit" className="dash-btn primary gw-add-submit">Add Guest</button>
               </form>
@@ -185,7 +186,7 @@ export default async function GuestsWaiversPage({
                           {[g.email, g.phone].filter(Boolean).join(' - ') || 'No contact on file'}
                         </p>
                         <p className="gw-booking-line">
-                          {formatInTimeZone(g.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')}{g.bayLabel ? ` - ${g.bayLabel}` : ''}
+                          {formatInTimeZone(g.startsAt, FACILITY_TZ, 'EEE, MMM d, h:mm a')} - {durationLabel(g.startsAt, g.endsAt)}
                         </p>
                       </div>
                       <div className="gw-status-col">
