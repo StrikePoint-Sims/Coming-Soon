@@ -1863,6 +1863,24 @@
   height: 16px;
 }
 
+.mb-cancel-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mb-cancel-wrap .mb-action {
+  width: 100%;
+}
+
+.mb-cancel-error {
+  max-width: 240px;
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #e8735a;
+}
+
 /* ── Waiver row ───────────────────────────────────────────────────────────── */
 
 .mb-waiver-row {

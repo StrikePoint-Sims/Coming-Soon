@@ -199,7 +199,7 @@ export default async function BookingsPage({
                     </svg>
                     View Details
                   </a>
-                  <a href={`/account/bookings/${nextBooking.id}#change`} className="dash-btn ghost bk-action-btn">
+                  <a href="/book" className="dash-btn ghost bk-action-btn">
                     <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
                       <circle cx="9" cy="9" r="7"/>
                       <path d="M9 5v4l3 2"/>

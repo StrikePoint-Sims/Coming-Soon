@@ -5,6 +5,7 @@ import { accessCodes, bookings, bays, waiverSignings } from '@/db/schema'
 import { eq, and, gt, desc } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
+import { CancelBookingButton } from './CancelBookingButton'
 import '../../account.css'
 
 export const metadata: Metadata = {
@@ -185,7 +186,7 @@ export default async function ManageBookingPage({
       {/* ── Action buttons ──────────────────────────────────────────────── */}
       {isFuture && (
         <div className="mb-action-row">
-          <a href="#change" className="dash-btn ghost mb-action">
+          <a href="/book" className="dash-btn ghost mb-action">
             <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
               <circle cx="9" cy="9" r="7"/>
               <path d="M9 5v4l3 2"/>
@@ -201,12 +202,7 @@ export default async function ManageBookingPage({
             Add Guests
           </a>
           {isCancellable && (
-            <button className="dash-btn danger mb-action" type="button">
-              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 5h12M6 5V3a1 1 0 011-1h4a1 1 0 011 1v2M5 5l1 10h6l1-10"/>
-              </svg>
-              Cancel Booking
-            </button>
+            <CancelBookingButton bookingId={booking.id} />
           )}
         </div>
       )}
