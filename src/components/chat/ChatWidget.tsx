@@ -203,10 +203,28 @@ export function ChatWidget() {
             }}
           >
             <span style={{ fontSize: '20px' }}>⛳</span>
-            <div>
+            <div style={{ flex: 1 }}>
               <div style={{ fontWeight: 600, color: '#A97845', fontSize: '14px' }}>Striker</div>
               <div style={{ fontSize: '11px', color: '#aaa' }}>StrikePoint Sims Support</div>
             </div>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close chat"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'rgba(255,255,255,0.5)',
+                cursor: 'pointer',
+                fontSize: '18px',
+                lineHeight: 1,
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              ✕
+            </button>
           </div>
 
           {/* Messages */}
