@@ -1,5 +1,6 @@
 import { auth } from '@/auth'
 import { LoginForm } from '@/components/auth/LoginForm'
+import { env } from '@/env'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
@@ -25,7 +26,13 @@ export default async function LoginPage({
     redirect('/account')
   }
 
-  return <LoginForm callbackUrl={params.callbackUrl} />
+  return (
+    <LoginForm
+      callbackUrl={params.callbackUrl}
+      showGoogle={!!env.GOOGLE_CLIENT_ID}
+      showApple={!!env.APPLE_ID}
+    />
+  )
 }
 
 function safeCallbackUrl(raw: string): string {

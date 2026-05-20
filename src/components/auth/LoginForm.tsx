@@ -10,9 +10,11 @@ type Intent = 'signin' | 'signup'
 
 interface LoginFormProps {
   callbackUrl?: string
+  showGoogle?: boolean
+  showApple?: boolean
 }
 
-export function LoginForm({ callbackUrl }: LoginFormProps) {
+export function LoginForm({ callbackUrl, showGoogle = false, showApple = false }: LoginFormProps) {
   const router = useRouter()
   const redirectTo = normalizeCallbackUrl(callbackUrl)
 
@@ -201,30 +203,29 @@ export function LoginForm({ callbackUrl }: LoginFormProps) {
         </div>
 
         <div className="auth-form">
-          <OAuthButton
-            provider="google"
-            label={intent === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
-            callbackUrl={redirectTo}
-            icon={<GoogleIcon />}
-          />
-          <OAuthButton
-            provider="apple"
-            label={intent === 'signin' ? 'Continue with Apple' : 'Sign up with Apple'}
-            callbackUrl={redirectTo}
-            icon={<AppleIcon />}
-          />
-
-          <div className="auth-divider">
-            <div className="auth-divider-line" />
-            <span className="auth-divider-text">or</span>
-            <div className="auth-divider-line" />
-          </div>
-
-          <button type="button" className="auth-method-btn" onClick={() => setMode('email')}>
+          {showGoogle && (
+            <OAuthButton
+              provider="google"
+              label={intent === 'signin' ? 'Continue with Google' : 'Sign up with Google'}
+              callbackUrl={redirectTo}
+              icon={<GoogleIcon />}
+            />
+          )}
+          {showApple && (
+            <OAuthButton
+              provider="apple"
+              label={intent === 'signin' ? 'Continue with Apple' : 'Sign up with Apple'}
+              callbackUrl={redirectTo}
+              icon={<AppleIcon />}
+            />
+          )}
+          <button type="button" className="auth-oauth-btn" onClick={() => setMode('email')}>
+            <EmailIcon />
             {intent === 'signin' ? 'Continue with email' : 'Sign up with email'}
           </button>
-          <button type="button" className="auth-method-btn" onClick={() => setMode('phone')}>
-            {intent === 'signin' ? 'Continue with phone number' : 'Sign up with phone number'}
+          <button type="button" className="auth-oauth-btn" onClick={() => setMode('phone')}>
+            <PhoneIcon />
+            {intent === 'signin' ? 'Continue with phone' : 'Sign up with phone'}
           </button>
         </div>
 
@@ -484,6 +485,24 @@ function GoogleIcon() {
       <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
       <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
       <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+  )
+}
+
+function EmailIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="2" y="4" width="14" height="10" rx="2"/>
+      <path d="M2 7l7 4 7-4"/>
+    </svg>
+  )
+}
+
+function PhoneIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="1" width="8" height="16" rx="2"/>
+      <path d="M9 13.5h.01"/>
     </svg>
   )
 }
