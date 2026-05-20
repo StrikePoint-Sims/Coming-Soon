@@ -86,7 +86,7 @@ export default async function GuestsWaiversPage({
   const canSendAny = guestRows.some(g => statusFor(g.waiverExpiresAt) !== 'signed' && (g.email || g.phone))
 
   return (
-    <div className="dash-page">
+    <div className="dash-page dash-page-v2 dash-subpage">
       <div className="dash-header">
         <h1 className="dash-title">Guests &amp; Waivers</h1>
         <p className="dash-subtitle">

@@ -89,7 +89,7 @@ export default async function BookingsPage({
   const additionalUpcoming = upcomingRows.slice(1)
 
   return (
-    <div className="dash-page">
+    <div className="dash-page dash-page-v2 dash-subpage">
       <div className="dash-header">
         <h1 className="dash-title">My Bookings</h1>
         <p className="dash-subtitle">View and manage your reservations.</p>

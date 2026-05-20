@@ -3828,8 +3828,9 @@ select.st-form-input {
 
 .gw-add-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 12px;
+  row-gap: 14px;
   align-items: end;
 }
 
@@ -3849,29 +3850,42 @@ select.st-form-input {
 }
 
 .gw-field span {
-  color: rgba(255, 255, 255, 0.36);
+  color: rgba(255, 255, 255, 0.42);
   font-size: 0.64rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  line-height: 1;
 }
 
 .gw-input {
   width: 100%;
-  height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  height: 44px;
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(255, 255, 255, 0.045);
   color: rgba(255, 255, 255, 0.86);
   font-family: var(--font-sans);
   font-size: 0.86rem;
-  padding: 0 12px;
+  line-height: 44px;
+  padding: 0 14px;
   outline: none;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
 .gw-input:focus {
   border-color: rgba(126, 154, 92, 0.50);
+  background: rgba(255, 255, 255, 0.06);
   box-shadow: 0 0 0 3px rgba(61, 90, 42, 0.13);
+}
+
+.gw-input::placeholder {
+  color: rgba(255, 255, 255, 0.34);
+}
+
+select.gw-input {
+  appearance: auto;
 }
 
 .gw-input option {
@@ -3880,7 +3894,7 @@ select.st-form-input {
 }
 
 .gw-add-submit {
-  height: 42px;
+  height: 44px;
   white-space: nowrap;
 }
 
@@ -3941,4 +3955,215 @@ select.st-form-input {
     width: calc(100% - 52px);
     margin-left: 52px;
   }
+}
+
+/* Account subpages use the dashboard v2 palette so bookings, guests, billing,
+   and settings feel related to the main account hub. */
+.dash-subpage .dash-header {
+  margin-bottom: 24px;
+}
+
+.dash-subpage .dash-title {
+  color: var(--dash-text);
+}
+
+.dash-subpage .dash-subtitle,
+.dash-subpage .dash-empty-body,
+.dash-subpage .dash-empty-line,
+.dash-subpage .dash-muted {
+  color: var(--dash-muted);
+}
+
+.dash-subpage .dash-empty-heading,
+.dash-subpage .bk-subheading,
+.dash-subpage .bk-featured-time,
+.dash-subpage .bk-featured-price,
+.dash-subpage .bk-row-time,
+.dash-subpage .mb-res-value,
+.dash-subpage .mb2-tier-name,
+.dash-subpage .mb2-charge-desc,
+.dash-subpage .mb2-payment-title,
+.dash-subpage .st-toggle-label,
+.dash-subpage .gw-name {
+  color: var(--dash-text);
+}
+
+.dash-subpage .bk-tabs {
+  background: rgba(242, 239, 233, 0.025);
+  border-color: var(--dash-line);
+  border-radius: 10px;
+}
+
+.dash-subpage .bk-tab {
+  color: var(--dash-muted);
+  border-radius: 8px;
+}
+
+.dash-subpage .bk-tab:hover {
+  color: var(--dash-text);
+}
+
+.dash-subpage .bk-tab.is-active {
+  background: rgba(61, 90, 42, 0.16);
+  border-color: rgba(126, 154, 92, 0.32);
+  color: #A6BA78;
+}
+
+.dash-subpage .bk-featured-sub,
+.dash-subpage .bk-featured-paid,
+.dash-subpage .bk-row-meta,
+.dash-subpage .bk-row-price,
+.dash-subpage .mb-res-label,
+.dash-subpage .mb-conf-num,
+.dash-subpage .mb-waiver-label,
+.dash-subpage .mb2-tier-sub,
+.dash-subpage .mb2-price-period,
+.dash-subpage .mb2-renewal-label,
+.dash-subpage .mb2-charge-date,
+.dash-subpage .mb2-payment-body,
+.dash-subpage .st-form-hint,
+.dash-subpage .st-toggle-sub,
+.dash-subpage .st-info-body,
+.dash-subpage .st-info-note,
+.dash-subpage .st-waiver-detail,
+.dash-subpage .gw-banner-body,
+.dash-subpage .gw-email,
+.dash-subpage .gw-status-date,
+.dash-subpage .gw-footer-note,
+.dash-subpage .gw-policy-tagline,
+.dash-subpage .gw-policy-sub,
+.dash-subpage .gw-policy-list li {
+  color: var(--dash-muted);
+}
+
+.dash-subpage .bk-meta-grid,
+.dash-subpage .mb-conf-num,
+.dash-subpage .mb2-charge,
+.dash-subpage .mb2-question-link,
+.dash-subpage .gw-row,
+.dash-subpage .gw-policy-divider,
+.dash-subpage .st-toggle {
+  border-color: var(--dash-line);
+}
+
+.dash-subpage .bk-meta svg,
+.dash-subpage .mb-res-icon,
+.dash-subpage .mb2-tier-icon,
+.dash-subpage .mb2-charge-icon,
+.dash-subpage .mb2-payment-icon,
+.dash-subpage .gw-banner-icon,
+.dash-subpage .gw-avatar,
+.dash-subpage .gw-policy-icon,
+.dash-subpage .gw-policy-bullet,
+.dash-subpage .st-waiver-icon,
+.dash-subpage .st-form-input,
+.dash-subpage .gw-input {
+  border-color: rgba(126, 154, 92, 0.24);
+}
+
+.dash-subpage .mb-res-icon,
+.dash-subpage .mb2-tier-icon,
+.dash-subpage .mb2-charge-icon,
+.dash-subpage .mb2-payment-icon,
+.dash-subpage .gw-banner-icon,
+.dash-subpage .gw-avatar,
+.dash-subpage .gw-policy-icon,
+.dash-subpage .gw-policy-bullet,
+.dash-subpage .st-waiver-icon {
+  background: rgba(61, 90, 42, 0.13);
+  color: #A6BA78;
+}
+
+.dash-subpage .bk-row {
+  background: var(--dash-surface);
+  border-color: var(--dash-line);
+  border-radius: 12px;
+}
+
+.dash-subpage .bk-row:hover {
+  background: var(--dash-surface-2);
+  border-color: rgba(126, 154, 92, 0.28);
+}
+
+.dash-subpage .bk-meta-label,
+.dash-subpage .st-form-label,
+.dash-subpage .gw-field span,
+.dash-subpage .gw-policy-title,
+.dash-subpage .mb-waiver-label {
+  color: rgba(166, 186, 120, 0.74);
+}
+
+.dash-subpage .bk-meta-value,
+.dash-subpage .mb-conf-num > span:first-child,
+.dash-subpage .mb-waiver-status,
+.dash-subpage .mb2-renewal-date,
+.dash-subpage .mb2-charge-amount,
+.dash-subpage .st-waiver-detail strong,
+.dash-subpage .gw-policy-headline {
+  color: var(--dash-soft);
+}
+
+.dash-subpage .mb-back,
+.dash-subpage .mb2-question-link,
+.dash-subpage .gw-banner-title,
+.dash-subpage .gw-booking-line,
+.dash-subpage .gw-row-action-text,
+.dash-subpage .st-waiver-status.valid,
+.dash-subpage .mb-waiver-status.valid,
+.dash-subpage .gw-status.signed,
+.dash-subpage .mb2-charge-amount.refund {
+  color: #A6BA78;
+}
+
+.dash-subpage .mb-back:hover,
+.dash-subpage .mb2-question-link:hover {
+  color: var(--dash-tan);
+}
+
+.dash-subpage .mb-conf-num span span,
+.dash-subpage .mb2-price-amount {
+  color: var(--dash-tan);
+}
+
+.dash-subpage .mb2-renewal,
+.dash-subpage .gw-banner,
+.dash-subpage .st-info-note {
+  background: rgba(31, 29, 26, 0.55);
+  border-color: var(--dash-line);
+}
+
+.dash-subpage .st-form-input,
+.dash-subpage .gw-input {
+  background: rgba(242, 239, 233, 0.035);
+  color: var(--dash-text);
+}
+
+.dash-subpage .st-form-input:focus,
+.dash-subpage .gw-input:focus {
+  background: rgba(242, 239, 233, 0.055);
+  border-color: rgba(126, 154, 92, 0.46);
+  box-shadow: 0 0 0 3px rgba(61, 90, 42, 0.14);
+}
+
+.dash-subpage .st-toggle-switch {
+  background: rgba(242, 239, 233, 0.06);
+  border-color: var(--dash-line-strong);
+}
+
+.dash-subpage .st-toggle-checkbox:checked ~ .st-toggle-switch {
+  background: rgba(61, 90, 42, 0.78);
+  border-color: rgba(126, 154, 92, 0.7);
+}
+
+.dash-subpage .gw-policy {
+  text-align: left;
+}
+
+.dash-subpage .gw-policy-icon {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.dash-subpage .gw-policy-bullet {
+  color: var(--dash-tan);
 }

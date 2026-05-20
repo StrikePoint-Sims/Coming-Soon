@@ -91,7 +91,7 @@ export default async function ManageBookingPage({
     .limit(1)
 
   return (
-    <div className="dash-page">
+    <div className="dash-page dash-page-v2 dash-subpage">
       {/* Header with back link */}
       <a href="/account/bookings" className="mb-back">
         <span className="mb-back-arrow">‹</span> My Bookings

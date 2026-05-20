@@ -36,7 +36,7 @@ export default async function SettingsPage({
     .limit(1)
 
   return (
-    <div className="dash-page">
+    <div className="dash-page dash-page-v2 dash-subpage">
       <div className="dash-header">
         <h1 className="dash-title">Settings</h1>
         <p className="dash-subtitle">Manage your profile, contact info, and preferences.</p>

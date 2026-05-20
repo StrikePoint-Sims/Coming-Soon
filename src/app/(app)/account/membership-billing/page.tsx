@@ -60,7 +60,7 @@ export default async function MembershipBillingPage() {
     : 0
 
   return (
-    <div className="dash-page">
+    <div className="dash-page dash-page-v2 dash-subpage">
       <div className="dash-header">
         <h1 className="dash-title">Membership &amp; Billing</h1>
         <p className="dash-subtitle">Your plan, payment method, and recent charges.</p>
