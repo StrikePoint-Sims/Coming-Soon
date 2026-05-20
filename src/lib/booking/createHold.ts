@@ -1,6 +1,6 @@
 import { sql, and, eq, gt, lt, inArray } from 'drizzle-orm'
 import { txDb } from './tx'
-import { bookings, bookingHolds, bookingBlocks } from '@/db/schema'
+import { auditLog, bookings, bookingHolds, bookingBlocks, payments } from '@/db/schema'
 import {
   CAPACITY_TOTAL,
   DEFAULT_SLOT_MINUTES,
@@ -8,7 +8,11 @@ import {
   facilityDateKey,
 } from './capacity'
 import { clearAvailabilityCacheForRange } from './cache'
+import { inngest } from '@/lib/inngest/client'
 import { nanoid } from '@/lib/utils'
+import { getActiveMembershipHourQuote, insertMembershipHourDebit, refundEligibleMembershipHours } from './membership-hours'
+import { calculatePriceCents, CT_SALES_TAX } from './pricing'
+import { toZonedTime } from 'date-fns-tz'
 
 const HOLD_TTL_MINUTES = 12
 const FNV_OFFSET_BASIS_64 = BigInt('1469598103934665603')
@@ -21,6 +25,7 @@ export interface HoldRequest {
   locationId: string
   startsAt: Date
   endsAt: Date
+  partySize?: number
 }
 
 export interface HoldResult {
@@ -133,6 +138,7 @@ export async function createHold(req: HoldRequest): Promise<HoldResult> {
       endsAt: req.endsAt,
       expiresAt,
       status: 'active',
+      partySize: Math.min(4, Math.max(1, req.partySize ?? 1)),
     })
 
     return { id, expiresAt }
@@ -148,10 +154,12 @@ export async function confirmHoldAsBooking(params: {
   holdId: string
   type: 'member' | 'walk_in' | 'day_pass' | 'trial' | 'corporate' | 'league' | 'lesson'
   totalCents: number
-}): Promise<{ bookingId: string } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' }> {
+  paymentIntentId?: string
+}): Promise<{ bookingId: string; partySize: number } | { error: 'hold_missing' | 'hold_not_active' | 'capacity_unavailable' | 'payment_mismatch' }> {
   const bookingId = nanoid()
+  const paymentId = nanoid()
 
-  return await txDb.transaction(async (tx) => {
+  const result = await txDb.transaction(async (tx) => {
     const rows = await tx
       .select()
       .from(bookingHolds)
@@ -159,7 +167,9 @@ export async function confirmHoldAsBooking(params: {
       .limit(1)
     const hold = rows[0]
     if (!hold) return { error: 'hold_missing' as const }
-    if (hold.status !== 'active') return { error: 'hold_not_active' as const }
+    if (hold.status !== 'active' || new Date(hold.expiresAt as unknown as string) <= new Date()) {
+      return { error: 'hold_not_active' as const }
+    }
 
     const startsAt = new Date(hold.startsAt as unknown as string)
     const endsAt = new Date(hold.endsAt as unknown as string)
@@ -173,27 +183,96 @@ export async function confirmHoldAsBooking(params: {
     const peak = await consumedCount(tx, hold.locationId, startsAt, endsAt)
     if (peak > CAPACITY_TOTAL) return { error: 'capacity_unavailable' as const }
 
+    const startET = toZonedTime(startsAt, 'America/New_York')
+    const durationMinutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60_000)
+    const subtotalCents = calculatePriceCents(startET.getHours(), startET.getMinutes(), durationMinutes, startET.getDay())
+    const memberHours = await getActiveMembershipHourQuote({
+      userId: hold.userId,
+      startsAt,
+      endsAt,
+      subtotalCents,
+      db: tx as unknown as typeof txDb,
+    })
+    const taxableCents = Math.max(0, subtotalCents - memberHours.discountCents)
+    const taxCents = Math.round(taxableCents * CT_SALES_TAX)
+    const totalCents = taxableCents + taxCents
+
+    if (params.totalCents !== totalCents) return { error: 'payment_mismatch' as const }
+
     await tx.insert(bookings).values({
       id: bookingId,
       locationId: hold.locationId,
       bayId: null,
       userId: hold.userId,
-      type: params.type,
+      type: memberHours.appliedMinutes > 0 ? 'member' : params.type,
       startsAt,
       endsAt,
+      partySize: hold.partySize,
       status: 'confirmed',
-      totalCents: params.totalCents,
+      totalCents,
       paidAt: new Date(),
     })
+    await insertMembershipHourDebit({
+      db: tx as unknown as typeof txDb,
+      userId: hold.userId,
+      bookingId,
+      quote: memberHours,
+    })
+    if (params.paymentIntentId && totalCents > 0) {
+      await tx.insert(payments).values({
+        id: paymentId,
+        userId: hold.userId,
+        bookingId,
+        amountCents: totalCents,
+        processor: 'stripe',
+        processorRef: params.paymentIntentId,
+        type: 'charge',
+        status: 'succeeded',
+        idempotencyKey: `booking-${params.paymentIntentId}`,
+        description: `Bay booking ${bookingId}`,
+      })
+    }
     await tx
       .update(bookingHolds)
       .set({ status: 'consumed' })
       .where(eq(bookingHolds.id, hold.id))
+    await tx.insert(auditLog).values({
+      id: nanoid(),
+      actorType: 'user',
+      actorId: hold.userId,
+      action: 'booking.created',
+      targetType: 'booking',
+      targetId: bookingId,
+      payloadJson: {
+        startsAt: startsAt.toISOString(),
+        subtotalCents,
+        membershipDiscountCents: memberHours.discountCents,
+        membershipMinutesApplied: memberHours.appliedMinutes,
+        totalCents,
+        paymentIntentId: params.paymentIntentId,
+      },
+      at: new Date(),
+    })
 
     // Cache clear after commit, but we're still in tx — defer via process.nextTick.
     queueMicrotask(() => { void clearAvailabilityCacheForRange(startsAt, endsAt) })
-    return { bookingId }
+    return {
+      bookingId,
+      partySize: hold.partySize,
+      userId: hold.userId,
+      locationId: hold.locationId,
+    }
   })
+
+  if (!('error' in result)) {
+    await inngest.send({
+      name: 'booking/created',
+      data: { bookingId: result.bookingId, userId: result.userId, locationId: result.locationId },
+    }).catch(console.error)
+    return { bookingId: result.bookingId, partySize: result.partySize }
+  }
+
+  return result
 }
 
 export async function cancelBooking(bookingId: string, reason?: string) {
@@ -201,13 +280,20 @@ export async function cancelBooking(bookingId: string, reason?: string) {
     const rows = await tx.select().from(bookings).where(eq(bookings.id, bookingId)).limit(1)
     const b = rows[0]
     if (!b) return null
+    const cancelledAt = new Date()
     await tx
       .update(bookings)
-      .set({ status: 'cancelled', cancelledAt: new Date(), cancellationReason: reason ?? null })
+      .set({ status: 'cancelled', cancelledAt, cancellationReason: reason ?? null })
       .where(eq(bookings.id, bookingId))
+    const membershipRefund = await refundEligibleMembershipHours({
+      db: tx as unknown as typeof txDb,
+      bookingId,
+      cancelledAt,
+    })
     return {
       startsAt: new Date(b.startsAt as unknown as string),
       endsAt: new Date(b.endsAt as unknown as string),
+      membershipRefund,
     }
   })
   if (result) await clearAvailabilityCacheForRange(result.startsAt, result.endsAt)

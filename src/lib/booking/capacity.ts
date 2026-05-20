@@ -2,8 +2,11 @@ import { db } from '@/db'
 import { bookings, bookingHolds, bookingBlocks } from '@/db/schema'
 import { and, eq, gt, lt, inArray, sql } from 'drizzle-orm'
 import { fromZonedTime, toZonedTime } from 'date-fns-tz'
+import { calculatePriceCents } from './pricing'
 
 export const FACILITY_TZ = 'America/New_York'
+// Three physical bays means three sellable capacity units. Customers reserve
+// capacity now; a physical bay is assigned about 1 hour before session start.
 export const CAPACITY_TOTAL = 3
 export const DEFAULT_SLOT_MINUTES = 30
 const OPEN_HOUR = 8
@@ -14,6 +17,7 @@ export interface CapacitySlot {
   endsAt: string
   spotsRemaining: number
   available: boolean
+  priceCents: number
 }
 
 export interface AvailabilityResponse {
@@ -174,6 +178,7 @@ export async function calculateAvailabilityFromDb(params: {
         endsAt: endUTC.toISOString(),
         spotsRemaining,
         available: spotsRemaining > 0,
+        priceCents: calculatePriceCents(h, mm, durationMinutes, startET.getDay()),
       })
     }
   }

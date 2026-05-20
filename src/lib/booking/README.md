@@ -2,11 +2,12 @@
 
 Three guarantees this module enforces:
 
-1. **Availability is capacity-based.** There are 3 simulator bays, but the
-   public API never returns bay IDs. Slots report `spotsRemaining` over a total
-   of `CAPACITY_TOTAL = 3`. Confirmed bookings, active (non-expired) holds,
-   admin blocks, and maintenance blocks all consume capacity. Cancelled /
-   expired / failed records do not.
+1. **Availability is capacity-based.** There are 3 physical simulator bays, so
+   `CAPACITY_TOTAL = 3`. Customers reserve one unit of capacity, not a specific
+   bay, and the public API never returns bay IDs. Slots report
+   `spotsRemaining` over that capacity. Confirmed bookings, active
+   (non-expired) holds, admin blocks, and maintenance blocks all consume
+   capacity. Cancelled / expired / failed records do not.
 
 2. **The cache is display-only.** `service.ts:getAvailability` reads through
    the in-memory cache (`cache.ts`) with a 5-minute TTL as a backstop. Real
@@ -33,8 +34,8 @@ correctness and simplicity beat micro-optimization.
 
 `bookings.bay_id` and `booking_holds.bay_id` are nullable. The customer-facing
 flow never sets them. A separate job (`assignBaysForUpcomingBookings`, to be
-implemented) runs ~1 hour before the reservation and assigns physical bays to
-confirmed bookings only.
+implemented) runs 1 hour before session start and assigns physical bays to
+confirmed bookings in the way that preserves maximum bay utilization.
 
 ## Cache deployment notes
 
@@ -50,14 +51,13 @@ ignores the cache), but they will show wrong availability to users.
 IP/session rate limits before being exposed publicly. Magic-link and Stripe
 checkout creation endpoints should be limited strictly.
 
-## Legacy
+## Booking flow
 
-`src/lib/booking/availability.ts` (per-bay) and `src/app/api/book/slots/route.ts`
-are the older bay-aware path still used by the existing book UI and AI tool.
-They should be migrated to consume `getAvailability` from `service.ts`; until
-then, do **not** create bookings with `bay_id = null` in production without
-also retiring those legacy consumers, or the legacy view will undercount
-capacity.
+The customer-facing booking UI reads capacity slots from `/api/availability`,
+creates holds through `/api/hold`, creates payment intents through
+`/api/book/payment-intent`, and confirms paid holds through
+`confirmHoldAsBooking`. Do not reintroduce bay-aware customer booking routes;
+physical bay assignment happens later, close to session time.
 
 ## Tests
 

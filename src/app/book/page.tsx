@@ -5,8 +5,6 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { addDays, format } from 'date-fns'
 import { formatInTimeZone } from 'date-fns-tz'
-import { createHold } from './actions'
-import type { GridRow } from '@/lib/booking/availability'
 
 const LOCATION_ID = process.env['NEXT_PUBLIC_LOCATION_ID'] ?? 'loc_main'
 const FACILITY_TZ = 'America/New_York'
@@ -22,11 +20,23 @@ const DURATIONS = [
 const PLAYER_COUNTS = [1, 2, 3, 4]
 
 interface SelectedSlot {
-  bayId: string   // used internally for hold creation, not shown to customer
   startsAt: string
   endsAt: string
   priceCents: number
   timeLabel: string
+}
+
+interface CapacitySlot {
+  startsAt: string
+  endsAt: string
+  spotsRemaining: number
+  available: boolean
+  priceCents: number
+}
+
+interface AvailabilityResponse {
+  capacityTotal: number
+  slots: CapacitySlot[]
 }
 
 interface DraftState {
@@ -79,8 +89,8 @@ const RATE_CATEGORIES: Record<RateCategoryKey, RateCategory> = {
   peak: { key: 'peak', label: 'Peak', detail: '$60 / hr' },
 }
 
-function rateCategoryForRow(row: GridRow): RateCategory {
-  const start = new Date(row.startsAt)
+function rateCategoryForSlot(slot: CapacitySlot): RateCategory {
+  const start = new Date(slot.startsAt)
   const hour = Number(formatInTimeZone(start, FACILITY_TZ, 'H'))
   if (hour >= 22 || hour < 6) return RATE_CATEGORIES.night
 
@@ -91,8 +101,8 @@ function rateCategoryForRow(row: GridRow): RateCategory {
   return RATE_CATEGORIES.peak
 }
 
-function isSixAm(row: GridRow): boolean {
-  return formatInTimeZone(new Date(row.startsAt), FACILITY_TZ, 'H:mm') === '6:00'
+function isSixAm(slot: CapacitySlot): boolean {
+  return formatInTimeZone(new Date(slot.startsAt), FACILITY_TZ, 'H:mm') === '6:00'
 }
 
 export default function BookPage() {
@@ -104,7 +114,8 @@ export default function BookPage() {
   const [selectedDate, setSelectedDate] = useState(tomorrow)
   const [duration, setDuration] = useState(60)
   const [players, setPlayers] = useState(2)
-  const [rows, setRows] = useState<GridRow[]>([])
+  const [slots, setSlots] = useState<CapacitySlot[]>([])
+  const [capacityTotal, setCapacityTotal] = useState(3)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [selected, setSelected] = useState<SelectedSlot | null>(null)
@@ -124,14 +135,15 @@ export default function BookPage() {
     setError('')
     try {
       const res = await fetch(
-        `/api/book/grid?locationId=${LOCATION_ID}&date=${date}&duration=${dur}`
+        `/api/availability?locationId=${LOCATION_ID}&date=${date}&duration=${dur}`
       )
-      const data = await res.json() as { rows?: GridRow[]; error?: string }
+      const data = await res.json() as AvailabilityResponse & { error?: string }
       if (!res.ok || data.error) throw new Error(data.error ?? 'Failed to load availability.')
-      setRows(data.rows ?? [])
+      setSlots(data.slots ?? [])
+      setCapacityTotal(data.capacityTotal ?? 3)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load availability.')
-      setRows([])
+      setSlots([])
     } finally {
       setLoading(false)
     }
@@ -139,7 +151,7 @@ export default function BookPage() {
 
   useEffect(() => {
     if (isPastWindow) {
-      setRows([])
+      setSlots([])
       setLoading(false)
       return
     }
@@ -179,7 +191,7 @@ export default function BookPage() {
   }, [session?.user?.id])
 
   useEffect(() => {
-    if (loading || isPastWindow || rows.length === 0) return
+    if (loading || isPastWindow || slots.length === 0) return
 
     const scrollFrameToSix = (frame: HTMLDivElement | null) => {
       if (!frame) return
@@ -194,7 +206,7 @@ export default function BookPage() {
     })
 
     return () => cancelAnimationFrame(raf)
-  }, [rows, loading, isPastWindow])
+  }, [slots, loading, isPastWindow])
 
   async function handleReserve(slot?: SelectedSlot) {
     const target = slot ?? selected
@@ -202,40 +214,44 @@ export default function BookPage() {
     setSubmitting(true)
     setError('')
 
-    const result = await createHold({
-      locationId: LOCATION_ID,
-      bayId: target.bayId,
-      startsAt: target.startsAt,
-      endsAt: target.endsAt,
-      partySize: players,
+    const res = await fetch('/api/hold', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        locationId: LOCATION_ID,
+        startsAt: target.startsAt,
+        endsAt: target.endsAt,
+        partySize: players,
+      }),
     })
 
-    if ('needsAuth' in result) {
+    if (res.status === 401) {
       const draft: DraftState = { date: selectedDate, duration, players, slot: target }
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
       window.location.href = '/login?callbackUrl=' + encodeURIComponent('/book')
       return
     }
 
-    if ('error' in result) {
-      setError(result.error)
+    const result = await res.json() as { id?: string; error?: string }
+    if (!res.ok || result.error || !result.id) {
+      setError(result.error ?? 'Could not reserve that time. Please try again.')
       setSubmitting(false)
       return
     }
 
-    window.location.href = `/book/review?holdId=${result.holdId}`
+    window.location.href = `/book/review?holdId=${result.id}`
   }
 
   function handleDateChange(date: string) {
     setSelectedDate(date)
     setSelected(null)
-    setRows([])
+    setSlots([])
   }
 
   function handleDurationChange(dur: number) {
     setDuration(dur)
     setSelected(null)
-    setRows([])
+    setSlots([])
   }
 
   function stepDuration(delta: number) {
@@ -244,11 +260,7 @@ export default function BookPage() {
     handleDurationChange(newDur)
   }
 
-  const availableCount = rows.reduce(
-    (sum, row) => sum + row.cells.filter(c => c.status === 'available').length,
-    0
-  )
-  const availableSlotCount = rows.filter(r => r.cells.some(c => c.status === 'available')).length
+  const availableSlotCount = slots.filter(s => s.available).length
 
   const formatTimeRange = (startsAt: string, endsAt: string) => {
     const start = formatInTimeZone(new Date(startsAt), FACILITY_TZ, 'h:mm a')
@@ -348,30 +360,29 @@ export default function BookPage() {
             <div className="book-grid-col">
               <div className="book-avail-header">
                 <span className="book-avail-title">Available Times</span>
-                {!loading && !isPastWindow && rows.length > 0 && <span className="book-avail-count">{availableSlotCount} times open</span>}
+                {!loading && !isPastWindow && slots.length > 0 && <span className="book-avail-count">{availableSlotCount} times open</span>}
               </div>
               {isPastWindow ? (
                 <WindowUpsellCard {...upsell} />
               ) : loading ? (
                 <div className="book-loading-row"><div className="book-spinner" /><span>Loading availability…</span></div>
-              ) : rows.length === 0 ? (
+              ) : slots.length === 0 ? (
                 <p className="book-no-slots">No times available. Try a different date or duration.</p>
               ) : (
                 <div className="book-slot-frame" ref={desktopSlotFrameRef}>
                   <div className="book-slot-list">
-                  {rows.map((row, index) => {
-                    const avail = row.cells.filter(c => c.status === 'available')
-                    const total = row.cells.length
-                    const isBooked = avail.length === 0
-                    const isLimited = avail.length === 1
-                    const isSelected = selected?.startsAt === row.startsAt
+                  {slots.map((slot, index) => {
+                    const isBooked = !slot.available
+                    const isLimited = slot.spotsRemaining === 1
+                    const isSelected = selected?.startsAt === slot.startsAt
                     const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
-                    const price = avail[0]?.priceCents ?? 0
-                    const rateCategory = rateCategoryForRow(row)
-                    const prevRateCategory = index > 0 ? rateCategoryForRow(rows[index - 1]!) : null
+                    const price = slot.priceCents
+                    const rateCategory = rateCategoryForSlot(slot)
+                    const prevRateCategory = index > 0 ? rateCategoryForSlot(slots[index - 1]!) : null
                     const showRateSeparator = !prevRateCategory || prevRateCategory.key !== rateCategory.key
+                    const timeLabel = formatInTimeZone(new Date(slot.startsAt), FACILITY_TZ, 'h:mm a')
                     return (
-                      <div className="book-slot-item" key={row.startsAt} data-scroll-anchor={isSixAm(row) ? 'day-start' : undefined}>
+                      <div className="book-slot-item" key={slot.startsAt} data-scroll-anchor={isSixAm(slot) ? 'day-start' : undefined}>
                         {showRateSeparator && (
                           <div className={`book-rate-separator ${rateCategory.key}`}>
                             <span>{rateCategory.label}</span>
@@ -382,16 +393,14 @@ export default function BookPage() {
                         className={`book-slot ${rateCategory.key}${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                         onClick={() => {
                           if (isBooked) return
-                          const bay = avail[0]
-                          if (!bay) return
-                          setSelected({ bayId: bay.bayId, startsAt: row.startsAt, endsAt: row.endsAt, priceCents: bay.priceCents ?? 0, timeLabel: row.timeLabel })
+                          setSelected({ startsAt: slot.startsAt, endsAt: slot.endsAt, priceCents: slot.priceCents, timeLabel })
                         }}
                         disabled={isBooked || submitting}
                       >
-                        <span className="book-slot-time">{row.timeLabel}</span>
+                        <span className="book-slot-time">{timeLabel}</span>
                         <span className="book-slot-avail">
                           <span className={`book-slot-dot ${dotCls}`} />
-                          {isBooked ? 'Fully booked' : `${avail.length} of ${total} bay${total !== 1 ? 's' : ''} available`}
+                          {isBooked ? 'Fully booked' : `${slot.spotsRemaining} of ${capacityTotal} spot${capacityTotal !== 1 ? 's' : ''} available`}
                         </span>
                         {!isBooked && <span className="book-slot-price">${(price / 100).toFixed(0)}</span>}
                         <span className="book-slot-action">
@@ -518,7 +527,7 @@ export default function BookPage() {
           {/* ── Available times ─────────────────────────────────────────── */}
           <div className="book-m-times-hdr">
             <span className="book-m-ctrl-label" style={{ margin: 0 }}>AVAILABLE TIMES</span>
-            {!loading && !isPastWindow && rows.length > 0 && (
+            {!loading && !isPastWindow && slots.length > 0 && (
               <span className="book-m-slots-count">{availableSlotCount} times open</span>
             )}
           </div>
@@ -539,24 +548,23 @@ export default function BookPage() {
               <div className="book-spinner" />
               <span>Loading availability…</span>
             </div>
-          ) : rows.length === 0 ? (
+          ) : slots.length === 0 ? (
             <p className="book-no-slots">No times available. Try a different date or duration.</p>
           ) : (
             <div className="book-m-slot-frame" ref={mobileSlotFrameRef}>
               <div className="book-m-slot-list">
-              {rows.map((row, index) => {
-                const avail = row.cells.filter(c => c.status === 'available')
-                const total = row.cells.length
-                const isBooked = avail.length === 0
-                const isLimited = avail.length === 1
-                const isSelected = selected?.startsAt === row.startsAt
+              {slots.map((slot, index) => {
+                const isBooked = !slot.available
+                const isLimited = slot.spotsRemaining === 1
+                const isSelected = selected?.startsAt === slot.startsAt
                 const dotCls = isBooked ? 'is-booked' : isLimited ? 'is-limited' : 'is-avail'
-                const rateCategory = rateCategoryForRow(row)
-                const prevRateCategory = index > 0 ? rateCategoryForRow(rows[index - 1]!) : null
+                const rateCategory = rateCategoryForSlot(slot)
+                const prevRateCategory = index > 0 ? rateCategoryForSlot(slots[index - 1]!) : null
                 const showRateSeparator = !prevRateCategory || prevRateCategory.key !== rateCategory.key
+                const timeLabel = formatInTimeZone(new Date(slot.startsAt), FACILITY_TZ, 'h:mm a')
 
                 return (
-                  <div className="book-m-slot-item" key={row.startsAt} data-scroll-anchor={isSixAm(row) ? 'day-start' : undefined}>
+                  <div className="book-m-slot-item" key={slot.startsAt} data-scroll-anchor={isSixAm(slot) ? 'day-start' : undefined}>
                     {showRateSeparator && (
                       <div className={`book-rate-separator ${rateCategory.key}`}>
                         <span>{rateCategory.label}</span>
@@ -567,28 +575,25 @@ export default function BookPage() {
                     className={`book-m-slot ${rateCategory.key}${isSelected ? ' is-selected' : ''}${isBooked ? ' is-unavail' : ''}`}
                     onClick={() => {
                       if (isBooked) return
-                      const bay = avail[0]
-                      if (!bay) return
                       setSelected({
-                        bayId: bay.bayId,
-                        startsAt: row.startsAt,
-                        endsAt: row.endsAt,
-                        priceCents: bay.priceCents ?? 0,
-                        timeLabel: row.timeLabel,
+                        startsAt: slot.startsAt,
+                        endsAt: slot.endsAt,
+                        priceCents: slot.priceCents,
+                        timeLabel,
                       })
                     }}
                     disabled={isBooked}
                   >
-                    <span className="book-m-slot-time">{row.timeLabel}</span>
+                    <span className="book-m-slot-time">{timeLabel}</span>
                     <span className="book-m-slot-avail">
                       <span className={`book-m-dot ${dotCls}`} />
                       {isBooked
                         ? 'Booked'
-                        : `${avail.length} of ${total} bay${total !== 1 ? 's' : ''} left`}
+                        : `${slot.spotsRemaining} of ${capacityTotal} spot${capacityTotal !== 1 ? 's' : ''} left`}
                     </span>
                     {!isBooked && (
                       <span className="book-m-slot-price">
-                        ${((avail[0]?.priceCents ?? 0) / 100).toFixed(0)}
+                        ${(slot.priceCents / 100).toFixed(0)}
                       </span>
                     )}
                     <span className="book-m-slot-end">

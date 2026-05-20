@@ -43,7 +43,12 @@ export async function POST(req: NextRequest) {
     if (holdId) {
       const { confirmHoldAsBooking } = await import('@/lib/booking/createHold')
       const totalCents = obj.amount_total ?? obj.amount ?? 0
-      const result = await confirmHoldAsBooking({ holdId, type: bookingType, totalCents })
+      const result = await confirmHoldAsBooking({
+        holdId,
+        type: bookingType,
+        totalCents,
+        paymentIntentId: 'id' in obj ? String(obj.id) : undefined,
+      })
       if ('error' in result) {
         // Flag for manual reconciliation / refund.
         console.error('hold_confirm_failed', { holdId, error: result.error, eventId: event.id })

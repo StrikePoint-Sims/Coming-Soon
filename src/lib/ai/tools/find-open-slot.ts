@@ -1,5 +1,5 @@
 import { registerTool } from './index'
-import { getAvailableSlots } from '@/lib/booking/availability'
+import { getAvailability } from '@/lib/booking/service'
 import { env } from '@/env'
 import { formatInTimeZone } from 'date-fns-tz'
 import { format, addDays } from 'date-fns'
@@ -34,7 +34,8 @@ registerTool({
     const date = (input['date'] as string | undefined) ?? format(addDays(new Date(), 1), 'yyyy-MM-dd')
     const duration = (input['duration_minutes'] as number | undefined) ?? 60
 
-    const slots = await getAvailableSlots({ locationId, date, durationMinutes: duration })
+    const availability = await getAvailability({ locationId, date, durationMinutes: duration })
+    const slots = availability.slots.filter(slot => slot.available)
 
     if (slots.length === 0) {
       return JSON.stringify({
@@ -44,24 +45,21 @@ registerTool({
       })
     }
 
-    const byTime: Record<string, string[]> = {}
-    for (const slot of slots) {
-      const key = slot.startsAtET
-      byTime[key] = [...(byTime[key] ?? []), slot.bayLabel]
-    }
-
     const formatted = formatInTimeZone(new Date(`${date}T12:00:00Z`), FACILITY_TZ, 'EEEE, MMMM d')
-    const summary = Object.entries(byTime)
+    const summary = slots
       .slice(0, 8)
-      .map(([time, bayLabels]) => `${time}: ${bayLabels.join(', ')}`)
+      .map(slot => {
+        const time = formatInTimeZone(new Date(slot.startsAt), FACILITY_TZ, 'h:mm a')
+        return `${time}: ${slot.spotsRemaining} spot${slot.spotsRemaining === 1 ? '' : 's'} open`
+      })
       .join('\n')
 
     return JSON.stringify({
       available: true,
       date: formatted,
       duration_minutes: duration,
-      slots_shown: Math.min(Object.keys(byTime).length, 8),
-      total_slots: Object.keys(byTime).length,
+      slots_shown: Math.min(slots.length, 8),
+      total_slots: slots.length,
       summary,
       booking_url: `${process.env['NEXT_PUBLIC_APP_URL']}/book`,
     })

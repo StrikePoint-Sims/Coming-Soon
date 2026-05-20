@@ -1,7 +1,7 @@
 import { getCurrentUser } from '@/auth'
 import { redirect } from 'next/navigation'
 import { db } from '@/db'
-import { bays, bookings, memberships, membershipTiers, waiverSignings } from '@/db/schema'
+import { bays, bookings, membershipHourLedger, memberships, membershipTiers, waiverSignings } from '@/db/schema'
 import { and, desc, eq, gt, gte, inArray, lt } from 'drizzle-orm'
 import { formatInTimeZone } from 'date-fns-tz'
 import type { Metadata } from 'next'
@@ -18,6 +18,14 @@ const SAVINGS_THRESHOLD_CENTS = 2500
 
 type UsageSummary = ReturnType<typeof summarizeUsage>
 
+type MembershipHourRow = {
+  bookingId: string | null
+  kind: string
+  minutes: number
+  bookingStartsAt: Date | null
+  bookingStatus: string | null
+}
+
 type BookingSummary = {
   id: string
   startsAt: Date
@@ -26,6 +34,46 @@ type BookingSummary = {
   status: string
   totalCents?: number
   partySize?: number
+}
+
+function summarizeMembershipHours(rows: MembershipHourRow[], now: Date) {
+  const byBooking = new Map<string, { minutes: number; startsAt: Date | null; status: string | null }>()
+  let unbookedMinutes = 0
+
+  for (const row of rows) {
+    const signedMinutes = row.kind === 'refund' ? -row.minutes : row.minutes
+    if (!row.bookingId) {
+      unbookedMinutes += signedMinutes
+      continue
+    }
+
+    const existing = byBooking.get(row.bookingId) ?? {
+      minutes: 0,
+      startsAt: row.bookingStartsAt,
+      status: row.bookingStatus,
+    }
+    existing.minutes += signedMinutes
+    existing.startsAt = existing.startsAt ?? row.bookingStartsAt
+    existing.status = existing.status ?? row.bookingStatus
+    byBooking.set(row.bookingId, existing)
+  }
+
+  let usedMinutes = Math.max(0, unbookedMinutes)
+  let reservedMinutes = 0
+  for (const entry of byBooking.values()) {
+    const minutes = Math.max(0, entry.minutes)
+    if (minutes === 0) continue
+    const isUpcomingActive =
+      entry.startsAt &&
+      entry.startsAt > now &&
+      entry.status !== 'cancelled' &&
+      entry.status !== 'no_show'
+
+    if (isUpcomingActive) reservedMinutes += minutes
+    else usedMinutes += minutes
+  }
+
+  return { usedMinutes, reservedMinutes }
 }
 
 function durationLabel(startsAt: Date, endsAt: Date): string {
@@ -94,6 +142,7 @@ export default async function AccountDashboardPage() {
       .innerJoin(membershipTiers, eq(memberships.tierId, membershipTiers.id))
       .where(and(
         eq(memberships.userId, user.id),
+        inArray(memberships.status, ['active', 'reactivated', 'trial']),
         gt(memberships.currentPeriodEnd, now),
       ))
       .limit(1),
@@ -129,6 +178,24 @@ export default async function AccountDashboardPage() {
   ])
 
   const usage = summarizeUsage(last30Bookings)
+  const membershipHourRows = membership
+    ? await db
+      .select({
+        bookingId: membershipHourLedger.bookingId,
+        kind: membershipHourLedger.kind,
+        minutes: membershipHourLedger.minutes,
+        bookingStartsAt: bookings.startsAt,
+        bookingStatus: bookings.status,
+      })
+      .from(membershipHourLedger)
+      .leftJoin(bookings, eq(membershipHourLedger.bookingId, bookings.id))
+      .where(and(
+        eq(membershipHourLedger.membershipId, membership.id),
+        gte(membershipHourLedger.createdAt, membership.startedAt),
+        lt(membershipHourLedger.createdAt, membership.currentPeriodEnd),
+      ))
+    : []
+  const membershipHourSummary = summarizeMembershipHours(membershipHourRows, now)
   const nextBooking = upcomingBookings[0] ?? null
   const isMember = !!membership
   const savings = !isMember ? findBestSavings(usage) : null
@@ -167,8 +234,9 @@ export default async function AccountDashboardPage() {
             tierName={membership.tierName}
             startedAt={membership.startedAt}
             currentPeriodEnd={membership.currentPeriodEnd}
-            peakMinutesUsed={usage.peakMinutes}
-            peakMinutesIncluded={membership.includedPeakMinutes ?? 0}
+            usedMinutes={membershipHourSummary.usedMinutes}
+            reservedMinutes={membershipHourSummary.reservedMinutes}
+            includedMinutes={membership.includedPeakMinutes ?? 0}
           />
         ) : (
           <ExploreMembershipsCard hasUsage={usage.sessions > 0} />
@@ -318,18 +386,25 @@ function MembershipCard({
   tierName,
   startedAt,
   currentPeriodEnd,
-  peakMinutesUsed,
-  peakMinutesIncluded,
+  usedMinutes,
+  reservedMinutes,
+  includedMinutes,
 }: {
   tierName: string
   startedAt: Date
   currentPeriodEnd: Date
-  peakMinutesUsed: number
-  peakMinutesIncluded: number
+  usedMinutes: number
+  reservedMinutes: number
+  includedMinutes: number
 }) {
-  const peakHoursUsed = Math.round(peakMinutesUsed / 60)
-  const peakHoursIncluded = Math.round(peakMinutesIncluded / 60)
-  const peakHoursRemaining = Math.max(0, peakHoursIncluded - peakHoursUsed)
+  const usedHours = usedMinutes / 60
+  const reservedHours = reservedMinutes / 60
+  const includedHours = includedMinutes / 60
+  const availableHours = Math.max(0, includedHours - usedHours - reservedHours)
+  const committedHours = Math.min(includedHours, usedHours + reservedHours)
+  const committedPct = includedHours > 0 ? Math.min(100, (committedHours / includedHours) * 100) : 0
+  const stat = (value: number) => Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1)
+  const peakHoursRemaining = availableHours
 
   return (
     <section className="dash-section-card dash-member-card">
@@ -350,14 +425,28 @@ function MembershipCard({
         </div>
       </div>
 
-      {peakHoursIncluded > 0 ? (
+      {includedHours > 0 ? (
         <div className="dash-peak-tracker">
           <div className="dash-peak-row">
-            <span className="dash-peak-label">Peak hours this month</span>
-            <span className="dash-peak-value">{peakHoursUsed} <span>of {peakHoursIncluded}</span></span>
+            <span className="dash-peak-label">Membership hours this period</span>
+            <span className="dash-peak-value">{stat(committedHours)} <span>of {stat(includedHours)}</span></span>
           </div>
           <div className="dash-peak-bar">
-            <div className="dash-peak-bar-fill" style={{ width: `${Math.min(100, (peakHoursUsed / peakHoursIncluded) * 100)}%` }} />
+            <div className="dash-peak-bar-fill" style={{ width: `${committedPct}%` }} />
+          </div>
+          <div className="dash-hour-stats" aria-label="Membership hour balance">
+            <div className="dash-hour-stat used">
+              <span className="dash-hour-stat-value">{stat(usedHours)}</span>
+              <span className="dash-hour-stat-label">Used</span>
+            </div>
+            <div className="dash-hour-stat reserved">
+              <span className="dash-hour-stat-value">{stat(reservedHours)}</span>
+              <span className="dash-hour-stat-label">Reserved</span>
+            </div>
+            <div className="dash-hour-stat available">
+              <span className="dash-hour-stat-value">{stat(availableHours)}</span>
+              <span className="dash-hour-stat-label">Available</span>
+            </div>
           </div>
           <p className="dash-peak-sub">{peakHoursRemaining} hour{peakHoursRemaining !== 1 ? 's' : ''} remaining · Renews {formatInTimeZone(currentPeriodEnd, FACILITY_TZ, 'MMM d')}</p>
         </div>
