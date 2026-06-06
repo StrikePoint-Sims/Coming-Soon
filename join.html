@@ -1135,7 +1135,7 @@
       <!-- Slide 1: Name + Email -->
       <div class="slide is-active" data-slide="1">
         <div class="slide-inner">
-          <p class="slide-step" id="step-1">1 of 4</p>
+          <p class="slide-step" id="step-1">1 of 3</p>
           <h2 class="slide-q" id="slide-1-heading">Where should we send updates?</h2>
           <p class="slide-hint" id="slide-1-hint">Build progress, opening news, and when bookings go live.</p>
           <div class="name-grid">
@@ -1165,7 +1165,7 @@
       <!-- Slide 2: Golf level -->
       <div class="slide" data-slide="2">
         <div class="slide-inner">
-          <p class="slide-step" id="step-2">2 of 4</p>
+          <p class="slide-step" id="step-2">2 of 3</p>
           <h2 class="slide-q">How does golf fit into your life?</h2>
           <div class="choices" id="level-choices">
             <div class="choice" data-value="I play often and want to improve" onclick="selectLevel(this)">
@@ -1203,7 +1203,7 @@
       <!-- Slide 3: Town -->
       <div class="slide" data-slide="3">
         <div class="slide-inner">
-          <p class="slide-step" id="step-3">3 of 4</p>
+          <p class="slide-step" id="step-3">3 of 3</p>
           <h2 class="slide-q">Where are you coming from?</h2>
           <div class="choices" id="town-choices">
             <div class="choice" data-value="Colchester" onclick="selectTown(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Colchester</div></div></div>
@@ -1219,26 +1219,6 @@
                 <input class="choice-other-input" type="text" id="other-town" placeholder="Your town" style="display:none" onclick="event.stopPropagation()">
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Slide 4: Priority (multi-select) -->
-      <div class="slide" data-slide="4">
-        <div class="slide-inner">
-          <p class="slide-step" id="step-4">4 of 4</p>
-          <h2 class="slide-q">What matters most to you in a sim facility?</h2>
-          <div class="choices" id="priority-choices">
-            <div class="choice" data-value="Accuracy of the shot data" onclick="toggleMulti(this)"><div class="choice-key">A</div><div class="choice-content"><div class="choice-title">Accuracy of the shot data</div></div></div>
-            <div class="choice" data-value="Being able to play on my own schedule" onclick="toggleMulti(this)"><div class="choice-key">B</div><div class="choice-content"><div class="choice-title">Being able to play on my own schedule</div></div></div>
-            <div class="choice" data-value="Having somewhere to play year-round" onclick="toggleMulti(this)"><div class="choice-key">C</div><div class="choice-content"><div class="choice-title">Having somewhere to play year-round</div></div></div>
-            <div class="choice" data-value="A golf-focused atmosphere" onclick="toggleMulti(this)"><div class="choice-key">D</div><div class="choice-content"><div class="choice-title">A golf-focused atmosphere</div></div></div>
-            <div class="choice" data-value="Access to a wide variety of courses" onclick="toggleMulti(this)"><div class="choice-key">E</div><div class="choice-content"><div class="choice-title">Access to a wide variety of courses</div></div></div>
-            <div class="choice" data-value="Leagues and competitive events" onclick="toggleMulti(this)"><div class="choice-key">F</div><div class="choice-content"><div class="choice-title">Leagues and competitive events</div></div></div>
-          </div>
-          <div class="inline-slide-actions">
-            <button class="inline-primary-btn" type="button" onclick="nextSlide()">Continue &#8594;</button>
-            <span class="inline-action-note">Optional — choose any that apply.</span>
           </div>
         </div>
       </div>
@@ -1337,7 +1317,7 @@
     var data = {
       first_name: '', last_name: '', full_name: '', email: '',
       community: '', community_other: '',
-      golf_level: '', priority: [],
+      golf_level: '',
       founding_20: false, updates: '',
       path: '',
       stripe_tier: '', stripe_price: '',
@@ -1396,7 +1376,7 @@
       var slide1Hint = document.getElementById('slide-1-hint');
       if (asFounder) {
         if (notice) notice.style.display = 'flex';
-        if (step1)  step1.textContent = '1 of 4';
+        if (step1)  step1.textContent = '1 of 3';
         if (slide1Heading) slide1Heading.textContent = 'Finish your ' + (selectedTier ? selectedTier.name : 'Founder') + ' reservation.';
         if (slide1Hint) slide1Hint.textContent = 'We’ll use this for your confirmation and opening updates.';
       } else {
@@ -1453,7 +1433,7 @@
       // Path-aware step labels
       var stepLabels;
       if (data.founding_20) {
-        stepLabels = { 1:'1 of 4', 2:'2 of 4', 3:'3 of 4', 4:'4 of 4', 6:'Final step' };
+        stepLabels = { 1:'1 of 3', 2:'2 of 3', 3:'3 of 3', 6:'Final step' };
       } else {
         stepLabels = { 1:'1 of 3', 2:'2 of 3', 3:'3 of 3' };
       }
@@ -1541,11 +1521,6 @@
         var town = data.community === 'other' ? data.community_other : data.community;
         saveToServer({ row_id: rowId, community: town });
       }
-      if (n === 4) {
-        var sel = document.querySelectorAll('#priority-choices .choice.is-selected');
-        var arr = Array.from(sel).map(function(el){ return el.getAttribute('data-value'); });
-        if (arr.length) saveToServer({ row_id: rowId, priority: arr.join(', ') });
-      }
     }
 
     // ── Validate slide 1 ──
@@ -1600,16 +1575,10 @@
           data.community_other = otherVal;
         }
         if (data.founding_20) {
-          current = 4; showSlide(4);
+          current = 6; showSlide(6);
         } else {
           submitForm();
         }
-        return;
-      }
-
-      // Slide 4 → founding goes straight to payment (skip slide 5)
-      if (current === 4) {
-        current = 6; showSlide(6);
         return;
       }
 
@@ -1620,8 +1589,7 @@
     };
 
     window.prevSlide = function() {
-      // From payment, back to slide 4 (slide 5 is not in either path)
-      if (current === 6) { current = 4; showSlide(4); return; }
+      if (current === 6) { current = 3; showSlide(3); return; }
       if (current > 1 && current <= TOTAL) {
         current--;
         showSlide(current);
@@ -1927,9 +1895,6 @@
       if (data.community === 'other') {
         data.community_other = document.getElementById('other-town').value.trim();
       }
-      var sel = document.querySelectorAll('#priority-choices .choice.is-selected');
-      data.priority = Array.from(sel).map(function(el){ return el.getAttribute('data-value'); });
-
       var payload = {
         row_id: rowId,
         first_name: data.first_name,
@@ -1938,7 +1903,6 @@
         email: data.email,
         updates: data.updates,
         founding_20: data.founding_20 ? 'Yes' : 'No',
-        priority: data.priority.join(', '),
         path: data.path,
         payment_status: data.stripe_tier ? 'authorized' : 'none',
         status: data.stripe_tier ? 'card_authorized' : 'lead_completed'
