@@ -8,7 +8,7 @@ The email form reuses the existing Google Apps Script lead endpoint and its no-c
 
 The script accepts acknowledgements with status=ok, status=success, or success=true. Verify the actual deployed Apps Script's acknowledgement and a row in the private Google Sheet before treating email delivery/storage as end-to-end verified. No synthetic email has been added to the production list during development.
 
-The original privacy policy remains linked so existing data practices and rights information are retained. Existing cards, payment authorizations, subscriptions, legacy direct URLs, and externally hosted services have not been modified. Original static and Next.js homepages are preserved byte-for-byte under archive/; see archive/README.md for restoration. The lower section reuses the original vision and founder story, explicitly presented as a concept.
+The original privacy policy remains linked so existing data practices and rights information are retained. Existing cards, payment authorizations, subscriptions, legacy direct URLs, and externally hosted services have not been modified. Original static and Next.js homepages are preserved byte-for-byte under archive/; see archive/README.md for restoration. The lower section reuses the original vision and bay concept. The founder story and lower disclaimer were removed at the owner’s request.
 
 Validation: `node --test scripts/interest.test.cjs` passes all 9 tests (payload, error handling, required validity, honeypot, and exact archive preservation). `npx tsc --noEmit` passes. The owner will perform the real signup test after deployment.
 
