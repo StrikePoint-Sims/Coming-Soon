@@ -1,5 +1,7 @@
 # StrikePoint Sims — Coming Soon + Waitlist
 
+> **Current status (October 29, 2026):** The homepage is now a project-pause update and email interest form for a possible 2027 business in the Colchester area. See [WEBSITE-STATUS.md](WEBSITE-STATUS.md). The previous homepage is preserved under [archive/](archive/README.md). The older setup notes below describe the retained original site.
+
 ## Files
 
 ```

@@ -1,10 +1,7 @@
 import type { Metadata } from 'next'
 import { Hanken_Grotesk, Playfair_Display } from 'next/font/google'
 import './globals.css'
-import { ChatWidget } from '@/components/chat/ChatWidget'
-import { PostHogProvider } from '@/components/PostHogProvider'
-import { PrivacyConsent } from '@/components/PrivacyConsent'
-import { Providers } from '@/components/Providers'
+import { SiteExperience } from '@/components/SiteExperience'
 import { Suspense } from 'react'
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -23,9 +20,9 @@ const playfairDisplay = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'StrikePoint Sims | Indoor Golf Simulator — Connecticut',
+  title: 'StrikePoint Sims | Exploring Possibilities for 2027',
   description:
-    'Private indoor golf simulator bays in Connecticut. Trackman technology. Memberships and walk-in sessions available.',
+    'StrikePoint Sims is paused while we explore options for 2027 in the Colchester, Connecticut area. No location or opening date is confirmed.',
   metadataBase: new URL(process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://strikepointsims.com'),
   openGraph: {
     siteName: 'StrikePoint Sims',
@@ -38,13 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={`${hankenGrotesk.variable} ${playfairDisplay.variable}`}>
         <Suspense>
-          <Providers>
-            <PostHogProvider>
-              {children}
-              <ChatWidget />
-              <PrivacyConsent />
-            </PostHogProvider>
-          </Providers>
+          <SiteExperience>{children}</SiteExperience>
         </Suspense>
       </body>
     </html>
