@@ -61,6 +61,6 @@ Preview: run `python -m http.server 4173 --bind 127.0.0.1` from the repository a
 
 ## Publication status
 
-All changes are committed locally. Publication was attempted, but GitHub rejected the push with HTTP 403: the connected account `mrock187` has read access but no push access to `StrikePoint-Sims/Coming-Soon`. Both the CLI and connected GitHub app reported `push: false`. Do not claim the site is live until a permitted account pushes these commits and the public homepage is verified.
+Repository access was restored on October 29, 2026 after the owner accepted the collaborator invitation for the connected account, mrock187. The initial HTTP 403 push failure is resolved.
 
-After access is restored, run `git push origin main` from this checkout, wait for GitHub Pages to publish, verify the public homepage and its assets, then have the owner test an email signup. Update this section with the actual deployed commit and outcome.
+This update is being published to the main branch for the existing GitHub Pages site. The complete prior website archive and restoration instructions are committed alongside the new homepage. Verify https://www.strikepointsims.com/ after GitHub Pages finishes deployment. The owner will perform the real signup test after publication; Google Sheet storage remains unverified until that test.
