@@ -1,153 +1,66 @@
-# StrikePoint Sims — Coming Soon + Waitlist
+# StrikePoint Sims — project pause and email interest site
 
-> **Current status (October 29, 2026):** The homepage is now a project-pause update and email interest form for a possible 2027 business in the Colchester area. See [WEBSITE-STATUS.md](WEBSITE-STATUS.md). The previous homepage is preserved under [archive/](archive/README.md). The older setup notes below describe the retained original site.
+Updated October 29, 2026. Read this file and WEBSITE-STATUS.md before changing the website in future chats.
 
-## Files
+## Current direction
 
-```
-├── index.html       # Landing page + SEO metadata + structured data
-├── join.html        # Founding 20 waitlist form
-├── style.css        # Landing page styles
-├── logo.png         # SP logo (used in form)
-├── robots.txt       # Crawl directives
-├── sitemap.xml      # XML sitemap
-├── background.jpg   # Hero background (add manually)
-├── og-image.jpg     # Social preview 1200×630 (add manually)
-└── README.md
-```
+The business is paused while the owner explores options for 2027. The Colchester, Connecticut area remains the target. There is no confirmed venue or opening date, and the project may not go ahead.
 
-## Quick Start
+The public homepage is an email capture and project update. Below the initial section, it describes the vision with the existing bay concept image and three fuller feature descriptions: Room for your game, More than a screen, and Golf around real life.
 
-1. Add `background.jpg` and `og-image.jpg` to root.
-2. Set up the Google Sheets backend (see below).
-3. Push to GitHub → enable Pages from `main` branch.
-4. Optional: add `CNAME` file with `www.strikepointsims.com`.
+Owner decisions to preserve:
 
----
+- Keep the first section and email form simple.
+- The lower heading is “What we are looking to build.”
+- Use direct, fuller feature copy. Avoid “the original plan” and similar retrospective language in the three descriptions.
+- Remove the founder/“Why it started” section and the separate lower disclaimer.
+- Do not promise a venue or opening date, sell memberships, collect cards, or link to payment/signup pages from the new homepage.
+- Leave existing commercial pages and payment functionality intact. The owner specifically requested unlinking them rather than disabling them.
+- Preserve the old site for possible future reuse.
 
-## Form Backend: Google Sheets (Free, Private, No Third Party)
+## Hosting and editing
 
-Submissions go directly from the form to a Google Sheet you own.
-Nothing touches GitHub. Nothing is public. Here's how to set it up:
+Repository: https://github.com/StrikePoint-Sims/Coming-Soon
 
-### Step 1 — Create the Sheet
+Public URL: https://www.strikepointsims.com/
 
-1. Go to [Google Sheets](https://sheets.google.com) and create a new spreadsheet.
-2. Name it something like "StrikePoint Waitlist."
-3. In Row 1, add these exact column headers:
+The live site is the root static website served by GitHub Pages behind Cloudflare. The CNAME file must remain intact. The repository also contains a Next.js implementation; it is not the current GitHub Pages entry point.
 
-| A | B | C | D | E | F | G | H |
-|---|---|---|---|---|---|---|---|
-| full_name | email | community | golf_level | priority | founding_20 | updates | submitted |
+- `index.html`: live static homepage, metadata, email form and vision section.
+- `interest.css` and `interest.js`: new homepage styles and email form behavior.
+- `src/app/page.tsx`: matching Next.js homepage. It contains the same first-party static markup.
+- `src/app/interest.css`, `public/interest.css`, `public/interest.js`: copies for Next.js. Keep them synchronized with the root files.
+- `src/components/SiteExperience.tsx`: suppresses the old chat/analytics/account experience on the holding homepage while retaining it elsewhere.
+- `sitemap.xml` and `llms.txt`: current homepage discovery and status. The sitemap no longer advertises old offers.
+- `robots.txt`: excludes the archive from crawling.
 
-### Step 2 — Create the Apps Script
+Do not use the stale desktop checkout as the current source. This chat used a fresh clone in `C:/Users/Mike Rockland/AppData/Local/Temp/Coming-Soon/site`; the desktop copy had older uncommitted work and was left untouched.
 
-1. In your spreadsheet, go to **Extensions → Apps Script**.
-2. Delete any existing code and paste the following:
+## Email capture
 
-```javascript
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
+The form reuses the existing Google Apps Script endpoint from the previous signup page, using only its no-card lead save path. It requires a valid email and explicit update consent and submits email plus source/consent/status metadata. No Stripe script or payment action is used by the homepage.
 
-  sheet.appendRow([
-    data.full_name || '',
-    data.email || '',
-    data.community || '',
-    data.golf_level || '',
-    data.priority || '',
-    data.founding_20 || '',
-    data.updates || '',
-    data.submitted || new Date().toISOString()
-  ]);
+A success message requires a readable JSON acknowledgement (`status: ok`, `status: success`, or `success: true`). Failures and timeouts retain the email and offer retry/contact details. The owner chose to do the real signup test after the site is live; production Google Sheet storage has not been verified during this work. See WEBSITE-STATUS.md for details.
 
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: 'ok' }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-```
+## Preserved website and restoration
 
-3. Click **Save** (name the project anything, e.g., "Waitlist Handler").
+`archive/website-before-pause.zip` is a complete 35-file snapshot of the previous root static website, including pages, styles, scripts, images, icons, CNAME, sitemap, and prior README. Every file was compared byte-for-byte with commit `b575dc21dc5a374e5529b9fd1842f37c2b1048ee`.
 
-### Step 3 — Deploy as Web App
+The prior homepage is also directly preserved as `archive/homepage-before-pause.html`; the Next.js homepage is `archive/next-homepage-before-pause.tsx.txt`. Old setup instructions are in `archive/setup-before-pause.md`. See archive/README.md for restoration steps. The baseline commit retains the complete repository, including the application source.
 
-1. Click **Deploy → New deployment**.
-2. Click the gear icon next to "Select type" and choose **Web app**.
-3. Set:
-   - **Description:** Waitlist form handler
-   - **Execute as:** Me
-   - **Who has access:** Anyone
-4. Click **Deploy**.
-5. Authorize when prompted (click through the "unverified app" warning — this is your own script).
-6. Copy the **Web app URL**. It looks like:
-   ```
-   https://script.google.com/macros/s/AKfycbx.../exec
-   ```
+To restore only a homepage, copy the archived version to its original path and review current offers and dates before publishing. For a complete static restoration, extract the ZIP into a separate directory first, review it, then copy the chosen files to the repository root. Keep the ZIP as the baseline backup.
 
-### Step 4 — Connect the Form
+## Validation
 
-1. Open `join.html`.
-2. Find `FORM_ENDPOINT` near the top of the `<script>` block.
-3. Replace `YOUR_GOOGLE_APPS_SCRIPT_URL` with your Web app URL:
-   ```javascript
-   var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbx.../exec';
-   ```
-4. Save and push.
+- `node --test scripts/interest.test.cjs`: 9 passing tests for safe email payloads, confirmed saves, failure/retry behavior, required form validity, honeypot and exact homepage backups.
+- `npx tsc --noEmit`: passed after implementation; subsequent changes only alter static copy.
+- Browser review: initial section and lower section inspected in the local preview.
+- `git diff --check`: clean after the final edits.
 
-### How It Works
+Preview: run `python -m http.server 4173 --bind 127.0.0.1` from the repository and visit http://127.0.0.1:4173/.
 
-- The form collects data client-side, then POSTs JSON to your Apps Script.
-- The script appends a row to your Google Sheet.
-- The request uses `mode: 'no-cors'` so it works from any static host (GitHub Pages included).
-- No data is stored in the GitHub repo. The sheet is private to your Google account.
-- You can share the sheet with others, set up email notifications, or connect it to other tools.
+## Publication status
 
-### Testing
+All changes are committed locally. Publication was attempted, but GitHub rejected the push with HTTP 403: the connected account `mrock187` has read access but no push access to `StrikePoint-Sims/Coming-Soon`. Both the CLI and connected GitHub app reported `push: false`. Do not claim the site is live until a permitted account pushes these commits and the public homepage is verified.
 
-After deploying, open `join.html` locally (or on GitHub Pages), fill out the form,
-and check your Google Sheet. A new row should appear within a few seconds.
-
-If rows aren't appearing:
-- Make sure the Web app URL is correct (no trailing spaces).
-- Make sure "Who has access" is set to "Anyone."
-- Check the Apps Script execution log: **Extensions → Apps Script → Executions**.
-
----
-
-## Data Collected Per Submission
-
-| Column | Example Values |
-|--------|---------------|
-| full_name | Mike Rockland |
-| email | mike@example.com |
-| community | Colchester / Hebron / ... / (typed town for "Somewhere else") |
-| golf_level | The Competitor / The Regular / The Social Player / The Newcomer |
-| priority | Accuracy of the shot data / Being able to play on my own schedule / Having somewhere to play year-round / Access to a wide variety of courses |
-| founding_20 | Yes / No |
-| updates | Yes, keep me in the loop / Just let me know when you're open |
-| submitted | 2026-03-15T14:32:00.000Z |
-
----
-
-## SEO (index.html)
-
-- `<title>` and `<meta description>` targeting local golf simulator queries
-- Geo meta tags (region, placename, position, ICBM)
-- Open Graph + Twitter Card with image dimensions
-- Schema.org SportsActivityLocation (15 towns in areaServed)
-- Schema.org FAQPage (7 Q&A pairs, rich snippet eligible)
-- Schema.org WebSite
-- robots.txt + sitemap.xml
-
-## Post-Deploy
-
-- [ ] Submit sitemap to Google Search Console
-- [ ] Submit to Bing Webmaster Tools
-- [ ] List on GolfSimFind.com and GolfSimMap.com
-
-**Once lease is signed:**
-- [ ] Create Google Business Profile (primary: "Golf Simulator Center")
-- [ ] Update schema address with street + postal code
-- [ ] Create Apple Business Connect listing
-- [ ] Register on local chamber directories
-- [ ] Solicit Google reviews from founding members
+After access is restored, run `git push origin main` from this checkout, wait for GitHub Pages to publish, verify the public homepage and its assets, then have the owner test an email signup. Update this section with the actual deployed commit and outcome.
